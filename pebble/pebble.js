@@ -1,2 +1,598 @@
-//THIS IS OBFUSCATED SO DONT EVEN THINK ABOUT IT
-var _0x3f500a=_0x246b;function _0x36c5(){var _0x530af8=['alertDisclaimer','color','check_mute','chatter-97e8c.appspot.com','getItem','users/god','profile','clear','SpaceSeizure/spaceSeizure.html','send_server_message','username','send_message','member','active','rofl','click','316995BpfoOi','marginTop','members','profile-img','onclick','setupGame','2064452MjAwIm','password-login','_blank','Login','setAttribute','button','value','sos','src','380502BYNkYq','lol','\x20has\x20joined\x20the\x20chat','send-message','refresh_chat','43145fVXvOG','[SERVER]','val','addEventListener','class','createElement','ref','Space\x20Seizure','name','register','getElementById','Back','values','chats/','img','exists','../images/lunarlunacy.png','sidebar','TERMS\x20OF\x20SERVICE:\x0aPlease\x20note\x20that\x20these\x20Terms\x20of\x20Service\x20will\x20hold\x20until\x20...\x20forever.\x0a1.\x20By\x20clicking\x20the\x20button\x20below,\x20or\x20exiting\x20out\x20of\x20this\x20alert\x20in\x20any\x20way,\x20shape,\x20or\x20form,\x20but\x20continuing\x20to\x20use\x20this\x20chat\x20room,\x20you,\x20the\x20user,\x20are\x20agreeing\x20to\x20the\x20following\x20terms.\x0a\x0a2.\x20I,\x20the\x20creator\x20of\x20this\x20chat\x20room,\x20or\x20anybody\x20who\x20I\x20cooperated\x20with\x20to\x20create\x20this\x20chatroom,\x20are\x20not\x20responsible\x20for\x20anything\x20that\x20occurs\x20in\x20this\x20chatroom,\x20or\x20its\x20uses.\x20This\x20includes\x20anything\x20that\x20goes\x20against\x20these\x20terms.\x0a\x0a3.\x20No\x20hate\x20speech\x20or\x20slurs.\x20Any\x20hate\x20speech\x20or\x20slurs\x20will\x20not\x20be\x20accepted\x20in\x20this\x20chatroom.\x20The\x20consequences\x20include\x20being\x20banned\x20(for\x20an\x20indefinite\x20amount\x20of\x20time),\x20and\x20notifying\x20the\x20police\x20if\x20necessary.\x0a\x0a4.\x20No\x20illegal\x20activites.\x20Planning\x20or\x20carrying\x20out\x20illegal\x20activities,\x20including\x20world\x20domination,\x20is\x20not\x20permitted\x20in\x20this\x20chatroom.\x20If\x20this\x20does\x20happen,\x20the\x20police\x20WILL\x20be\x20notified.\x0a\x0a5.\x20Hacking\x20is\x20not\x20permitted.\x20If\x20you\x20are\x20caught\x20hacking\x20this\x20chatroom,\x20then\x20you\x20will\x20be\x20be\x20banned\x20(the\x20length\x20of\x20time\x20varies\x20depending\x20on\x20the\x20severity).\x0a\x0a6.\x20No\x20doxxing.\x20Doxers\x20will\x20be\x20evicted.\x0a\x0a7.\x20As\x20long\x20as\x20you,\x20the\x20user,\x20have\x20seen\x20these\x20Terms,\x20you\x20may\x20not\x20claim\x20ignorance\x20of\x20these\x20terms\x20for\x20your\x20actions.\x0a\x0aP.S.\x20These\x20terms\x20apply\x20to\x20all\x20of\x20the\x20webpages\x20under\x20\x22ssw.sinsaywu.com\x22,\x20or\x20any\x20other\x20website\x20that\x20I\x20own.\x20Just\x20change\x20\x22chatroom\x22\x20to\x20\x22website\x22','location','5px','\x20muted\x20themselves!','numChildren','div','\x20@(','get_name','innerHTML','readFile','open','\x20[Muted]','281722915171','login','set','username-login','login-button','http://ssw.sinsaywu.com','display_name','1:281722915171:web:3b136d8a0b79389f2f6b56','muted','length','message-text','username-register','god','filter','!mute\x20','keydown','text-box','block','setItem','2833888zPHGXo','name-register','845348vLBkGw','message_','once','35992DMtMSh','main','password-register','Muted','Register','display-register','Green','replace','scrollHeight','onload','message','substring','disabled','downbar','update','scrollTop','toLowerCase','push','index','style','G-4CGJ1JFX58','display_members','database','then','textarea','https://classroom.google.com','none','update_name','appendChild','chatter-97e8c.firebaseapp.com','forEach','initializeApp','check_creds','placeholder','2yLBZBT','sidebar-button','activeElement','78PUUEPp','users/','reload','display','Credit\x20to\x20Mr.\x20BungoChungo\x20for\x20cooperating\x20with\x20me\x20(at\x20least\x20for\x20a\x20short\x20time)\x20on\x20this\x20project.\x0aCredit\x20to\x20Mr.\x20WagnerRizzer\x20for\x20the\x20logo\x20of\x20this\x20site,\x20which\x20originated\x20from\x20a\x20school\x20project.','password','key','Did\x20not\x20work!','setup'];_0x36c5=function(){return _0x530af8;};return _0x36c5();}function _0x246b(_0x2f43b6,_0x15a4ae){var _0x2f2be4=_0x36c5();return _0x246b=function(_0x24b2f2,_0x1c503a){_0x24b2f2=_0x24b2f2-(-0x2*0x839+0x1503+0xb*-0x4c);var _0x251210=_0x2f2be4[_0x24b2f2];return _0x251210;},_0x246b(_0x2f43b6,_0x15a4ae);}(function(_0x499578,_0x9cff16){var _0x410fe3=_0x246b,_0x551a46=_0x499578();while(!![]){try{var _0x3d4a6b=-parseInt(_0x410fe3(0x197))/(0x8e2+0x875*0x4+-0x2ab5)+-parseInt(_0x410fe3(0x1b9))/(-0x1*-0x2446+-0x18bf+-0xb85)*(-parseInt(_0x410fe3(0x14d))/(-0x536+0x46f+0x65*0x2))+parseInt(_0x410fe3(0x153))/(0x7*0x19c+-0x2139+-0x465*-0x5)+-parseInt(_0x410fe3(0x161))/(0x1e77+0x1f49+-0x1*0x3dbb)*(parseInt(_0x410fe3(0x1bc))/(0x2c*-0x97+-0x2420+-0x1*-0x3e1a))+parseInt(_0x410fe3(0x194))/(-0x212a*-0x1+-0x1d30+-0x3f3)+-parseInt(_0x410fe3(0x192))/(0xab8+0xb03+-0x15b3)+parseInt(_0x410fe3(0x15c))/(0x1cef+0x111f+-0xe7*0x33);if(_0x3d4a6b===_0x9cff16)break;else _0x551a46['push'](_0x551a46['shift']());}catch(_0x444c9a){_0x551a46['push'](_0x551a46['shift']());}}}(_0x36c5,0x1*-0x3f53b+0x1*-0x6905d+0xed4c7),window[_0x3f500a(0x1a0)]=function(){var _0x1245db=_0x3f500a;try{const _0x176f0a={'apiKey':'AIzaSyDOAj76E00Rg8Qyc5DQndWXHtCy2umC6vA','authDomain':_0x1245db(0x1b4),'projectId':'chatter-97e8c','storageBucket':_0x1245db(0x1c8),'messagingSenderId':_0x1245db(0x17f),'appId':_0x1245db(0x186),'measurementId':_0x1245db(0x1ab)};firebase[_0x1245db(0x1b6)](_0x176f0a);var _0x24cdff=firebase[_0x1245db(0x1ad)](),_0x3819ed=_0x1245db(0x1c0),_0x5c7013=_0x1245db(0x173);class _0x2a4407{[_0x1245db(0x160)](){var _0x5ccbad=_0x1245db,_0x5d067e=document[_0x5ccbad(0x16b)](_0x5ccbad(0x1af));_0x24cdff[_0x5ccbad(0x167)]('chats/')['on'](_0x5ccbad(0x159),function(_0x5a265e){var _0x5d819d=_0x5ccbad;_0x5d067e['innerHTML']='';if(_0x5a265e[_0x5d819d(0x177)]()==-0x901+0xfe0*-0x1+0x18e1)return;var _0x215f23=Object[_0x5d819d(0x16d)](_0x5a265e[_0x5d819d(0x163)]()),_0x1e3022=[],_0x10f717=[],_0x3672a3=[];for(var _0x457aa6,_0x457aa6=-0x1a19*0x1+-0x15c8+0x2fe1;_0x457aa6<_0x215f23[_0x5d819d(0x188)];_0x457aa6++){_0x1e3022[_0x5d819d(0x1a8)](_0x457aa6+(-0x1ffd+-0x158f+0x358d)),_0x10f717[_0x5d819d(0x1a8)]([_0x215f23[_0x457aa6],_0x215f23[_0x457aa6][_0x5d819d(0x1a9)]]);}_0x1e3022['forEach'](function(_0x19f908){var _0x2dbb99=_0x5d819d,_0x7932c=![];_0x10f717=_0x10f717[_0x2dbb99(0x18c)](function(_0x5e1e84){var _0x5143a8=_0x2dbb99;return!_0x7932c&&_0x5e1e84[0x18bf+-0x1c*-0xbd+0x1*-0x2d6a]==_0x19f908?(_0x3672a3[_0x5143a8(0x1a8)](_0x5e1e84[-0x746+-0x17*0xd9+0x7*0x3d3]),_0x7932c=!![],![]):!![];});}),_0x3672a3[_0x5d819d(0x1b5)](function(_0x3e7932){var _0x1b1c45=_0x5d819d,_0x2c53b6=_0x3e7932['display_name'],_0x4af231=_0x3e7932[_0x1b1c45(0x1a1)],_0x548ca6=document['createElement'](_0x1b1c45(0x178));_0x548ca6[_0x1b1c45(0x157)](_0x1b1c45(0x165),'message'),_0x5d067e[_0x1b1c45(0x1b3)](_0x548ca6);if(_0x3e7932[_0x1b1c45(0x169)]=='[SERVER]'){var _0x510e7b=document['createElement'](_0x1b1c45(0x16f));_0x510e7b[_0x1b1c45(0x15b)]='../images/meteorite.png',_0x510e7b[_0x1b1c45(0x157)]('class',_0x1b1c45(0x150)),_0x548ca6[_0x1b1c45(0x1b3)](_0x510e7b);}var _0x91651a=document[_0x1b1c45(0x166)]('div');_0x91651a['setAttribute']('class',_0x1b1c45(0x1cf)),_0x91651a[_0x1b1c45(0x164)](_0x1b1c45(0x1d4),function(_0x39d1b6){var _0x4e9333=_0x1b1c45;_0x91651a[_0x4e9333(0x17b)]=_0x2c53b6+_0x4e9333(0x179)+_0x3e7932[_0x4e9333(0x169)]+')';}),_0x91651a[_0x1b1c45(0x17b)]=_0x2c53b6,_0x91651a[_0x1b1c45(0x1aa)]['fontWeight']='bold';_0x3e7932[_0x1b1c45(0x169)]==_0x1b1c45(0x162)&&(_0x91651a[_0x1b1c45(0x1aa)]['color']='Yellow');_0x548ca6[_0x1b1c45(0x1b3)](_0x91651a);var _0x1debe2=document['createElement']('div');_0x1debe2[_0x1b1c45(0x157)](_0x1b1c45(0x165),_0x1b1c45(0x189)),_0x1debe2['innerHTML']=_0x4af231,_0x548ca6[_0x1b1c45(0x1b3)](_0x1debe2);}),_0x5d067e[_0x5d819d(0x1a6)]=_0x5d067e[_0x5d819d(0x19f)];});var _0x27d298=this[_0x5ccbad(0x17a)]();_0x24cdff[_0x5ccbad(0x167)](_0x5ccbad(0x1bd)+_0x27d298)[_0x5ccbad(0x1a5)]({'active':!![]});}[_0x1245db(0x1ac)](){var _0x67da25=_0x1245db,_0x23ed5a=document[_0x67da25(0x16b)](_0x67da25(0x14f));_0x24cdff[_0x67da25(0x167)]('users/')['on'](_0x67da25(0x159),function(_0x4f287f){var _0x46b100=_0x67da25;_0x23ed5a[_0x46b100(0x17b)]='';if(_0x4f287f['numChildren']()==0x59*-0x9+0x19+0x308)return;var _0x5dcb90=Object[_0x46b100(0x16d)](_0x4f287f[_0x46b100(0x163)]()),_0x25a35a=[];for(var _0x385034,_0x385034=0x12b7+-0x99*-0x41+-0x266*0x18;_0x385034<_0x5dcb90['length'];_0x385034++){_0x25a35a[_0x46b100(0x1a8)]([_0x5dcb90[_0x385034][_0x46b100(0x185)],_0x5dcb90[_0x385034][_0x46b100(0x187)],_0x5dcb90[_0x385034]['username'],_0x5dcb90[_0x385034][_0x46b100(0x1d2)]]);}_0x25a35a[_0x46b100(0x1b5)](function(_0x435752){var _0x144ac4=_0x46b100,_0x4fc727=document[_0x144ac4(0x166)](_0x144ac4(0x178));_0x4fc727[_0x144ac4(0x157)](_0x144ac4(0x165),_0x144ac4(0x1d1)),_0x4fc727[_0x144ac4(0x17b)]=_0x435752[0x5d7*-0x5+-0x89*0x9+0x2204];var _0x364f07=_0x4fc727['innerHTML'];_0x435752[0x2*0x1081+-0x38b*-0x3+-0x2ba0]&&(_0x4fc727[_0x144ac4(0x1aa)][_0x144ac4(0x1c6)]=_0x144ac4(0x19d));_0x4fc727[_0x144ac4(0x164)](_0x144ac4(0x1d4),function(_0x3b3e83){var _0x8c1f6b=_0x144ac4;_0x4fc727[_0x8c1f6b(0x17b)]=_0x364f07+_0x8c1f6b(0x179)+_0x435752[0x2a*0x6+-0x1be4+0x1aea]+')';if(_0x435752[0x13af+-0x1dda+0xa2c]){var _0x203de9=document[_0x8c1f6b(0x166)]('span');_0x203de9[_0x8c1f6b(0x1aa)][_0x8c1f6b(0x1c6)]='Red',_0x203de9[_0x8c1f6b(0x17b)]=_0x8c1f6b(0x17e),_0x4fc727[_0x8c1f6b(0x1b3)](_0x203de9);}});if(_0x435752[-0x1*0x1105+0x90d+0x7f9]){var _0x2f6025=document[_0x144ac4(0x166)]('span');_0x2f6025['style'][_0x144ac4(0x1c6)]='Red',_0x2f6025[_0x144ac4(0x17b)]=_0x144ac4(0x17e),_0x4fc727[_0x144ac4(0x1b3)](_0x2f6025);}_0x23ed5a['appendChild'](_0x4fc727);}),_0x23ed5a[_0x46b100(0x1a6)]=_0x23ed5a[_0x46b100(0x19f)];});}[_0x1245db(0x1ce)](_0x4c1166){var _0x20740c=_0x1245db;try{var _0x51f484=document[_0x20740c(0x16b)]('textarea'),_0x4c1166=_0x4c1166,_0x2b7738=_0x20740c(0x162);if(_0x4c1166==''||_0x2b7738=='')return;else{if(_0x4c1166==_0x20740c(0x15a)){window[_0x20740c(0x174)][_0x20740c(0x19e)]('https://classroom.google.com');return;}else{if(_0x4c1166==_0x20740c(0x1d3))_0x4c1166='🤣';else{if(_0x4c1166=='lol')_0x4c1166='😂';else(_0x4c1166=='k'||_0x4c1166=='ok'||_0x4c1166=='kk'||_0x4c1166=='okay')&&(_0x4c1166='👌');}_0x24cdff[_0x20740c(0x167)](_0x20740c(0x16e))[_0x20740c(0x196)](_0x20740c(0x159),function(_0x5a339f){var _0x2ca7c8=_0x20740c,_0x4c4982=parseFloat(_0x5a339f[_0x2ca7c8(0x177)]())+(0x19*0x118+0x22a5+-0x3dfc);_0x24cdff[_0x2ca7c8(0x167)](_0x2ca7c8(0x16e)+(_0x2ca7c8(0x195)+_0x4c4982))[_0x2ca7c8(0x181)]({'name':_0x2ca7c8(0x162),'message':_0x4c1166,'display_name':'[SERVER]','index':_0x4c4982})[_0x2ca7c8(0x1ae)](this[_0x2ca7c8(0x160)]());});}}}catch(_0xe1e1b2){alert(_0xe1e1b2);}}[_0x1245db(0x1b7)](){var _0x4455f9=_0x1245db,_0x152b3b=localStorage[_0x4455f9(0x1c9)]('username'),_0x4107bc=localStorage[_0x4455f9(0x1c9)](_0x4455f9(0x1c1));_0x24cdff['ref'](_0x4455f9(0x1bd)+_0x152b3b)[_0x4455f9(0x196)]('value',function(_0x128a29){var _0x31d16f=_0x4455f9;if(_0x128a29['exists']()==!![]){var _0x59f634=_0x128a29['val']();if(_0x59f634['password']==_0x4107bc&&_0x59f634[_0x31d16f(0x1cf)]!='god')return;else{var _0x235590=document[_0x31d16f(0x16b)](_0x31d16f(0x198)),_0x39b7b3=document[_0x31d16f(0x16b)](_0x31d16f(0x180));_0x235590[_0x31d16f(0x1aa)][_0x31d16f(0x1bf)]=_0x31d16f(0x1b1),_0x39b7b3[_0x31d16f(0x1aa)][_0x31d16f(0x1bf)]=_0x31d16f(0x190),localStorage[_0x31d16f(0x1cc)]();}}});}['send_message'](){var _0x80b712=_0x1245db;try{var _0x456134=document[_0x80b712(0x16b)](_0x80b712(0x1af)),_0x5e1a82=document['getElementById'](_0x80b712(0x18f))[_0x80b712(0x159)];this[_0x80b712(0x1b7)];var _0x118057=localStorage['getItem'](_0x80b712(0x1cf));if(_0x118057==null)return;_0x118057==_0x80b712(0x18b)&&(localStorage[_0x80b712(0x1cc)](),window[_0x80b712(0x174)][_0x80b712(0x1be)]());_0x24cdff[_0x80b712(0x167)](_0x80b712(0x1bd)+_0x118057)[_0x80b712(0x196)]('value',function(_0x13bc77){var _0x493f90=_0x80b712;if(_0x13bc77[_0x493f90(0x187)])return;});if(_0x5e1a82==''||_0x118057=='')return;else{if(_0x5e1a82==_0x80b712(0x15a)){window[_0x80b712(0x174)][_0x80b712(0x19e)](_0x80b712(0x1b0));return;}else{if(_0x5e1a82['startsWith'](_0x80b712(0x18d))){var _0x3f7d23=_0x5e1a82[_0x80b712(0x1a2)](0x1bb*-0x2+0x11b2+0x6b*-0x22)[_0x80b712(0x1a7)]();if(_0x3f7d23==_0x80b712(0x18b)){alert('Rebound!'),_0x24cdff['ref'](_0x80b712(0x1bd)+_0x118057)['on'](_0x80b712(0x159),function(_0x2e41d1){var _0x474731=_0x80b712;_0x24cdff[_0x474731(0x167)](_0x474731(0x1bd)+_0x118057)[_0x474731(0x1a5)]({'muted':!![]}),window['location'][_0x474731(0x1be)]();}),_0x24cdff['ref']('chats/')[_0x80b712(0x196)](_0x80b712(0x159),function(_0x8bab){var _0x3d427b=_0x80b712,_0x540fe7=parseFloat(_0x8bab[_0x3d427b(0x177)]())+(-0xd*0x113+0x2621+-0x1829);_0x24cdff[_0x3d427b(0x167)](_0x3d427b(0x16e)+(_0x3d427b(0x195)+_0x540fe7))[_0x3d427b(0x181)]({'name':'[SERVER]','message':_0x118057+_0x3d427b(0x176),'display_name':_0x3d427b(0x162),'index':_0x540fe7})[_0x3d427b(0x1ae)](function(){var _0x2dba42=_0x3d427b;this[_0x2dba42(0x160)]();});});return;}}}}if(_0x5e1a82==_0x80b712(0x1d3))_0x5e1a82='🤣';else{if(_0x5e1a82==_0x80b712(0x15d))_0x5e1a82='😂';else(_0x5e1a82=='k'||_0x5e1a82=='ok'||_0x5e1a82=='kk'||_0x5e1a82=='okay')&&(_0x5e1a82='👌');}_0x24cdff['ref']('users/'+_0x118057)[_0x80b712(0x196)](_0x80b712(0x159),function(_0x148c25){var _0x48ca25=_0x80b712,_0xdfd359=_0x148c25[_0x48ca25(0x163)](),_0x53cc85=_0xdfd359[_0x48ca25(0x185)];document[_0x48ca25(0x16b)](_0x48ca25(0x18f))[_0x48ca25(0x159)]='',_0x24cdff['ref']('chats/')[_0x48ca25(0x196)](_0x48ca25(0x159),function(_0x34ac66){var _0x4690ec=_0x48ca25,_0x211c8e=parseFloat(_0x34ac66[_0x4690ec(0x177)]())+(0x8a1*-0x2+-0x4*-0x1cf+0x11*0x97);_0x24cdff[_0x4690ec(0x167)](_0x4690ec(0x16e)+(_0x4690ec(0x195)+_0x211c8e))[_0x4690ec(0x181)]({'name':_0x118057,'message':_0x5e1a82,'display_name':_0x53cc85,'index':_0x211c8e})[_0x4690ec(0x1ae)](function(){var _0x4ea000=_0x4690ec;this[_0x4ea000(0x160)]();});});});}catch(_0x167eba){alert(_0x167eba);}}[_0x1245db(0x1c5)](){var _0x5392a2=_0x1245db;const _0x5a2213=require('fs');_0x5a2213[_0x5392a2(0x17c)]('pebbleCredits.txt',function(_0x4a8e51,_0x5ab750){alert(_0x5ab750);});}[_0x1245db(0x17a)](){var _0x1a9b9b=_0x1245db;return localStorage['getItem'](_0x1a9b9b(0x1cf))!=null?localStorage[_0x1a9b9b(0x1c9)](_0x1a9b9b(0x1cf)):null;}['update_name'](){var _0x49681e=_0x1245db,_0x182a96=localStorage[_0x49681e(0x1c9)](_0x49681e(0x1cf));_0x24cdff['ref'](_0x49681e(0x1bd)+_0x182a96)[_0x49681e(0x196)](_0x49681e(0x159),function(_0xb690de){var _0xe7beb9=_0x49681e,_0x14190e=_0xb690de[_0xe7beb9(0x163)](),_0x2d5043=_0x14190e['display_name'];localStorage[_0xe7beb9(0x191)]('display',_0x2d5043),document['getElementById']('userdisplay')[_0xe7beb9(0x17b)]=_0x2d5043+('\x20(@'+_0x182a96+')');_0x182a96==_0xe7beb9(0x18b)&&(localStorage[_0xe7beb9(0x1cc)](),window[_0xe7beb9(0x174)]['reload']());var _0x2f26c2=document['getElementById'](_0xe7beb9(0x1cb)),_0xea4141=document[_0xe7beb9(0x166)](_0xe7beb9(0x158));_0xea4141[_0xe7beb9(0x151)]=_0x41d169,_0xea4141[_0xe7beb9(0x17b)]='Logout',_0xea4141[_0xe7beb9(0x157)](_0xe7beb9(0x165),'profile-button'),_0x2f26c2[_0xe7beb9(0x1b3)](_0xea4141);function _0x41d169(){var _0x406b92=_0xe7beb9;localStorage[_0x406b92(0x1cc)](),window[_0x406b92(0x174)][_0x406b92(0x1be)](),_0x24cdff[_0x406b92(0x167)](_0x406b92(0x1bd)+this[_0x406b92(0x17a)]())['update']({'active':![]}),this[_0x406b92(0x1ac)]();}});}[_0x1245db(0x180)](){var _0x3e2fea=_0x1245db,_0x3112e=document[_0x3e2fea(0x16b)](_0x3e2fea(0x182))[_0x3e2fea(0x159)];_0x3112e=_0x3112e[_0x3e2fea(0x1a7)]();var _0x2e57b1=document[_0x3e2fea(0x16b)](_0x3e2fea(0x154))[_0x3e2fea(0x159)];if(_0x2e57b1=='')return;if(_0x3112e==_0x3e2fea(0x18b))return;_0x24cdff[_0x3e2fea(0x167)](_0x3e2fea(0x1bd)+_0x3112e)[_0x3e2fea(0x196)](_0x3e2fea(0x159),function(_0x51cd55){var _0x21b450=_0x3e2fea;if(_0x51cd55[_0x21b450(0x170)]()==!![]){var _0x158333=_0x51cd55['val']();if(_0x158333[_0x21b450(0x1c1)]==_0x2e57b1){var _0x297758=document[_0x21b450(0x16b)](_0x21b450(0x198)),_0x1fc0a5=document['getElementById'](_0x21b450(0x180));_0x297758[_0x21b450(0x1aa)][_0x21b450(0x1bf)]=_0x21b450(0x190),_0x1fc0a5[_0x21b450(0x1aa)][_0x21b450(0x1bf)]=_0x21b450(0x1b1),localStorage['setItem'](_0x21b450(0x1cf),_0x3112e),localStorage[_0x21b450(0x191)](_0x21b450(0x1c1),_0x2e57b1),localStorage[_0x21b450(0x191)](_0x21b450(0x1bf),_0x158333[_0x21b450(0x185)]),localStorage[_0x21b450(0x191)]('planets',_0x158333['planets']),alert(_0x3819ed),alert(_0x5c7013),window[_0x21b450(0x174)][_0x21b450(0x1be)]();}}});}[_0x1245db(0x16a)](){var _0x490ceb=_0x1245db,_0x1ae25f=document['getElementById'](_0x490ceb(0x18a))[_0x490ceb(0x159)];_0x1ae25f=_0x1ae25f[_0x490ceb(0x1a7)]();var _0x487070=document[_0x490ceb(0x16b)](_0x490ceb(0x199))[_0x490ceb(0x159)],_0x693dbb=document['getElementById'](_0x490ceb(0x19c))[_0x490ceb(0x159)],_0x20f022=document[_0x490ceb(0x16b)](_0x490ceb(0x193))['value'];if(_0x1ae25f==''||_0x487070==''||_0x693dbb==''||_0x1ae25f==_0x490ceb(0x162)||_0x20f022==''){alert(_0x490ceb(0x1c3));return;}var _0x2176bf=document[_0x490ceb(0x16b)](_0x490ceb(0x198)),_0x3fd9a2=document[_0x490ceb(0x16b)](_0x490ceb(0x180)),_0xc690f2=document[_0x490ceb(0x16b)](_0x490ceb(0x16a));_0x24cdff[_0x490ceb(0x167)]('users/'+_0x1ae25f)['once']('value',function(_0x2ea477){var _0x5d0573=_0x490ceb;_0x2ea477[_0x5d0573(0x170)]()==!![]?alert('Username\x20already\x20exists!'):_0x24cdff[_0x5d0573(0x167)](_0x5d0573(0x1bd)+_0x1ae25f)[_0x5d0573(0x181)]({'display_name':_0x693dbb,'password':_0x487070,'username':_0x1ae25f,'name':_0x20f022,'muted':!![],'active':!![]})[_0x5d0573(0x1ae)](function(){var _0x253725=_0x5d0573;_0x2176bf['style']['display']='block',_0x3fd9a2['style'][_0x253725(0x1bf)]=_0x253725(0x1b1),_0xc690f2[_0x253725(0x1aa)]['display']=_0x253725(0x1b1),localStorage[_0x253725(0x191)](_0x253725(0x1cf),_0x1ae25f),localStorage[_0x253725(0x191)](_0x253725(0x1c1),_0x487070),localStorage[_0x253725(0x191)](_0x253725(0x1bf),_0x693dbb),alert(_0x3819ed),alert(_0x5c7013),window['location']['reload']();});});}[_0x1245db(0x1c7)](){var _0x2b52d3=_0x1245db;_0x24cdff['ref']('users/god')['on'](_0x2b52d3(0x159),function(_0x3a82f9){var _0x57a2f9=_0x2b52d3;_0x24cdff['ref'](_0x57a2f9(0x1ca))[_0x57a2f9(0x1a5)]({'muted':![]});}),_0x24cdff[_0x2b52d3(0x167)](_0x2b52d3(0x1bd)+localStorage['getItem'](_0x2b52d3(0x1cf)))['on'](_0x2b52d3(0x159),function(_0x3398c0){var _0x18aa84=_0x2b52d3,_0x51a1ad=_0x3398c0[_0x18aa84(0x163)]();_0x51a1ad[_0x18aa84(0x187)]?(document[_0x18aa84(0x16b)]('text-box')[_0x18aa84(0x1a3)]=!![],document[_0x18aa84(0x16b)](_0x18aa84(0x18f))[_0x18aa84(0x1b8)]=_0x18aa84(0x19a)):(document[_0x18aa84(0x16b)]('text-box')[_0x18aa84(0x1a3)]=![],document['getElementById']('text-box')[_0x18aa84(0x1b8)]='Message');});}[_0x1245db(0x1c4)](){var _0x4ba8b6=_0x1245db;this[_0x4ba8b6(0x1b7)](),this[_0x4ba8b6(0x1b2)]();var _0x4cd5ab=document['createElement'](_0x4ba8b6(0x158));_0x4cd5ab[_0x4ba8b6(0x157)](_0x4ba8b6(0x165),_0x4ba8b6(0x15f)),_0x4cd5ab[_0x4ba8b6(0x17b)]='➤',_0x4cd5ab[_0x4ba8b6(0x151)]=this[_0x4ba8b6(0x1d0)];var _0x462905=document[_0x4ba8b6(0x166)](_0x4ba8b6(0x158));_0x462905[_0x4ba8b6(0x157)]('class',_0x4ba8b6(0x1ba)),_0x462905['title']='Return\x20to\x20HomePage';var _0x243fb6=document['createElement'](_0x4ba8b6(0x16f));_0x243fb6[_0x4ba8b6(0x15b)]=_0x4ba8b6(0x171),_0x243fb6[_0x4ba8b6(0x157)](_0x4ba8b6(0x165),'sidebar-logo'),_0x462905[_0x4ba8b6(0x1b3)](_0x243fb6),_0x462905[_0x4ba8b6(0x164)]('click',function(_0x568866){var _0x5bfa58=_0x4ba8b6;window[_0x5bfa58(0x174)][_0x5bfa58(0x19e)](_0x5bfa58(0x184));}),document['getElementById'](_0x4ba8b6(0x172))[_0x4ba8b6(0x1b3)](_0x462905),document[_0x4ba8b6(0x16b)](_0x4ba8b6(0x172))['appendChild'](document[_0x4ba8b6(0x166)]('hr'));var _0x2d66c3=document[_0x4ba8b6(0x166)](_0x4ba8b6(0x158));_0x2d66c3[_0x4ba8b6(0x157)](_0x4ba8b6(0x165),_0x4ba8b6(0x1ba)),_0x2d66c3['title']=_0x4ba8b6(0x168);var _0x5d356c=document[_0x4ba8b6(0x166)](_0x4ba8b6(0x16f));_0x5d356c[_0x4ba8b6(0x15b)]='../images/spaceseizuremain.png',_0x5d356c[_0x4ba8b6(0x157)](_0x4ba8b6(0x165),'sidebar-logo'),_0x2d66c3[_0x4ba8b6(0x1b3)](_0x5d356c),_0x2d66c3[_0x4ba8b6(0x164)](_0x4ba8b6(0x1d4),function(_0xef65ab){var _0x4a8976=_0x4ba8b6;window[_0x4a8976(0x17d)](_0x4a8976(0x1cd),_0x4a8976(0x155));}),_0x2d66c3[_0x4ba8b6(0x151)]=this[_0x4ba8b6(0x152)],document[_0x4ba8b6(0x16b)](_0x4ba8b6(0x172))[_0x4ba8b6(0x1b3)](_0x2d66c3),document[_0x4ba8b6(0x16b)](_0x4ba8b6(0x1a4))[_0x4ba8b6(0x1b3)](_0x4cd5ab),document[_0x4ba8b6(0x164)](_0x4ba8b6(0x18e),_0x154a6d=>{var _0x305b65=_0x4ba8b6;const _0x1567b3=_0x154a6d[_0x305b65(0x1c2)]['toLowerCase']();if(document[_0x305b65(0x16b)](_0x305b65(0x18f))==document[_0x305b65(0x1bb)])_0x1567b3=='enter'&&this[_0x305b65(0x1d0)]();else document['getElementById'](_0x305b65(0x154))==document[_0x305b65(0x1bb)]&&(_0x1567b3=='enter'&&this[_0x305b65(0x180)]());}),this[_0x4ba8b6(0x160)](),this[_0x4ba8b6(0x1ac)](),this[_0x4ba8b6(0x1c7)]();var _0x5b9e29=document[_0x4ba8b6(0x16b)]('main'),_0x40adcd=document[_0x4ba8b6(0x16b)]('login');this[_0x4ba8b6(0x17a)]()!=null?(_0x5b9e29[_0x4ba8b6(0x1aa)][_0x4ba8b6(0x1bf)]='block',_0x40adcd['style']['display']='none',this['send_server_message'](localStorage[_0x4ba8b6(0x1c9)](_0x4ba8b6(0x1bf))+_0x4ba8b6(0x15e))):(_0x5b9e29[_0x4ba8b6(0x1aa)][_0x4ba8b6(0x1bf)]=_0x4ba8b6(0x1b1),_0x40adcd[_0x4ba8b6(0x1aa)]['display']=_0x4ba8b6(0x190));var _0x4cd5ab=document[_0x4ba8b6(0x166)](_0x4ba8b6(0x158));_0x4cd5ab[_0x4ba8b6(0x157)](_0x4ba8b6(0x165),_0x4ba8b6(0x183)),_0x4cd5ab[_0x4ba8b6(0x17b)]=_0x4ba8b6(0x156),_0x4cd5ab['onclick']=this['login'];var _0x1bc0d4=document['createElement'](_0x4ba8b6(0x158));_0x1bc0d4[_0x4ba8b6(0x157)](_0x4ba8b6(0x165),'login-button'),_0x1bc0d4[_0x4ba8b6(0x17b)]=_0x4ba8b6(0x19b),_0x1bc0d4[_0x4ba8b6(0x1aa)][_0x4ba8b6(0x14e)]=_0x4ba8b6(0x175),_0x1bc0d4['onclick']=_0x4e525e;function _0x4e525e(){var _0x9aea00=_0x4ba8b6,_0x10eae0=document[_0x9aea00(0x16b)](_0x9aea00(0x16a));_0x10eae0[_0x9aea00(0x1aa)]['display']=_0x9aea00(0x190),_0x40adcd['style'][_0x9aea00(0x1bf)]=_0x9aea00(0x1b1);}logincontain['appendChild'](_0x4cd5ab),logincontain['appendChild'](_0x1bc0d4);var _0x301ce3=document['getElementById']('registercontain'),_0x144fcf=document[_0x4ba8b6(0x166)]('button');_0x144fcf[_0x4ba8b6(0x157)](_0x4ba8b6(0x165),'login-button'),_0x144fcf[_0x4ba8b6(0x17b)]=_0x4ba8b6(0x19b),_0x144fcf[_0x4ba8b6(0x151)]=this['register'];var _0x17f17a=document[_0x4ba8b6(0x166)](_0x4ba8b6(0x158));_0x17f17a[_0x4ba8b6(0x157)](_0x4ba8b6(0x165),'login-button'),_0x17f17a[_0x4ba8b6(0x17b)]=_0x4ba8b6(0x16c),_0x17f17a[_0x4ba8b6(0x1aa)]['marginTop']=_0x4ba8b6(0x175),_0x17f17a[_0x4ba8b6(0x151)]=function(){var _0x56623d=_0x4ba8b6;register[_0x56623d(0x1aa)][_0x56623d(0x1bf)]='none',_0x40adcd['style'][_0x56623d(0x1bf)]='block';},_0x301ce3[_0x4ba8b6(0x1b3)](_0x144fcf),_0x301ce3[_0x4ba8b6(0x1b3)](_0x17f17a);}}var _0x2f9280=new _0x2a4407();_0x2f9280[_0x1245db(0x1c4)]();}catch(_0x48f009){alert(_0x48f009);}});
+window.onload = function() {
+    try {
+        const firebaseConfig = {
+            apiKey: "AIzaSyDOAj76E00Rg8Qyc5DQndWXHtCy2umC6vA",
+            authDomain: "chatter-97e8c.firebaseapp.com",
+            projectId: "chatter-97e8c",
+            storageBucket: "chatter-97e8c.appspot.com",
+            messagingSenderId: "281722915171",
+            appId: "1:281722915171:web:3b136d8a0b79389f2f6b56",
+            measurementId: "G-4CGJ1JFX58"
+        };
+        firebase.initializeApp(firebaseConfig);
+        var db = firebase.database();
+        var credits = `Credit to Mr. BungoChungo for cooperating with me (at least for a short time) on this project.
+Credit to Mr. WagnerRizzer for the logo of this site, which originated from a school project.`;
+        var termsOfService = `TERMS OF SERVICE:
+Please note that these Terms of Service will hold until ... forever.
+1. By clicking the button below, or exiting out of this alert in any way, shape, or form, but continuing to use this chat room, you, the user, are agreeing to the following terms.
+
+2. I, the creator of this chat room, or anybody who I cooperated with to create this chatroom, are not responsible for anything that occurs in this chatroom, or its uses. This includes anything that goes against these terms.
+
+3. No hate speech or slurs. Any hate speech or slurs will not be accepted in this chatroom. The consequences include being banned (for an indefinite amount of time), and notifying the police if necessary.
+
+4. No illegal activites. Planning or carrying out illegal activities, including world domination, is not permitted in this chatroom. If this does happen, the police WILL be notified.
+
+5. Hacking is not permitted. If you are caught hacking this chatroom, then you will be be banned (the length of time varies depending on the severity).
+
+6. No doxxing. Doxers will be evicted.
+
+7. As long as you, the user, have seen these Terms, you may not claim ignorance of these terms for your actions.
+
+P.S. These terms apply to all of the webpages I own"`
+
+        class chatter {
+            refresh_chat() {
+                var textarea = document.getElementById('textarea');
+        
+                // Get the chats from firebase
+                db.ref('chats/').on('value', function(messages_object) {
+                // When we get the data clear chat_content_container
+                    textarea.innerHTML = '';
+                // if there are no messages in the chat. Return . Don't load anything
+                    if(messages_object.numChildren() == 0){
+                        return
+                    }
+        
+                // OK! SO IF YOU'RE A ROOKIE CODER. THIS IS GOING TO BE
+                // SUPER EASY-ISH! I THINK. MAYBE NOT. WE'LL SEE!
+        
+                    // convert the message object values to an array.
+                    var messages = Object.values(messages_object.val());
+                    var guide = []; // this will be our guide to organizing the messages
+                    var unordered = []; // unordered messages
+                    var ordered = []; // we're going to order these messages
+        
+                    for (var i, i = 0; i < messages.length; i++) {
+                        // The guide is simply an array from 0 to the messages.length
+                        guide.push(i+1);
+                        // unordered is the [message, index_of_the_message]
+                        unordered.push([messages[i], messages[i].index]);
+                    }
+        
+                // Now this is straight up from stack overflow Ã°Å¸Â¤Â£
+                // Sort the unordered messages by the guide
+                    guide.forEach(function(key) {
+                        var found = false;
+                        unordered = unordered.filter(function(item) {
+                            if(!found && item[1] == key) {
+                                ordered.push(item[0]);
+                                found = true;
+                                return false;
+                            } else {
+                                return true;
+                            }
+                        })
+                    })
+                    
+                // Now we're done. Simply display the ordered messages
+                    ordered.forEach(function(data) {
+                        var username = data.display_name;
+                        var message = data.message;
+                        
+                        var messageElement = document.createElement("div");
+                        messageElement.setAttribute("class", "message");
+                        
+                        textarea.appendChild(messageElement);
+
+                        if (data.name == "[SERVER]") {
+                            var messageImg = document.createElement("img");
+                            messageImg.src = "../images/meteorite.png";
+                            messageImg.setAttribute("class", "profile-img");
+                            messageElement.appendChild(messageImg);
+                        }
+                        
+                        var userElement = document.createElement("div");
+                        userElement.setAttribute("class", "username");
+                        userElement.addEventListener("click", function(e) {
+                            userElement.innerHTML = username + " @(" + data.name + ")" ;
+                        })
+                        userElement.innerHTML = username;
+                        userElement.style.fontWeight = "bold";
+                        if (data.name == "[SERVER]") {
+                            userElement.style.color = "Yellow";
+                        }
+                        messageElement.appendChild(userElement);
+                        
+                        var messageContent = document.createElement("div");
+                        messageContent.setAttribute("class", "message-text");
+                        messageContent.innerHTML = message;
+                        messageElement.appendChild(messageContent);
+                    });
+                    textarea.scrollTop = textarea.scrollHeight;
+                })
+                var username = this.get_name();
+                db.ref("users/" + username).update({
+                    active: true
+                })
+            }
+            
+            display_members() {
+                var members = document.getElementById('members');
+        
+                // Get the users from firebase
+                db.ref('users/').on('value', function(membersList) {
+                    members.innerHTML = '';
+                    if(membersList.numChildren() == 0){
+                        return
+                    }
+                    var usernames = Object.values(membersList.val());
+                    var ordered = [];
+        
+                    for (var i, i = 0; i < usernames.length; i++) {
+                        ordered.push([usernames[i].display_name, usernames[i].muted, usernames[i].username, usernames[i].active]);
+                    }
+                    ordered.forEach(function(properties) {
+                        var memberElement = document.createElement("div");
+                        memberElement.setAttribute("class", "member");
+                        memberElement.innerHTML = properties[0];
+                        var text = memberElement.innerHTML;
+                        if (properties[3]) {
+                            memberElement.style.color = "Green";
+                        }
+                        memberElement.addEventListener("click", function(e) {
+                            memberElement.innerHTML = text + " @(" + properties[2] + ")";
+                            if (properties[1]) {
+                                var mutedElement = document.createElement("span");
+                                mutedElement.style.color = "Red";
+                                mutedElement.innerHTML = " [Muted]";
+                                memberElement.appendChild(mutedElement);
+                            } 
+                        })
+                        if (properties[1]) {
+                            var mutedElement = document.createElement("span");
+                            mutedElement.style.color = "Red";
+                            mutedElement.innerHTML = " [Muted]";
+                            memberElement.appendChild(mutedElement);
+                        }
+                        members.appendChild(memberElement);
+                    });
+                    members.scrollTop = members.scrollHeight;
+                })
+        
+            }
+            
+            send_server_message(message) {
+                try {
+                    var textarea = document.getElementById("textarea");
+                    var message = message;
+                    var username = "[SERVER]";
+                    if (message == "" || username == "") {
+                        return
+                    } else if (message == "sos") {
+                        window.location.replace("https://schoology.pickens.k12.sc.us/home");
+                        return
+                    } else {
+                        if (message == "rofl") {
+                            message = "🤣";
+                        } else if (message == "lol") {
+                            message = "😂";
+                        } else if (message == "k" || message == "ok" || message == "kk" || message == "okay") {
+                            message = "👌";
+                        }
+                        db.ref('chats/').once('value', function(message_object) {
+                            var index = parseFloat(message_object.numChildren()) + 1
+                            db.ref('chats/' + `message_${index}`).set({
+                                name: "[SERVER]",
+                                message: message,
+                                display_name: "[SERVER]",
+                                index: index
+                            }).then(this.refresh_chat())
+                        })
+                    }
+                } catch(err) {
+                    alert(err);
+                }
+            }
+            
+            check_creds() {
+                var username = localStorage.getItem('username')
+                var password = localStorage.getItem('password')
+                db.ref("users/" + username).once('value', function(user_object) {
+                    if (user_object.exists() == true) {
+                        var obj = user_object.val()
+                        if (obj.password == password && obj.username != "god") {
+                            return
+                        } else {
+                            var main = document.getElementById("main")
+                            var login = document.getElementById("login")
+                            main.style.display = "none"
+                            login.style.display = "block"
+                            localStorage.clear()
+                        }
+                    } 
+                })
+            }
+            
+            send_message() {
+                try {
+                    var textarea = document.getElementById("textarea")
+                    var message = document.getElementById("text-box").value
+                    this.check_creds
+                    var username = localStorage.getItem('username')
+                    if (username == null) {
+                        return
+                    }
+                    if (username == "god") {
+                        localStorage.clear();
+                        window.location.reload();
+                    }
+
+                    //Check if user is muted
+                    db.ref("users/" + username).once('value', function(user_object) {
+                        if (user_object.muted) {
+                            return
+                        }
+                    })
+                    
+                    if (message == "" || username == "") {
+                        return
+                    } else if (message == "sos") {
+                        window.location.replace("https://schoology.pickens.k12.sc.us/home")
+                        return
+                    } else if (message.startsWith("!mute ")) {
+                        var muted_user = message.substring(6).toLowerCase()
+                        if (muted_user == "god") {
+                            alert("Rebound!")
+                            db.ref("users/" + username).on('value', function(user_object) {
+                                db.ref("users/" + username).update({
+                                    muted: true
+                                })
+                                window.location.reload();
+                            })
+                            db.ref('chats/').once('value', function(message_object) {
+                                var index = parseFloat(message_object.numChildren()) + 1
+                                db.ref('chats/' + `message_${index}`).set({
+                                    name: "[SERVER]",
+                                    message: username + " muted themselves!",
+                                    display_name: "[SERVER]",
+                                    index: index
+                                }).then(function() {
+                                    this.refresh_chat()
+                                })
+                            })
+                            return
+                        }
+                    } else if (message.startsWith("!remove ")) {
+                        var removed_user = message.substring(6).toLowerCase()
+                        if (removed_user == "god") {
+                            alert("Rebound!")
+                            db.ref("users/" + username).on('value', function(user_object) {
+                                db.ref("users/" + username).update({
+                                    muted: true
+                                })
+                                window.location.reload();
+                            })
+                            db.ref('chats/').once('value', function(message_object) {
+                                var index = parseFloat(message_object.numChildren()) + 1
+                                db.ref('chats/' + `message_${index}`).set({
+                                    name: "[SERVER]",
+                                    message: username + " muted themselves!",
+                                    display_name: "[SERVER]",
+                                    index: index
+                                }).then(function() {
+                                    this.refresh_chat()
+                                })
+                            })
+                            return
+                        }
+                    }
+                    if (message == "rofl") {
+                        message = "🤣"
+                    } else if (message == "lol") {
+                        message = "😂"
+                    } else if (message == "k" || message == "ok" || message == "kk" || message == "okay") {
+                        message = "👌"
+                    }
+                    db.ref("users/" + username).once('value', function(user_object) {
+                        var obj = user_object.val()
+                        var display_name = obj.display_name
+                        document.getElementById("text-box").value = ""
+                        db.ref('chats/').once('value', function(message_object) {
+                            var index = parseFloat(message_object.numChildren()) + 1
+                            db.ref('chats/' + `message_${index}`).set({
+                                name: username,
+                                message: message,
+                                display_name: display_name,
+                                index: index
+                            }).then(function() {
+                                this.refresh_chat()
+                            })
+                        })
+                    })
+                } catch(err) {
+                    alert(err)
+                }
+            }
+
+            alertDisclaimer() {
+                const fs = require('fs')
+                fs.readFile('pebbleCredits.txt', function (err, data) {
+                    alert(data)
+                })
+            }
+            
+            get_name() {
+                if (localStorage.getItem('username') != null) {
+                    return localStorage.getItem('username')
+                } else {
+                    return null
+                }
+            }
+            
+            update_name() {
+                var name = localStorage.getItem('username')
+                db.ref("users/" + name).once('value', function(user_object) {
+                    var obj = user_object.val()
+                    var display_name = obj.display_name
+                    localStorage.setItem("display", display_name)
+                    document.getElementById("userdisplay").innerHTML = display_name + ` (@${name})`
+                    if (name == "god") {
+                        localStorage.clear();
+                        window.location.reload();
+                    }
+                    var dash = document.getElementById("profile")
+                    
+                    var logoutButton = document.createElement("button")
+                    logoutButton.onclick = logout
+                    logoutButton.innerHTML = "Logout"
+                    logoutButton.setAttribute("class", "profile-button")
+                    dash.appendChild(logoutButton)
+                    
+                    function logout() {
+                        localStorage.clear()
+                        window.location.reload()
+                        db.ref("users/" + this.get_name()).update({
+                            active: false
+                        })
+                        this.display_members()
+                    }
+                })
+            }
+            
+            login() {
+                var username = document.getElementById("username-login").value
+                username = username.toLowerCase()
+                var password = document.getElementById("password-login").value
+                if (password == "") {
+                    return
+                }
+                if (username == "god") {
+                    return
+                }
+                db.ref("users/" + username).once('value', function(user_object) {
+                    if (user_object.exists() == true) {
+                        var obj = user_object.val();
+                        if (obj.password == password) {
+                            var main = document.getElementById("main");
+                            var login = document.getElementById("login");
+                            main.style.display = "block";
+                            login.style.display = "none";
+                            localStorage.setItem('username', username);
+                            localStorage.setItem('password', password);
+                            localStorage.setItem("display", obj.display_name);
+                            localStorage.setItem("planets", obj.planets);
+                            alert(credits);
+                            alert(termsOfService);
+                            window.location.reload();
+                        }
+                    } 
+                })
+            }
+            
+            register() {
+                var username = document.getElementById("username-register").value
+                username = username.toLowerCase()
+                var password = document.getElementById("password-register").value
+                var displayName = document.getElementById("display-register").value
+                var realName = document.getElementById("name-register").value
+                if (username == "" || password == "" || displayName == "" || username == "[SERVER]" || realName == "") {
+                    alert("Fill out all fields")
+                    return
+                }
+                
+                var main = document.getElementById("main")
+                var login = document.getElementById("login")
+                var register = document.getElementById("register")
+                db.ref("users/" + username).once('value', function(user_object) {
+                    if (user_object.exists() == true) {
+                        alert("Username already exists!")
+                    } else {
+                        db.ref("users/" + username).set({
+                            display_name: displayName,
+                            password: password,
+                            username: username,
+                            name: realName,
+                            muted: true,
+                            active: true,
+                        }).then(function() {
+                            main.style.display = "block"
+                            login.style.display = "none"
+                            register.style.display = "none"
+                            localStorage.setItem('username', username)
+                            localStorage.setItem('password', password)
+                            localStorage.setItem("display", displayName)
+                            alert(credits);
+                            alert(termsOfService);
+                            window.location.reload()
+                        })
+                    }
+                })
+            }
+            
+            check_mute() {
+                db.ref("users/god").on('value', function(user_object) {
+                    db.ref("users/god").update({
+                        muted: false
+                    })
+                })
+                db.ref("users/" + localStorage.getItem("username")).on('value', function(user_object) {
+                    var obj = user_object.val()
+                    if (obj.muted) {
+                        document.getElementById("text-box").disabled = true
+                        document.getElementById("text-box").placeholder = "Muted"
+                    } else {
+                        document.getElementById("text-box").disabled = false
+                        document.getElementById("text-box").placeholder = "Message"
+                    }
+                })
+            }
+
+            /*setupGame() {
+                var message_area = document.getElementById("messagebox");
+                var game_area = document.getElementById("gamearea");
+                var member_list = document.getElementById("memberlist");
+                message_area.style.width = "36%";
+                game_area.style.display = "block";
+                member_list.style.display = "none";
+            }
+            
+            lunarLunacy() {
+                console.log("worked")
+                var planets = localStorage.getItem("planets");
+                var gameArea = document.getElementById("gamearea");
+                gameArea.innerHTML = "";
+                var planetImg = document.createElement("img");
+                planetImg.src = "../images/planetImg.png";
+                planetImg.style.width = "3%";
+                gameArea.appendChild(planetImg);
+            }*/
+
+            setup() {
+                if (!("Notification" in window)) {
+                    // Check if the browser supports notifications
+                    alert("This browser does not support desktop notification");
+                } else if (Notification.permission === "granted") {
+                    // Check whether notification permissions have already been granted;
+                    // if so, create a notification
+                    var notification = new Notification("Hi there!", {body: "test"});
+                } else if (Notification.permission !== "denied") {
+                    // We need to ask the user for permission
+                    Notification.requestPermission().then((permission) => {
+                        console.log(permission);
+                        // If the user accepts, let's create a notification
+                        if (permission === "granted") {
+                            var notification = new Notification("Hi there!", {
+                                body: "Test"
+                            });
+                        }
+                    });
+                }
+                this.check_creds()
+                this.update_name()
+                var element = document.createElement("button")
+                element.setAttribute("class", "send-message")
+                element.innerHTML = "➤"
+                element.onclick = this.send_message
+
+                var returnHomeButton = document.createElement("button");
+                returnHomeButton.setAttribute("class", "sidebar-button");
+                returnHomeButton.title = "Return to HomePage";
+                var returnHomeLogo = document.createElement("img");
+                returnHomeLogo.src = "../images/lunarlunacy.png";
+                returnHomeLogo.setAttribute("class", "sidebar-logo");
+                returnHomeButton.appendChild(returnHomeLogo);
+                returnHomeButton.addEventListener("click", function(e) {
+                    window.location.replace("../index.html");
+                })
+                document.getElementById("sidebar").appendChild(returnHomeButton)
+                document.getElementById("sidebar").appendChild(document.createElement("hr"))
+
+                var spaceSeizureButton = document.createElement("button");
+                spaceSeizureButton.setAttribute("class", "sidebar-button");
+                spaceSeizureButton.title = "Space Seizure";
+                var spaceSeizureLogo = document.createElement("img");
+                spaceSeizureLogo.src = "../images/spaceseizuremain.png";
+                spaceSeizureLogo.setAttribute("class", "sidebar-logo");
+                spaceSeizureButton.appendChild(spaceSeizureLogo);
+                spaceSeizureButton.addEventListener("click", function(e) {
+                    window.open("SpaceSeizure/spaceSeizure.html", "_blank");
+                })
+                spaceSeizureButton.onclick = this.setupGame
+                document.getElementById("sidebar").appendChild(spaceSeizureButton)
+                
+                document.getElementById("downbar").appendChild(element)
+                document.addEventListener('keydown', event => {
+                    const key = event.key.toLowerCase();
+                    if (document.getElementById("text-box") == document.activeElement) {
+                        if (key == "enter") {
+                            this.send_message()
+                        }
+                    } else if (document.getElementById("password-login") == document.activeElement) {
+                        if (key == "enter") {
+                            this.login()
+                        }
+                    }
+                })
+                this.refresh_chat()
+                this.display_members()
+                this.check_mute()
+
+                //Login and Register Screens
+                var main = document.getElementById("main")
+                var login = document.getElementById("login")
+                if (this.get_name() != null) {
+                    main.style.display = "block"
+                    login.style.display = "none"
+                    this.send_server_message(localStorage.getItem("display") + " has joined the chat")
+                } else {
+                    main.style.display = "none"
+                    login.style.display = "block"
+                }
+                var element = document.createElement("button")
+                element.setAttribute("class", "login-button")
+                element.innerHTML = "Login"
+                element.onclick = this.login
+                
+                var reg = document.createElement("button")
+                reg.setAttribute("class", "login-button")
+                reg.innerHTML = "Register"
+                reg.style.marginTop = "5px"
+                reg.onclick = regMenu
+                
+                function regMenu() {
+                    var register = document.getElementById("register")
+                    register.style.display = "block"
+                    login.style.display = "none"
+                }
+                
+                logincontain.appendChild(element)
+                logincontain.appendChild(reg)
+                
+                var registercontain = document.getElementById("registercontain")
+                
+                var regbutton = document.createElement("button")
+                regbutton.setAttribute("class", "login-button")
+                regbutton.innerHTML = "Register"
+                regbutton.onclick = this.register
+                
+                var backbutton = document.createElement("button");
+                backbutton.setAttribute("class", "login-button");
+                backbutton.innerHTML = "Back";
+                backbutton.style.marginTop = "5px";
+                backbutton.onclick = function() {
+                    register.style.display = "none";
+                    login.style.display = "block";
+                }
+                
+                registercontain.appendChild(regbutton)
+                registercontain.appendChild(backbutton);
+            }
+        }
+        
+        var app = new chatter()
+        app.setup()
+    } catch(err) {
+        alert(err)
+    }
+}

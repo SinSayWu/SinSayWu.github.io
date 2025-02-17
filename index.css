@@ -1,2 +1,32 @@
-/*THIS IS OBFUSCATED SO DONT EVEN THINK ABOUT IT*/
-#pebble-img{border-left-width:.041666667in;}#pebble-img{border-bottom-width:.041666667in;}#pebble-img{border-right-width:.041666667in;}*{background-color:black;}#pebble-img{border-top-width:.041666667in;}#pebble-img{border-left-style:none;}*{background-image:url("images/myBackground.png");}#pebble-img{border-bottom-style:none;}#pebble-img{border-right-style:none;}#pebble-img{border-top-style:none;}#pebble-img{border-left-color:white;}#pebble-img{border-bottom-color:white;}#pebble-img{border-right-color:white;}#pebble-img{border-top-color:white;}*{background-attachment:fixed;}#pebble-img{border-image:none;}*{background-position:center;}*{background-repeat:no-repeat;}#pebble-img{max-width:10%;}*,h1{text-align:center;}#pebble-img,#specialPebble{position:absolute;}#pebble-img{top:10%;}#pebble-img{left:15%;}#specialPebble{margin-left:auto;}*{background-size:cover;}*{color:white;}#specialPebble{margin-bottom:auto;}*{vertical-align:middle;}#specialPebble{margin-right:auto;}#specialPebble{margin-top:auto;}#specialPebble{opacity:0;}
+* {
+    background-color: black;
+    background-image: url("images/myBackground.png");
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    color: white;
+    vertical-align: middle;
+    text-align: center;
+}
+
+h1 {
+    text-align: center;
+}
+
+#pebble-img {
+    border: 4px;
+    border-color: white;
+    max-width: 10%;
+    position: absolute;
+    top: 10%;
+    left: 15%;
+}
+
+#specialPebble {
+    position: absolute;
+    margin: auto;
+    /*top: 379px;
+    left: 766px;*/
+    opacity: 0;
+}

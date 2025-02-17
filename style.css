@@ -1,0 +1,83 @@
+*{
+    margin: 0px;
+    padding: 0px; 
+    font-size: 20px;
+  }
+  body {
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    margin: 0;
+    overflow-x: hidden;
+    background-image:url("images/background_rubiks_cube.jpeg");
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+  
+  #intro {
+    font-size: 20px;
+  }
+  
+  #other {
+    width: 100%;
+    background-color: black;
+    padding: 10px;
+    position: relative;
+    left: 0;
+    top: 200px;
+    margin: 0;
+    border: none;
+  }
+  
+  #moves {
+    width: 300px;
+    height: auto;
+    margin: auto;
+    background-color: red;
+  }
+  
+  table, th, td {
+    border: 1px solid black;
+    margin: auto;
+    padding: 3px;
+    background-color: red;
+  }
+  
+  #info {
+    position: fixed;
+    top: 5px;
+    right: 5px;
+    text-align: center;
+  }
+  
+  section {
+    left: 0;
+    width: 40%;
+    padding: 10px;
+    margin: 5px;
+    border: 1px solid blue;
+    border-radius: 5%;
+  }
+  
+  a:link {
+    color: blue;
+    margin: 5px;
+  }
+  
+  a:visited {
+    color: purple;
+  }
+  
+  a:hover {
+    color: blue;
+    text-decoration: underline;
+  }
+  
+  a:active {
+    color: red;
+  }
+  
+  h1 {
+    font-size: 30px;
+  }
+  

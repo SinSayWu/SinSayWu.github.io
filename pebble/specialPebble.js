@@ -1,2 +1,547 @@
-//THIS IS OBFUSCATED SO DONT EVEN THINK ABOUT IT
-function _0x4e46(_0x4a0713,_0x1709a0){var _0xa04262=_0x40ff();return _0x4e46=function(_0x2af85f,_0x490725){_0x2af85f=_0x2af85f-(0x97*-0x3+0x155*0x2+-0x2*-0x1);var _0x1bd82a=_0xa04262[_0x2af85f];return _0x1bd82a;},_0x4e46(_0x4a0713,_0x1709a0);}var _0x44922d=_0x4e46;(function(_0x3e7a68,_0x4ab88c){var _0x3e6f5a=_0x4e46,_0x10c64e=_0x3e7a68();while(!![]){try{var _0xce3046=parseInt(_0x3e6f5a(0xfd))/(-0xbca*0x1+0x2*0x669+0x1*-0x107)+-parseInt(_0x3e6f5a(0xf0))/(-0x1*-0x17bf+-0x1520+-0x29d)+-parseInt(_0x3e6f5a(0x12d))/(-0x32*0x2e+0x83f+0xc0)*(parseInt(_0x3e6f5a(0x154))/(-0x134d+-0x3f+0x1390))+parseInt(_0x3e6f5a(0x150))/(0x1609+0x1b00+0x1*-0x3104)+-parseInt(_0x3e6f5a(0x11e))/(-0x445+-0x5fd*0x3+0x1642)+-parseInt(_0x3e6f5a(0x14d))/(-0x57d+0x435+0x14f*0x1)*(-parseInt(_0x3e6f5a(0x120))/(0x1dae+0x96*-0x3+-0x1be4))+parseInt(_0x3e6f5a(0x147))/(0x4d*-0x1+0xe92+-0x2*0x71e);if(_0xce3046===_0x4ab88c)break;else _0x10c64e['push'](_0x10c64e['shift']());}catch(_0x310fdf){_0x10c64e['push'](_0x10c64e['shift']());}}}(_0x40ff,0x2af1f*0x4+0xf1d2d+-0x81856*0x2),window[_0x44922d(0x138)]=function(){var _0x4e76f6=_0x44922d;try{const _0x3d0314={'apiKey':'AIzaSyDOAj76E00Rg8Qyc5DQndWXHtCy2umC6vA','authDomain':_0x4e76f6(0x117),'projectId':_0x4e76f6(0x13a),'storageBucket':_0x4e76f6(0x124),'messagingSenderId':_0x4e76f6(0x126),'appId':'1:281722915171:web:3b136d8a0b79389f2f6b56','measurementId':_0x4e76f6(0x102)};firebase['initializeApp'](_0x3d0314);var _0x4e1977=firebase[_0x4e76f6(0x161)](),_0x2cd320=_0x4e76f6(0x17c);class _0x12d8e2{[_0x4e76f6(0x15e)](){var _0x550730=_0x4e76f6,_0x260774=document[_0x550730(0x114)](_0x550730(0x11c));_0x4e1977[_0x550730(0x164)](_0x550730(0x178))['on']('value',function(_0x12c45b){var _0x42c525=_0x550730;_0x260774[_0x42c525(0x152)]='';if(_0x12c45b['numChildren']()==-0x9*0x36e+0x42*-0xf+0xab*0x34)return;var _0x12bde4=Object[_0x42c525(0x133)](_0x12c45b[_0x42c525(0x100)]()),_0x1b8fcf=[],_0x3556d7=[],_0x494777=[];for(var _0x311b93,_0x311b93=-0xd*0x95+0x43*-0x17+0x6cb*0x2;_0x311b93<_0x12bde4[_0x42c525(0x142)];_0x311b93++){_0x1b8fcf[_0x42c525(0xff)](_0x311b93+(0x1e1a+0x1*-0x259+-0x25*0xc0)),_0x3556d7[_0x42c525(0xff)]([_0x12bde4[_0x311b93],_0x12bde4[_0x311b93][_0x42c525(0x170)]]);}_0x1b8fcf[_0x42c525(0x134)](function(_0x480e57){var _0x38b52d=_0x42c525,_0x4f3255=![];_0x3556d7=_0x3556d7[_0x38b52d(0x11d)](function(_0x24cfad){var _0x2da80a=_0x38b52d;return!_0x4f3255&&_0x24cfad[0x25e7+0x16db+0x67*-0x97]==_0x480e57?(_0x494777[_0x2da80a(0xff)](_0x24cfad[-0x1*-0x5f9+-0x25ba+-0x2e3*-0xb]),_0x4f3255=!![],![]):!![];});}),_0x494777[_0x42c525(0x134)](function(_0x276b6e){var _0x3c7666=_0x42c525,_0x2b9082=_0x276b6e['display_name'],_0x2962da=_0x276b6e[_0x3c7666(0x139)],_0x2076f4=document['createElement'](_0x3c7666(0x101));_0x2076f4[_0x3c7666(0x16b)](_0x3c7666(0xf6),'message'),_0x260774[_0x3c7666(0x163)](_0x2076f4);if(_0x276b6e[_0x3c7666(0x119)]==_0x3c7666(0x136)){var _0x385ea8=document[_0x3c7666(0x12b)](_0x3c7666(0xf9));_0x385ea8[_0x3c7666(0xf5)]=_0x3c7666(0x10e),_0x385ea8[_0x3c7666(0x16b)](_0x3c7666(0xf6),_0x3c7666(0x132)),_0x2076f4[_0x3c7666(0x163)](_0x385ea8);}var _0x70260d=document['createElement'](_0x3c7666(0x101));_0x70260d[_0x3c7666(0x16b)](_0x3c7666(0xf6),_0x3c7666(0x10d)),_0x70260d[_0x3c7666(0x130)](_0x3c7666(0x175),function(_0x49cc0a){var _0x88545d=_0x3c7666;_0x70260d[_0x88545d(0x152)]=_0x2b9082+_0x88545d(0xfc)+_0x276b6e[_0x88545d(0x119)]+')';}),_0x70260d['innerHTML']=_0x2b9082,_0x70260d[_0x3c7666(0xfb)][_0x3c7666(0x16a)]='bold';_0x276b6e['name']==_0x3c7666(0x136)&&(_0x70260d['style']['color']=_0x3c7666(0x135));_0x2076f4[_0x3c7666(0x163)](_0x70260d);var _0x428c74=document[_0x3c7666(0x12b)](_0x3c7666(0x101));_0x428c74['setAttribute'](_0x3c7666(0xf6),'message-text'),_0x428c74['innerHTML']=_0x2962da,_0x2076f4['appendChild'](_0x428c74);}),_0x260774['scrollTop']=_0x260774[_0x42c525(0x171)];});var _0x4fb8c9=this['get_name']();_0x4e1977[_0x550730(0x164)](_0x550730(0xf7)+_0x4fb8c9)['update']({'active':!![]});}['display_members'](){var _0x5d048e=_0x4e76f6,_0x176920=document[_0x5d048e(0x114)](_0x5d048e(0x17a));_0x4e1977[_0x5d048e(0x164)](_0x5d048e(0xf7))['on'](_0x5d048e(0x12c),function(_0x8fe2ad){var _0x31b4b3=_0x5d048e;_0x176920[_0x31b4b3(0x152)]='';if(_0x8fe2ad[_0x31b4b3(0x105)]()==0x24d0+-0x216e+-0x362)return;var _0x262b32=Object[_0x31b4b3(0x133)](_0x8fe2ad['val']()),_0x10619c=[];for(var _0x1d2482,_0x1d2482=-0x13d+0x20c3+-0x5*0x64e;_0x1d2482<_0x262b32[_0x31b4b3(0x142)];_0x1d2482++){_0x10619c['push']([_0x262b32[_0x1d2482][_0x31b4b3(0x17f)],_0x262b32[_0x1d2482]['muted'],_0x262b32[_0x1d2482][_0x31b4b3(0x10d)],_0x262b32[_0x1d2482][_0x31b4b3(0x160)]]);}_0x10619c['forEach'](function(_0x2c7da0){var _0x5d45bc=_0x31b4b3,_0x146e44=document[_0x5d45bc(0x12b)]('div');_0x146e44['setAttribute']('class',_0x5d45bc(0x121)),_0x146e44['innerHTML']=_0x2c7da0[-0x1*-0x546+-0x1b5e+-0x1c*-0xca];var _0x5c3a8d=_0x146e44[_0x5d45bc(0x152)];_0x2c7da0[0x2*-0xaca+0x467*-0x5+0x2b9a]&&(_0x146e44[_0x5d45bc(0xfb)][_0x5d45bc(0x166)]=_0x5d45bc(0xfa));_0x146e44[_0x5d45bc(0x130)](_0x5d45bc(0x175),function(_0x4e3b83){var _0x1c3309=_0x5d45bc;_0x146e44['innerHTML']=_0x5c3a8d+_0x1c3309(0xfc)+_0x2c7da0[0x7b9+0x19b+0x2*-0x4a9]+')';if(_0x2c7da0[-0x74f+-0x5ba*0x2+0x2*0x962]){var _0x21de34=document[_0x1c3309(0x12b)](_0x1c3309(0x16c));_0x21de34[_0x1c3309(0xfb)][_0x1c3309(0x166)]=_0x1c3309(0x141),_0x21de34[_0x1c3309(0x152)]=_0x1c3309(0x109),_0x146e44[_0x1c3309(0x163)](_0x21de34);}});if(_0x2c7da0[-0x13c3+0x1*-0x1a77+0x1*0x2e3b]){var _0xf756ca=document[_0x5d45bc(0x12b)](_0x5d45bc(0x16c));_0xf756ca[_0x5d45bc(0xfb)][_0x5d45bc(0x166)]=_0x5d45bc(0x141),_0xf756ca['innerHTML']='\x20[Muted]',_0x146e44[_0x5d45bc(0x163)](_0xf756ca);}_0x176920[_0x5d45bc(0x163)](_0x146e44);}),_0x176920[_0x31b4b3(0x16f)]=_0x176920['scrollHeight'];});}['send_server_message'](_0x468419){var _0xdcc1f4=_0x4e76f6;try{var _0x1bbbd8=document['getElementById']('textarea'),_0x468419=_0x468419,_0x3ae646=_0xdcc1f4(0x136);if(_0x468419==''||_0x3ae646=='')return;else{if(_0x468419==_0xdcc1f4(0x13c)){window[_0xdcc1f4(0x143)]['replace'](_0xdcc1f4(0x14b));return;}else{if(_0x468419=='rofl')_0x468419='🤣';else{if(_0x468419=='lol')_0x468419='😂';else(_0x468419=='k'||_0x468419=='ok'||_0x468419=='kk'||_0x468419=='okay')&&(_0x468419='👌');}_0x4e1977[_0xdcc1f4(0x164)](_0xdcc1f4(0x178))[_0xdcc1f4(0x118)](_0xdcc1f4(0x12c),function(_0xcda20c){var _0x12b97b=_0xdcc1f4,_0x1f999d=parseFloat(_0xcda20c['numChildren']())+(0x10*0x248+-0x18*-0xef+-0x3ae7*0x1);_0x4e1977[_0x12b97b(0x164)]('chats/'+('message_'+_0x1f999d))['set']({'name':'[SERVER]','message':_0x468419,'display_name':'[SERVER]','index':_0x1f999d})[_0x12b97b(0x113)](this[_0x12b97b(0x15e)]());});}}}catch(_0x5b1119){alert(_0x5b1119);}}[_0x4e76f6(0xe7)](){var _0x27e7a6=_0x4e76f6,_0x362324=localStorage['getItem'](_0x27e7a6(0x10d)),_0x1a683a=localStorage[_0x27e7a6(0x153)]('password');_0x4e1977[_0x27e7a6(0x164)]('users/'+_0x362324)[_0x27e7a6(0x118)]('value',function(_0x3d2710){var _0xe41529=_0x27e7a6;if(_0x3d2710[_0xe41529(0xf2)]()==!![]){var _0x4de2ca=_0x3d2710[_0xe41529(0x100)]();if(_0x4de2ca['password']==_0x1a683a)return;else{var _0x467262=document[_0xe41529(0x114)](_0xe41529(0x155)),_0x57965a=document[_0xe41529(0x114)]('login');_0x467262[_0xe41529(0xfb)][_0xe41529(0x14f)]=_0xe41529(0xfe),_0x57965a['style'][_0xe41529(0x14f)]='block',localStorage[_0xe41529(0x15c)]();}}});}[_0x4e76f6(0x173)](){var _0x767258=_0x4e76f6;try{var _0x3e7968=document['getElementById']('textarea'),_0x5748a1=document[_0x767258(0x114)](_0x767258(0x17b))['value'];this[_0x767258(0xe7)];var _0x370eb0=localStorage['getItem'](_0x767258(0x10d));if(_0x370eb0==null)return;_0x4e1977[_0x767258(0x164)]('users/'+_0x370eb0)[_0x767258(0x118)]('value',function(_0x319503){var _0x203cf1=_0x767258;if(_0x319503[_0x203cf1(0x116)])return;});if(_0x5748a1==''||_0x370eb0=='')return;else{if(_0x5748a1==_0x767258(0x13c)){window[_0x767258(0x143)][_0x767258(0x16e)](_0x767258(0x14b));return;}else{if(_0x5748a1['startsWith'](_0x767258(0x104))){var _0xa9b571=_0x5748a1[_0x767258(0xea)](-0x17bb+0xcdb+-0x3e*-0x2d)[_0x767258(0x13e)]();if(_0xa9b571==_0x767258(0x131)){alert(_0x767258(0x14a)),_0x4e1977[_0x767258(0x164)](_0x767258(0xf7)+_0x370eb0)['on']('value',function(_0x1989db){var _0x3c528f=_0x767258;_0x4e1977[_0x3c528f(0x164)](_0x3c528f(0xf7)+_0x370eb0)['update']({'muted':!![]});}),_0x4e1977['ref']('chats/')[_0x767258(0x118)](_0x767258(0x12c),function(_0x5b2ec7){var _0x3e2132=_0x767258,_0x33e7ee=parseFloat(_0x5b2ec7[_0x3e2132(0x105)]())+(0x224e+0x8e2+-0x2b2f);_0x4e1977[_0x3e2132(0x164)](_0x3e2132(0x178)+(_0x3e2132(0x15a)+_0x33e7ee))[_0x3e2132(0x11a)]({'name':_0x3e2132(0x136),'message':_0xa9b571+_0x3e2132(0x168),'display_name':_0x3e2132(0x136),'index':_0x33e7ee})[_0x3e2132(0x113)](function(){var _0x2dbd2f=_0x3e2132;this[_0x2dbd2f(0x15e)]();});});return;}_0x370eb0==_0x767258(0x131)&&_0x4e1977[_0x767258(0x164)]('users/'+_0xa9b571)['once'](_0x767258(0x12c),function(_0x3f003f){var _0x408ea1=_0x767258;if(_0x3f003f[_0x408ea1(0xf2)]()==![]){alert(_0x408ea1(0x107)+_0xa9b571+'\x20does\x20not\x20exist!');return;}else{if(_0xa9b571==_0x408ea1(0x131)){alert(_0x408ea1(0x14a)),_0x4e1977['ref'](_0x408ea1(0xf7)+_0x370eb0)['on'](_0x408ea1(0x12c),function(_0x43fe94){var _0x4c45cf=_0x408ea1;_0x4e1977[_0x4c45cf(0x164)](_0x4c45cf(0xf7)+_0x370eb0)[_0x4c45cf(0xf3)]({'muted':!![]});});return;}}_0x4e1977[_0x408ea1(0x164)](_0x408ea1(0x178))[_0x408ea1(0x118)]('value',function(_0x205f1b){var _0x44751f=_0x408ea1,_0x473ca4=parseFloat(_0x205f1b[_0x44751f(0x105)]())+(-0x1792+0x1a23+-0x290);_0x4e1977[_0x44751f(0x164)]('chats/'+(_0x44751f(0x15a)+_0x473ca4))[_0x44751f(0x11a)]({'name':_0x44751f(0x136),'message':_0x44751f(0x10b)+_0xa9b571,'display_name':'[SERVER]','index':_0x473ca4})[_0x44751f(0x113)](function(){var _0x4cdc2d=_0x44751f;this[_0x4cdc2d(0x15e)]();});}),_0x4e1977['ref'](_0x408ea1(0xf7)+_0xa9b571)[_0x408ea1(0xf3)]({'muted':!![]});});}else{if(_0x5748a1['startsWith'](_0x767258(0x10a))){if(_0x370eb0=='god'){var _0x122c83=_0x5748a1[_0x767258(0xea)](-0x23c3*0x1+-0xc72+-0x1*-0x303d)[_0x767258(0x13e)]();_0x4e1977[_0x767258(0x164)](_0x767258(0xf7)+_0x122c83)[_0x767258(0x118)](_0x767258(0x12c),function(_0x3e0fab){var _0xe0d7ac=_0x767258;if(_0x3e0fab['exists']()==![]){alert('User\x20cannot\x20be\x20unmuted,\x20'+_0x122c83+_0xe0d7ac(0x176));return;}_0x4e1977['ref'](_0xe0d7ac(0x178))[_0xe0d7ac(0x118)](_0xe0d7ac(0x12c),function(_0x1d530c){var _0x4e0107=_0xe0d7ac,_0x54a599=parseFloat(_0x1d530c[_0x4e0107(0x105)]())+(-0x873+-0x5c5+0xe39);_0x4e1977[_0x4e0107(0x164)]('chats/'+(_0x4e0107(0x15a)+_0x54a599))[_0x4e0107(0x11a)]({'name':_0x4e0107(0x136),'message':_0x4e0107(0x13d)+_0x122c83,'display_name':_0x4e0107(0x136),'index':_0x54a599})[_0x4e0107(0x113)](function(){this['refresh_chat']();});}),_0x4e1977[_0xe0d7ac(0x164)](_0xe0d7ac(0xf7)+_0x122c83)[_0xe0d7ac(0xf3)]({'muted':![]});});}}else{if(_0x5748a1[_0x767258(0x145)](_0x767258(0x16d))&&_0x370eb0==_0x767258(0x131)){var _0x575a11=_0x5748a1[_0x767258(0xea)](0x17b*0x11+-0x16a8*0x1+-0x27b)[_0x767258(0x13e)]();_0x4e1977[_0x767258(0x164)](_0x767258(0xf7)+_0x575a11)[_0x767258(0x118)](_0x767258(0x12c),function(_0x38664d){var _0x7ab813=_0x767258,_0x65d869=_0x38664d['val']();alert(_0x65d869[_0x7ab813(0x140)]);});}else{if(_0x5748a1['startsWith'](_0x767258(0x169))&&_0x370eb0==_0x767258(0x131)){var _0x3467eb=_0x5748a1[_0x767258(0xea)](-0x2206+0x1a49+0x7c5)[_0x767258(0x13e)]();_0x4e1977['ref']('users/'+_0x3467eb)[_0x767258(0x146)]();}else _0x5748a1==_0x767258(0x12f)&&_0x370eb0=='god'&&_0x4e1977[_0x767258(0x164)]('users/')['on']('value',function(_0x194829){var _0x32dad7=_0x767258,_0x52063c=Object['values'](_0x194829[_0x32dad7(0x100)]());_0x52063c[_0x32dad7(0x134)](function(_0x41332a){var _0x19bc7d=_0x32dad7;_0x41332a[_0x19bc7d(0x116)]&&_0x4e1977[_0x19bc7d(0x164)]('users/'+_0x41332a[_0x19bc7d(0x10d)])[_0x19bc7d(0x146)]();});});}}}}}if(_0x5748a1==_0x767258(0x162))_0x5748a1='🤣';else{if(_0x5748a1==_0x767258(0x128))_0x5748a1='😂';else(_0x5748a1=='k'||_0x5748a1=='ok'||_0x5748a1=='kk'||_0x5748a1=='okay')&&(_0x5748a1='👌');}_0x4e1977['ref']('users/'+_0x370eb0)[_0x767258(0x118)](_0x767258(0x12c),function(_0x2f0e20){var _0x4b6056=_0x767258,_0x2afe43=_0x2f0e20[_0x4b6056(0x100)](),_0x4e35bc=_0x2afe43[_0x4b6056(0x17f)];document['getElementById'](_0x4b6056(0x17b))[_0x4b6056(0x12c)]='',_0x4e1977[_0x4b6056(0x164)](_0x4b6056(0x178))[_0x4b6056(0x118)](_0x4b6056(0x12c),function(_0x3b82b6){var _0x2e6412=_0x4b6056,_0x414b31=parseFloat(_0x3b82b6[_0x2e6412(0x105)]())+(0x2b9+0xd1d+-0xc1*0x15);_0x4e1977[_0x2e6412(0x164)](_0x2e6412(0x178)+(_0x2e6412(0x15a)+_0x414b31))['set']({'name':_0x370eb0,'message':_0x5748a1,'display_name':_0x4e35bc,'index':_0x414b31})['then'](function(){this['refresh_chat']();});});});}catch(_0x50f259){alert(_0x50f259);}}['alertDisclaimer'](){var _0x2e1056=_0x4e76f6;const _0x1b2bfa=require('fs');_0x1b2bfa[_0x2e1056(0x165)](_0x2e1056(0x157),function(_0x281744,_0x2278d7){alert(_0x2278d7);});}['get_name'](){var _0x5a6333=_0x4e76f6;return localStorage[_0x5a6333(0x153)](_0x5a6333(0x10d))!=null?localStorage[_0x5a6333(0x153)](_0x5a6333(0x10d)):null;}[_0x4e76f6(0x112)](){var _0x441d34=_0x4e76f6,_0x692f59=localStorage[_0x441d34(0x153)](_0x441d34(0x10d));_0x4e1977[_0x441d34(0x164)]('users/'+_0x692f59)['once'](_0x441d34(0x12c),function(_0x4d5e42){var _0xc8f714=_0x441d34,_0x1d1665=_0x4d5e42[_0xc8f714(0x100)](),_0x323c6a=_0x1d1665[_0xc8f714(0x17f)];localStorage['setItem'](_0xc8f714(0x14f),_0x323c6a),document[_0xc8f714(0x114)](_0xc8f714(0x17d))['innerHTML']=_0x323c6a+(_0xc8f714(0x14c)+_0x692f59+')');if(_0x692f59==_0xc8f714(0x131)){var _0x1ab597=document[_0xc8f714(0x114)](_0xc8f714(0x103)),_0x580a8a=document[_0xc8f714(0x12b)](_0xc8f714(0x106));_0x580a8a[_0xc8f714(0xe9)]=_0x7ff6bd,_0x580a8a[_0xc8f714(0x152)]=_0xc8f714(0x179),_0x580a8a[_0xc8f714(0x16b)](_0xc8f714(0xf6),'profile-button'),_0x1ab597[_0xc8f714(0x163)](_0x580a8a);function _0x7ff6bd(){var _0x49a52a=_0xc8f714;_0x4e1977['ref'](_0x49a52a(0x178))[_0x49a52a(0x146)](),_0x4e1977['ref']('chats/')[_0x49a52a(0x118)](_0x49a52a(0x12c),function(_0x1ce8c4){var _0x4780f8=_0x49a52a,_0x3be54a=parseFloat(_0x1ce8c4[_0x4780f8(0x105)]())+(0x14f4+0x1f69+-0x345c);_0x4e1977[_0x4780f8(0x164)]('chats/'+(_0x4780f8(0x15a)+_0x3be54a))[_0x4780f8(0x11a)]({'name':_0x4780f8(0x136),'message':_0x4780f8(0x12a),'display_name':_0x4780f8(0x136),'index':_0x3be54a})[_0x4780f8(0x113)](function(){var _0x3079f4=_0x4780f8;this[_0x3079f4(0x15e)]();});});}}var _0x1ab597=document['getElementById']('profile'),_0x26e21e=document[_0xc8f714(0x12b)](_0xc8f714(0x106));_0x26e21e[_0xc8f714(0xe9)]=_0x3effa5,_0x26e21e['innerHTML']=_0xc8f714(0x110),_0x26e21e['setAttribute']('class',_0xc8f714(0xf8)),_0x1ab597[_0xc8f714(0x163)](_0x26e21e);function _0x3effa5(){var _0x31f6dc=_0xc8f714;localStorage[_0x31f6dc(0x15c)](),window[_0x31f6dc(0x143)]['reload'](),_0x4e1977[_0x31f6dc(0x164)](_0x31f6dc(0xf7)+this[_0x31f6dc(0x127)]())[_0x31f6dc(0xf3)]({'active':![]}),this['display_members']();}});}[_0x4e76f6(0x167)](){var _0x27d889=_0x4e76f6,_0x2d0c3b=document[_0x27d889(0x114)](_0x27d889(0xe8))['value'];_0x2d0c3b=_0x2d0c3b[_0x27d889(0x13e)]();var _0x47bb59=document[_0x27d889(0x114)]('password-login')['value'];if(_0x47bb59=='')return;if(_0x2d0c3b!=_0x27d889(0x131))return;_0x4e1977[_0x27d889(0x164)](_0x27d889(0xf7)+_0x2d0c3b)[_0x27d889(0x118)](_0x27d889(0x12c),function(_0x47499b){var _0x2afb09=_0x27d889;if(_0x47499b['exists']()==!![]){var _0x5cbddb=_0x47499b['val']();if(_0x5cbddb[_0x2afb09(0x140)]==_0x47bb59){var _0x1fcf1e=document[_0x2afb09(0x114)](_0x2afb09(0x155)),_0x474e02=document[_0x2afb09(0x114)](_0x2afb09(0x167));_0x1fcf1e[_0x2afb09(0xfb)]['display']='block',_0x474e02[_0x2afb09(0xfb)][_0x2afb09(0x14f)]=_0x2afb09(0xfe),localStorage[_0x2afb09(0xed)](_0x2afb09(0x10d),_0x2d0c3b),localStorage[_0x2afb09(0xed)]('password',_0x47bb59),localStorage[_0x2afb09(0xed)](_0x2afb09(0x14f),_0x5cbddb[_0x2afb09(0x17f)]),localStorage[_0x2afb09(0xed)](_0x2afb09(0x11f),_0x5cbddb[_0x2afb09(0x11f)]),alert(_0x2cd320),window[_0x2afb09(0x143)][_0x2afb09(0x13f)]();}}});}[_0x4e76f6(0x151)](){var _0x127427=_0x4e76f6;_0x4e1977[_0x127427(0x164)](_0x127427(0x159))['on'](_0x127427(0x12c),function(_0x54557d){var _0x23a627=_0x127427;_0x4e1977[_0x23a627(0x164)](_0x23a627(0x159))[_0x23a627(0xf3)]({'muted':![]});}),_0x4e1977['ref'](_0x127427(0xf7)+localStorage[_0x127427(0x153)](_0x127427(0x10d)))['on'](_0x127427(0x12c),function(_0x53a6b6){var _0x56e276=_0x127427,_0x15dcdc=_0x53a6b6[_0x56e276(0x100)]();_0x15dcdc[_0x56e276(0x116)]?(document['getElementById'](_0x56e276(0x17b))['disabled']=!![],document[_0x56e276(0x114)]('text-box')['placeholder']=_0x56e276(0x125)):(document[_0x56e276(0x114)](_0x56e276(0x17b))[_0x56e276(0x12e)]=![],document['getElementById'](_0x56e276(0x17b))[_0x56e276(0x15b)]=_0x56e276(0x123));});}[_0x4e76f6(0x11b)](){var _0x14a469=_0x4e76f6,_0x16e94b=document[_0x14a469(0x114)](_0x14a469(0xeb)),_0x1dcb08=document[_0x14a469(0x114)](_0x14a469(0x111)),_0xb1c18e=document[_0x14a469(0x114)](_0x14a469(0x13b));_0x16e94b[_0x14a469(0xfb)]['width']=_0x14a469(0x144),_0x1dcb08[_0x14a469(0xfb)]['display']='block',_0xb1c18e[_0x14a469(0xfb)][_0x14a469(0x14f)]=_0x14a469(0xfe);}[_0x4e76f6(0x149)](){var _0x10caba=_0x4e76f6;console[_0x10caba(0xf1)](_0x10caba(0x15f));var _0x2e0e39=localStorage[_0x10caba(0x153)]('planets'),_0x3e55f9=document['getElementById']('gamearea');_0x3e55f9[_0x10caba(0x152)]='';var _0x277f9f=document['createElement'](_0x10caba(0xf9));_0x277f9f['src']=_0x10caba(0x10c),_0x277f9f[_0x10caba(0xfb)]['width']='3%',_0x3e55f9['appendChild'](_0x277f9f);}[_0x4e76f6(0x156)](){var _0x20e954=_0x4e76f6;this[_0x20e954(0xe7)](),this[_0x20e954(0x112)]();var _0x26ac70=document[_0x20e954(0x12b)]('button');_0x26ac70[_0x20e954(0x16b)](_0x20e954(0xf6),'send-message'),_0x26ac70[_0x20e954(0x152)]='➤',_0x26ac70['onclick']=this[_0x20e954(0x173)];var _0x5ef9fe=document[_0x20e954(0x12b)]('button');_0x5ef9fe['setAttribute'](_0x20e954(0xf6),_0x20e954(0xef)),_0x5ef9fe[_0x20e954(0x15d)]=_0x20e954(0x115);var _0x14f413=document['createElement'](_0x20e954(0xf9));_0x14f413['src']=_0x20e954(0x137),_0x14f413[_0x20e954(0x16b)]('class',_0x20e954(0x129)),_0x5ef9fe['appendChild'](_0x14f413),_0x5ef9fe['onclick']=this[_0x20e954(0x11b)],document[_0x20e954(0x114)](_0x20e954(0x122))[_0x20e954(0x163)](_0x5ef9fe);var _0x46b1bb=document['createElement']('button');_0x46b1bb[_0x20e954(0x16b)](_0x20e954(0xf6),_0x20e954(0xef)),_0x46b1bb[_0x20e954(0x15d)]=_0x20e954(0xf4);var _0x19d0f2=document['createElement'](_0x20e954(0xf9));_0x19d0f2['src']=_0x20e954(0xee),_0x19d0f2[_0x20e954(0x16b)](_0x20e954(0xf6),_0x20e954(0x129)),_0x46b1bb[_0x20e954(0x163)](_0x19d0f2),console[_0x20e954(0xf1)](this),(_0x46b1bb['onclick']=this[_0x20e954(0x11b)],this[_0x20e954(0x149)]),document[_0x20e954(0x114)](_0x20e954(0x122))[_0x20e954(0x163)](_0x46b1bb),document[_0x20e954(0x114)](_0x20e954(0xec))[_0x20e954(0x163)](_0x26ac70),document[_0x20e954(0x130)](_0x20e954(0x177),_0x231113=>{var _0x8f572a=_0x20e954;const _0x49f93e=_0x231113[_0x8f572a(0x108)]['toLowerCase']();if(document['getElementById']('text-box')==document['activeElement'])_0x49f93e==_0x8f572a(0x174)&&this['send_message']();else document[_0x8f572a(0x114)](_0x8f572a(0x172))==document['activeElement']&&(_0x49f93e==_0x8f572a(0x174)&&this[_0x8f572a(0x167)]());}),this[_0x20e954(0x15e)](),this[_0x20e954(0x17e)](),this['check_mute']();var _0x59b16f=document[_0x20e954(0x114)](_0x20e954(0x155)),_0x5b576e=document[_0x20e954(0x114)](_0x20e954(0x167));this[_0x20e954(0x127)]()!=null?(_0x59b16f[_0x20e954(0xfb)]['display']=_0x20e954(0x10f),_0x5b576e[_0x20e954(0xfb)][_0x20e954(0x14f)]=_0x20e954(0xfe),this[_0x20e954(0x148)](localStorage[_0x20e954(0x153)](_0x20e954(0x14f))+_0x20e954(0x158))):(_0x59b16f[_0x20e954(0xfb)][_0x20e954(0x14f)]=_0x20e954(0xfe),_0x5b576e[_0x20e954(0xfb)][_0x20e954(0x14f)]=_0x20e954(0x10f));var _0x26ac70=document[_0x20e954(0x12b)](_0x20e954(0x106));_0x26ac70[_0x20e954(0x16b)]('class',_0x20e954(0x14e)),_0x26ac70['innerHTML']='Login',_0x26ac70[_0x20e954(0xe9)]=this[_0x20e954(0x167)],logincontain[_0x20e954(0x163)](_0x26ac70);}}var _0x3018f5=new _0x12d8e2();_0x3018f5[_0x4e76f6(0x156)]();}catch(_0x4141f5){alert(_0x4141f5);}});function _0x40ff(){var _0x447b86=['push','val','div','G-4CGJ1JFX58','profile','!mute\x20','numChildren','button','User\x20cannot\x20be\x20muted,\x20','key','\x20[Muted]','!unmute\x20','Muted\x20','../images/planetImg.png','username','../images/meteorite.png','block','Logout','gamearea','update_name','then','getElementById','Space\x20Seizure','muted','chatter-97e8c.firebaseapp.com','once','name','set','setupGame','textarea','filter','5883258qsUQYo','planets','128mHbTxB','member','sidebar','Message','chatter-97e8c.appspot.com','Muted','281722915171','get_name','lol','sidebar-logo','GOD\x20wiped\x20the\x20chat','createElement','value','122313XthbaH','disabled','!allmutedremove','addEventListener','god','profile-img','values','forEach','Yellow','[SERVER]','../images/spaceseizuremain.png','onload','message','chatter-97e8c','memberlist','sos','Unmuted\x20','toLowerCase','reload','password','Red','length','location','36%','startsWith','remove','19432764OdNNnj','send_server_message','lunarLunacy','Rebound!','https://classroom.google.com','\x20(@','322133RFtolV','login-button','display','489095pdyJCb','check_mute','innerHTML','getItem','100YMGBCr','main','setup','pebbleCredits.txt','\x20has\x20joined\x20the\x20chat','users/god','message_','placeholder','clear','title','refresh_chat','worked','active','database','rofl','appendChild','ref','readFile','color','login','\x20muted\x20themselves!','!remove\x20','fontWeight','setAttribute','span','!reveal\x20','replace','scrollTop','index','scrollHeight','password-login','send_message','enter','click','\x20does\x20not\x20exist!','keydown','chats/','Wipe\x20Chat','members','text-box','Credit\x20to\x20Mr.\x20BungoChungo\x20for\x20cooperating\x20with\x20me\x20(at\x20least\x20for\x20a\x20short\x20time)\x20on\x20this\x20project.\x0a\x20\x20\x20\x20\x20\x20\x20\x20Credit\x20to\x20Mr.\x20WagnerRizzer\x20for\x20the\x20logo\x20of\x20this\x20site,\x20which\x20originated\x20from\x20a\x20school\x20project.','userdisplay','display_members','display_name','check_creds','username-login','onclick','substring','messagebox','downbar','setItem','../images/lunarlunacy.png','sidebar-button','1443164wzCySp','log','exists','update','Lunar\x20Lunacy','src','class','users/','profile-button','img','Green','style','\x20@(','361166ysAfex','none'];_0x40ff=function(){return _0x447b86;};return _0x40ff();}
+window.onload = function() {
+    try {
+        const firebaseConfig = {
+            apiKey: "AIzaSyDOAj76E00Rg8Qyc5DQndWXHtCy2umC6vA",
+            authDomain: "chatter-97e8c.firebaseapp.com",
+            projectId: "chatter-97e8c",
+            storageBucket: "chatter-97e8c.appspot.com",
+            messagingSenderId: "281722915171",
+            appId: "1:281722915171:web:3b136d8a0b79389f2f6b56",
+            measurementId: "G-4CGJ1JFX58"
+        };
+        firebase.initializeApp(firebaseConfig);
+        var db = firebase.database();
+        var credits = `Credit to Mr. BungoChungo for cooperating with me (at least for a short time) on this project.
+        Credit to Mr. WagnerRizzer for the logo of this site, which originated from a school project.`;
+
+        class chatter {
+            refresh_chat() {
+                var textarea = document.getElementById('textarea');
+        
+                // Get the chats from firebase
+                db.ref('chats/').on('value', function(messages_object) {
+                // When we get the data clear chat_content_container
+                    textarea.innerHTML = '';
+                // if there are no messages in the chat. Return . Don't load anything
+                    if(messages_object.numChildren() == 0){
+                        return
+                    }
+        
+                // OK! SO IF YOU'RE A ROOKIE CODER. THIS IS GOING TO BE
+                // SUPER EASY-ISH! I THINK. MAYBE NOT. WE'LL SEE!
+        
+                    // convert the message object values to an array.
+                    var messages = Object.values(messages_object.val());
+                    var guide = []; // this will be our guide to organizing the messages
+                    var unordered = []; // unordered messages
+                    var ordered = []; // we're going to order these messages
+        
+                    for (var i, i = 0; i < messages.length; i++) {
+                        // The guide is simply an array from 0 to the messages.length
+                        guide.push(i+1);
+                        // unordered is the [message, index_of_the_message]
+                        unordered.push([messages[i], messages[i].index]);
+                    }
+        
+                // Now this is straight up from stack overflow Ã°Å¸Â¤Â£
+                // Sort the unordered messages by the guide
+                    guide.forEach(function(key) {
+                        var found = false;
+                        unordered = unordered.filter(function(item) {
+                            if(!found && item[1] == key) {
+                                ordered.push(item[0]);
+                                found = true;
+                                return false;
+                            } else {
+                                return true;
+                            }
+                        })
+                    })
+                    
+                // Now we're done. Simply display the ordered messages
+                    ordered.forEach(function(data) {
+                        var username = data.display_name;
+                        var message = data.message;
+                        
+                        var messageElement = document.createElement("div");
+                        messageElement.setAttribute("class", "message");
+                        
+                        textarea.appendChild(messageElement);
+
+                        if (data.name == "[SERVER]") {
+                            var messageImg = document.createElement("img");
+                            messageImg.src = "../images/meteorite.png";
+                            messageImg.setAttribute("class", "profile-img");
+                            messageElement.appendChild(messageImg);
+                        }
+                        
+                        var userElement = document.createElement("div");
+                        userElement.setAttribute("class", "username");
+                        userElement.addEventListener("click", function(e) {
+                            userElement.innerHTML = username + " @(" + data.name + ")" ;
+                        })
+                        userElement.innerHTML = username;
+                        userElement.style.fontWeight = "bold";
+                        if (data.name == "[SERVER]") {
+                            userElement.style.color = "Yellow";
+                        }
+                        messageElement.appendChild(userElement);
+                        
+                        var messageContent = document.createElement("div");
+                        messageContent.setAttribute("class", "message-text");
+                        messageContent.innerHTML = message;
+                        messageElement.appendChild(messageContent);
+                    });
+                    textarea.scrollTop = textarea.scrollHeight;
+                })
+                var username = this.get_name();
+                db.ref("users/" + username).update({
+                    active: true
+                })
+            }
+            
+            display_members() {
+                var members = document.getElementById('members');
+        
+                // Get the users from firebase
+                db.ref('users/').on('value', function(membersList) {
+                    members.innerHTML = '';
+                    if(membersList.numChildren() == 0){
+                        return
+                    }
+                    var usernames = Object.values(membersList.val());
+                    var ordered = [];
+        
+                    for (var i, i = 0; i < usernames.length; i++) {
+                        ordered.push([usernames[i].display_name, usernames[i].muted, usernames[i].username, usernames[i].active]);
+                    }
+                    ordered.forEach(function(properties) {
+                        var memberElement = document.createElement("div");
+                        memberElement.setAttribute("class", "member");
+                        memberElement.innerHTML = properties[0];
+                        var text = memberElement.innerHTML;
+                        if (properties[3]) {
+                            memberElement.style.color = "Green";
+                        }
+                        memberElement.addEventListener("click", function(e) {
+                            memberElement.innerHTML = text + " @(" + properties[2] + ")";
+                            if (properties[1]) {
+                                var mutedElement = document.createElement("span");
+                                mutedElement.style.color = "Red";
+                                mutedElement.innerHTML = " [Muted]";
+                                memberElement.appendChild(mutedElement);
+                            } 
+                        })
+                        if (properties[1]) {
+                            var mutedElement = document.createElement("span");
+                            mutedElement.style.color = "Red";
+                            mutedElement.innerHTML = " [Muted]";
+                            memberElement.appendChild(mutedElement);
+                        }
+                        members.appendChild(memberElement);
+                    });
+                    members.scrollTop = members.scrollHeight;
+                })
+        
+            }
+            
+            send_server_message(message) {
+                try {
+                    var textarea = document.getElementById("textarea");
+                    var message = message;
+                    var username = "[SERVER]";
+                    if (message == "" || username == "") {
+                        return
+                    } else if (message == "sos") {
+                        window.location.replace("https://classroom.google.com");
+                        return
+                    } else {
+                        if (message == "rofl") {
+                            message = "🤣";
+                        } else if (message == "lol") {
+                            message = "😂";
+                        } else if (message == "k" || message == "ok" || message == "kk" || message == "okay") {
+                            message = "👌";
+                        }
+                        db.ref('chats/').once('value', function(message_object) {
+                            var index = parseFloat(message_object.numChildren()) + 1
+                            db.ref('chats/' + `message_${index}`).set({
+                                name: "[SERVER]",
+                                message: message,
+                                display_name: "[SERVER]",
+                                index: index
+                            }).then(this.refresh_chat())
+                        })
+                    }
+                } catch(err) {
+                    alert(err);
+                }
+            }
+            
+            check_creds() {
+                var username = localStorage.getItem('username')
+                var password = localStorage.getItem('password')
+                db.ref("users/" + username).once('value', function(user_object) {
+                    if (user_object.exists() == true) {
+                        var obj = user_object.val()
+                        if (obj.password == password) {
+                            return
+                        } else {
+                            var main = document.getElementById("main")
+                            var login = document.getElementById("login")
+                            main.style.display = "none"
+                            login.style.display = "block"
+                            localStorage.clear()
+                        }
+                    } 
+                })
+            }
+            
+            send_message() {
+                try {
+                    var textarea = document.getElementById("textarea")
+                    var message = document.getElementById("text-box").value
+                    this.check_creds
+                    var username = localStorage.getItem('username')
+                    if (username == null) {
+                        return
+                    }
+
+                    //Check if user is muted
+                    db.ref("users/" + username).once('value', function(user_object) {
+                        if (user_object.muted) {
+                            return
+                        }
+                    })
+                    
+                    if (message == "" || username == "") {
+                        return
+                    } else if (message == "sos") {
+                        window.location.replace("https://classroom.google.com")
+                        return
+                    } else if (message.startsWith("!mute ")) {
+                        var muted_user = message.substring(6).toLowerCase()
+                        if (muted_user == "god") {
+                            alert("Rebound!")
+                            db.ref("users/" + username).on('value', function(user_object) {
+                                db.ref("users/" + username).update({
+                                    muted: true
+                                })
+                            })
+                            db.ref('chats/').once('value', function(message_object) {
+                                var index = parseFloat(message_object.numChildren()) + 1
+                                db.ref('chats/' + `message_${index}`).set({
+                                    name: "[SERVER]",
+                                    message: muted_user + " muted themselves!",
+                                    display_name: "[SERVER]",
+                                    index: index
+                                }).then(function() {
+                                    this.refresh_chat()
+                                })
+                            })
+                            return
+                        }
+                        if (username == "god") {
+                            db.ref("users/" + muted_user).once('value', function(user_object) {
+                                if (user_object.exists() == false) {
+                                    alert("User cannot be muted, " + muted_user + " does not exist!")
+                                    return
+                                } else if (muted_user == "god") {
+                                    alert("Rebound!")
+                                    db.ref("users/" + username).on('value', function(user_object) {
+                                        db.ref("users/" + username).update({
+                                            muted: true
+                                        })
+                                    })
+                                    return
+                                }
+                                db.ref('chats/').once('value', function(message_object) {
+                                    var index = parseFloat(message_object.numChildren()) + 1
+                                    db.ref('chats/' + `message_${index}`).set({
+                                        name: "[SERVER]",
+                                        message: "Muted " + muted_user,
+                                        display_name: "[SERVER]",
+                                        index: index
+                                    }).then(function() {
+                                        this.refresh_chat()
+                                    })
+                                })
+                                db.ref("users/" + muted_user).update({
+                                    muted: true
+                                })
+                            })
+                        }
+                    } else if (message.startsWith("!unmute ")) {
+                        if (username == "god") {
+                            var unmuted_user = message.substring(8).toLowerCase()
+                            db.ref("users/" + unmuted_user).once('value', function(user_object) {
+                                if (user_object.exists() == false) {
+                                    alert("User cannot be unmuted, " + unmuted_user + " does not exist!")
+                                    return
+                                }
+                                db.ref('chats/').once('value', function(message_object) {
+                                    var index = parseFloat(message_object.numChildren()) + 1
+                                    db.ref('chats/' + `message_${index}`).set({
+                                        name: "[SERVER]",
+                                        message: "Unmuted " + unmuted_user,
+                                        display_name: "[SERVER]",
+                                        index: index
+                                    }).then(function() {
+                                        this.refresh_chat()
+                                    })
+                                })
+                                db.ref("users/" + unmuted_user).update({
+                                    muted: false
+                                })
+                            })
+                        }
+                    } else if (message.startsWith("!reveal ") && username == "god") {
+                        var revealed_user = message.substring(8).toLowerCase()
+                        db.ref("users/" + revealed_user).once('value', function(user_object) {
+                            var obj = user_object.val()
+                            alert(obj.password)
+                        })
+                    } else if (message.startsWith("!remove ") && username == "god") {
+                        var removed_user = message.substring(8).toLowerCase()
+                        db.ref("users/" + removed_user).remove()
+                    } else if (message == "!allmutedremove" && username == "god") {
+                        db.ref("users/").on('value', function(usrObj) {
+                            var obj = Object.values(usrObj.val())
+                            obj.forEach(function(usr) {
+                                if (usr.muted) {
+                                    db.ref("users/" + usr.username).remove();
+                                }
+                            })
+                        })
+                    }
+                    if (message == "rofl") {
+                        message = "🤣"
+                    } else if (message == "lol") {
+                        message = "😂"
+                    } else if (message == "k" || message == "ok" || message == "kk" || message == "okay") {
+                        message = "👌"
+                    }
+                    db.ref("users/" + username).once('value', function(user_object) {
+                        var obj = user_object.val()
+                        var display_name = obj.display_name
+                        document.getElementById("text-box").value = ""
+                        db.ref('chats/').once('value', function(message_object) {
+                            var index = parseFloat(message_object.numChildren()) + 1
+                            db.ref('chats/' + `message_${index}`).set({
+                                name: username,
+                                message: message,
+                                display_name: display_name,
+                                index: index
+                            }).then(function() {
+                                this.refresh_chat()
+                            })
+                        })
+                    })
+                } catch(err) {
+                    alert(err)
+                }
+            }
+
+            alertDisclaimer() {
+                const fs = require('fs')
+                fs.readFile('pebbleCredits.txt', function (err, data) {
+                    alert(data)
+                })
+            }
+            
+            get_name() {
+                if (localStorage.getItem('username') != null) {
+                    return localStorage.getItem('username')
+                } else {
+                    return null
+                }
+            }
+            
+            update_name() {
+                var name = localStorage.getItem('username')
+                db.ref("users/" + name).once('value', function(user_object) {
+                    var obj = user_object.val()
+                    var display_name = obj.display_name
+                    localStorage.setItem("display", display_name)
+                    document.getElementById("userdisplay").innerHTML = display_name + ` (@${name})`
+                    if (name == "god") {
+                        var dash = document.getElementById("profile")
+                        
+                        var wipebutton = document.createElement("button")
+                        wipebutton.onclick = wipechat
+                        wipebutton.innerHTML = "Wipe Chat"
+                        wipebutton.setAttribute("class", "profile-button")
+                        
+                        dash.appendChild(wipebutton)
+                        
+                        function wipechat() {
+                            db.ref("chats/").remove()
+                            db.ref('chats/').once('value', function(message_object) {
+                                var index = parseFloat(message_object.numChildren()) + 1
+                                db.ref('chats/' + `message_${index}`).set({
+                                    name: "[SERVER]",
+                                    message: "GOD wiped the chat",
+                                    display_name: "[SERVER]",
+                                    index: index
+                                }).then(function() {
+                                    this.refresh_chat()
+                                })
+                            })
+                        }
+                    }
+                    var dash = document.getElementById("profile")
+                    
+                    var logoutButton = document.createElement("button")
+                    logoutButton.onclick = logout
+                    logoutButton.innerHTML = "Logout"
+                    logoutButton.setAttribute("class", "profile-button")
+                    dash.appendChild(logoutButton)
+                    
+                    function logout() {
+                        localStorage.clear()
+                        window.location.reload()
+                        db.ref("users/" + this.get_name()).update({
+                            active: false
+                        })
+                        this.display_members()
+                    }
+                })
+            }
+            
+            login() {
+                var username = document.getElementById("username-login").value
+                username = username.toLowerCase()
+                var password = document.getElementById("password-login").value
+                if (password == "") {
+                    return
+                }
+                if (username != "god") {
+                    return
+                }
+                db.ref("users/" + username).once('value', function(user_object) {
+                    if (user_object.exists() == true) {
+                        var obj = user_object.val();
+                        if (obj.password == password) {
+                            var main = document.getElementById("main");
+                            var login = document.getElementById("login");
+                            main.style.display = "block";
+                            login.style.display = "none";
+                            localStorage.setItem('username', username);
+                            localStorage.setItem('password', password);
+                            localStorage.setItem("display", obj.display_name);
+                            localStorage.setItem("planets", obj.planets);
+                            alert(credits);
+                            window.location.reload();
+                        }
+                    } 
+                })
+            }
+            
+            check_mute() {
+                db.ref("users/god").on('value', function(user_object) {
+                    db.ref("users/god").update({
+                        muted: false
+                    })
+                })
+                db.ref("users/" + localStorage.getItem("username")).on('value', function(user_object) {
+                    var obj = user_object.val()
+                    if (obj.muted) {
+                        document.getElementById("text-box").disabled = true
+                        document.getElementById("text-box").placeholder = "Muted"
+                    } else {
+                        document.getElementById("text-box").disabled = false
+                        document.getElementById("text-box").placeholder = "Message"
+                    }
+                })
+            }
+
+            setupGame() {
+                var message_area = document.getElementById("messagebox");
+                var game_area = document.getElementById("gamearea");
+                var member_list = document.getElementById("memberlist");
+                message_area.style.width = "36%";
+                game_area.style.display = "block";
+                member_list.style.display = "none";
+            }
+            
+            lunarLunacy() {
+                console.log("worked")
+                var planets = localStorage.getItem("planets");
+                var gameArea = document.getElementById("gamearea");
+                gameArea.innerHTML = "";
+                var planetImg = document.createElement("img");
+                planetImg.src = "../images/planetImg.png";
+                planetImg.style.width = "3%";
+                gameArea.appendChild(planetImg);
+            }
+
+            setup() {
+                this.check_creds()
+                this.update_name()
+                var element = document.createElement("button")
+                element.setAttribute("class", "send-message")
+                element.innerHTML = "➤"
+                element.onclick = this.send_message
+
+                var spaceSeizureButton = document.createElement("button");
+                spaceSeizureButton.setAttribute("class", "sidebar-button");
+                spaceSeizureButton.title = "Space Seizure";
+                var spaceSeizureLogo = document.createElement("img");
+                spaceSeizureLogo.src = "../images/spaceseizuremain.png";
+                spaceSeizureLogo.setAttribute("class", "sidebar-logo");
+                spaceSeizureButton.appendChild(spaceSeizureLogo);
+                spaceSeizureButton.onclick = this.setupGame
+                document.getElementById("sidebar").appendChild(spaceSeizureButton)
+                
+                var lunarLunacyButton = document.createElement("button");
+                lunarLunacyButton.setAttribute("class", "sidebar-button");
+                lunarLunacyButton.title = "Lunar Lunacy";
+                var lunarLunacyLogo = document.createElement("img");
+                lunarLunacyLogo.src = "../images/lunarlunacy.png";
+                lunarLunacyLogo.setAttribute("class", "sidebar-logo");
+                lunarLunacyButton.appendChild(lunarLunacyLogo);
+                console.log(this)
+                lunarLunacyButton.onclick = this.setupGame, this.lunarLunacy;
+                document.getElementById("sidebar").appendChild(lunarLunacyButton)
+                
+                document.getElementById("downbar").appendChild(element)
+                document.addEventListener('keydown', event => {
+                    const key = event.key.toLowerCase();
+                    if (document.getElementById("text-box") == document.activeElement) {
+                        if (key == "enter") {
+                            this.send_message()
+                        }
+                    } else if (document.getElementById("password-login") == document.activeElement) {
+                        if (key == "enter") {
+                            this.login()
+                        }
+                    }
+                })
+                this.refresh_chat()
+                this.display_members()
+                this.check_mute()
+                var main = document.getElementById("main")
+                var login = document.getElementById("login")
+                if (this.get_name() != null) {
+                    main.style.display = "block"
+                    login.style.display = "none"
+                    this.send_server_message(localStorage.getItem("display") + " has joined the chat")
+                } else {
+                    main.style.display = "none"
+                    login.style.display = "block"
+                }
+                var element = document.createElement("button")
+                element.setAttribute("class", "login-button")
+                element.innerHTML = "Login"
+                element.onclick = this.login
+
+                logincontain.appendChild(element)
+            }
+        }
+        
+        var app = new chatter()
+        app.setup()
+    } catch(err) {
+        alert(err)
+    }
+}
