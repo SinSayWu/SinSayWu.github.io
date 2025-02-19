@@ -1,0 +1,24 @@
+{
+  "name": "sinsaywu.github.io",
+  "version": "1.0.0",
+  "description": "pebble is up now yay",
+  "main": "firebaseAdmin.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SinSayWu/SinSayWu.github.io.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/SinSayWu/SinSayWu.github.io/issues"
+  },
+  "homepage": "https://github.com/SinSayWu/SinSayWu.github.io#readme",
+  "dependencies": {
+    "firebase-admin": "^13.1.0"
+  }
+}
