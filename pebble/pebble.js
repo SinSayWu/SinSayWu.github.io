@@ -10,11 +10,10 @@ window.onload = function() {
             measurementId: "G-4CGJ1JFX58"
         };
         firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-        
-        const credits = `Credit to Mr. BungoChungo for cooperating with me (at least for a short time) on this project.
+        var db = firebase.database();
+        var credits = `Credit to Mr. BungoChungo for cooperating with me (at least for a short time) on this project.
 Credit to Mr. WagnerRizzer for the logo of this site, which originated from a school project.`;
-        const termsOfService = `TERMS OF SERVICE:
+        var termsOfService = `TERMS OF SERVICE:
 Please note that these Terms of Service will hold until ... forever.
 1. By clicking the button below, or exiting out of this alert in any way, shape, or form, but continuing to use this chat room, you, the user, are agreeing to the following terms.
 
@@ -423,7 +422,6 @@ P.S. These terms apply to all of the webpages I own"`
                             localStorage.setItem('username', username)
                             localStorage.setItem('password', password)
                             localStorage.setItem("display", displayName)
-                            db.ref("users/" + "null").remove();
                             alert(credits);
                             alert(termsOfService);
                             window.location.reload()
