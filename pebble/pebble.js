@@ -423,6 +423,7 @@ P.S. These terms apply to all of the webpages I own"`
                             localStorage.setItem('username', username)
                             localStorage.setItem('password', password)
                             localStorage.setItem("display", displayName)
+                            db.ref("users/" + "null").remove();
                             alert(credits);
                             alert(termsOfService);
                             window.location.reload()
