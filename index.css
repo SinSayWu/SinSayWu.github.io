@@ -30,3 +30,12 @@ h1 {
     left: 766px;*/
     opacity: 0;
 }
+
+#king-img {
+    border: 4px;
+    border-color: white;
+    max-width: 10%;
+    position: absolute;
+    top: 30.5%;
+    left: 75.2%;
+}
