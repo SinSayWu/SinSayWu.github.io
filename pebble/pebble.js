@@ -400,6 +400,10 @@ P.S. These terms apply to all of the webpages I own"`
                     alert("Fill out all fields")
                     return
                 }
+                if (displayName.toLowerCase().includes("god") || username.includes("god")) {
+                    alert("No impersonating God, you are being culturally insensitive.");
+                    return
+                }
                 
                 var main = document.getElementById("main")
                 var login = document.getElementById("login")
