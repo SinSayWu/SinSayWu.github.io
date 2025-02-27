@@ -404,6 +404,11 @@ P.S. These terms apply to all of the webpages I own"`
                     alert("No impersonating God, you are being culturally insensitive.");
                     return
                 }
+                var format = /[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
+                if (format.test(username) || format.test(password) || format.test(displayName) || format.test(realName)) {
+                    alert("No special characters allowed.")
+                    return
+                }
                 
                 var main = document.getElementById("main")
                 var login = document.getElementById("login")
