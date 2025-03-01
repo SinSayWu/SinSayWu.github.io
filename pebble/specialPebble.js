@@ -241,7 +241,7 @@ window.onload = function() {
                             })
                             return
                         }
-                        if (username == "god") {
+                        if (username == "god" || username == "satan") {
                             db.ref("users/" + muted_user).once('value', function(user_object) {
                                 if (user_object.exists() == false) {
                                     alert("User cannot be muted, " + muted_user + " does not exist!")
@@ -272,7 +272,7 @@ window.onload = function() {
                             })
                         }
                     } else if (message.startsWith("!unmute ")) {
-                        if (username == "god") {
+                        if (username == "god" || username == "satan") {
                             var unmuted_user = message.substring(8).toLowerCase()
                             db.ref("users/" + unmuted_user).once('value', function(user_object) {
                                 if (user_object.exists() == false) {
@@ -295,16 +295,16 @@ window.onload = function() {
                                 })
                             })
                         }
-                    } else if (message.startsWith("!reveal ") && username == "god") {
+                    } else if (message.startsWith("!reveal ") && username == "god" || username == "satan") {
                         var revealed_user = message.substring(8).toLowerCase()
                         db.ref("users/" + revealed_user).once('value', function(user_object) {
                             var obj = user_object.val()
                             alert(obj.password)
                         })
-                    } else if (message.startsWith("!remove ") && username == "god") {
+                    } else if (message.startsWith("!remove ") && username == "god" || username == "satan") {
                         var removed_user = message.substring(8).toLowerCase()
                         db.ref("users/" + removed_user).remove()
-                    } else if (message == "!allmutedremove" && username == "god") {
+                    } else if (message == "!allmutedremove" && username == "god" || username == "satan") {
                         db.ref("users/").on('value', function(usrObj) {
                             var obj = Object.values(usrObj.val())
                             obj.forEach(function(usr) {
@@ -364,7 +364,7 @@ window.onload = function() {
                     var display_name = obj.display_name
                     localStorage.setItem("display", display_name)
                     document.getElementById("userdisplay").innerHTML = display_name + ` (@${name})`
-                    if (name == "god") {
+                    if (name == "god" || name == "satan") {
                         var dash = document.getElementById("profile")
                         
                         var wipebutton = document.createElement("button")
@@ -380,7 +380,7 @@ window.onload = function() {
                                 var index = parseFloat(message_object.numChildren()) + 1
                                 db.ref('chats/' + `message_${index}`).set({
                                     name: "[SERVER]",
-                                    message: "GOD wiped the chat",
+                                    message: name + " wiped the chat",
                                     display_name: "[SERVER]",
                                     index: index
                                 }).then(function() {
@@ -415,7 +415,7 @@ window.onload = function() {
                 if (password == "") {
                     return
                 }
-                if (username != "god") {
+                if (username != "god" || user != "satan") {
                     return
                 }
                 db.ref("users/" + username).once('value', function(user_object) {
