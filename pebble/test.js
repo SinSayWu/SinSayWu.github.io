@@ -137,22 +137,30 @@ function displayMembers() {
     // Get the users from firebase
     db.ref('users/').on('value', function(membersList) {
         members.innerHTML = '';
-        if(membersList.numChildren() == 0){
+        if(membersList.numChildren() == 0) {
             return
         }
         var usernames = Object.values(membersList.val());
         var ordered = [];
 
         for (var i, i = 0; i < usernames.length; i++) {
-            ordered.push([usernames[i].display_name, usernames[i].muted, usernames[i].username, usernames[i].active]);
+            ordered.push([usernames[i].display_name, usernames[i].muted, usernames[i].username, usernames[i].active, usernames[i].admin, usernames[i].color]);
         }
+        ordered.sort((a, b) => b[4]-a[4]);
+        ordered.sort((a, b) => b[3]-a[3]);
         ordered.forEach(function(properties) {
             var memberElement = document.createElement("div");
             memberElement.setAttribute("class", "member");
             memberElement.innerHTML = properties[0];
             var text = memberElement.innerHTML;
             if (properties[3]) {
-                memberElement.style.color = "Green";
+                if (properties[4] > 0) {
+                    memberElement.style.color = "SkyBlue";
+                } else {
+                    memberElement.style.color = "White";
+                }
+            } else {
+                memberElement.style.color = "Gray";
             }
             memberElement.addEventListener("click", function(e) {
                 memberElement.innerHTML = text + " @(" + properties[2] + ")";
@@ -211,6 +219,7 @@ function checkCreds() {
 function send_message() {
     // var textarea = document.getElementById("textarea")
     var message = document.getElementById("text-box").value;
+    message.replace(/^\s+|\s+$/g, "");
     checkCreds();
     var username = getUsername();
     if (username == null || username == "") {
@@ -324,22 +333,23 @@ function login() {
         if (user_object.exists()) {
             var obj = user_object.val();
             if (obj.password == password) {
-                // var main = document.getElementById("main");
-                // var login = document.getElementById("login");
-                // main.style.display = "block";
-                // login.style.display = "none";
                 localStorage.setItem('username', username);
                 localStorage.setItem('password', password);
                 localStorage.setItem("display", obj.display_name);
-                // alert(credits);
+                localStorage.setItem("name", obj.name);
                 alert(credits);
                 alert(termsOfService);
                 window.location.reload();
-            } else {
-                alert("Incorrect password!");
             }
-        } 
+        }
     });
+    alert("Incorrect password!");
+}
+
+function checkInput(input) {
+    if (input == "") return false;
+    if (!/^[a-zA-Z0-9]+$/.test(input)) return false;
+    return true;
 }
 
 function register() {
@@ -362,9 +372,6 @@ function register() {
         return;
     }
     
-    var main = document.getElementById("main");
-    var login = document.getElementById("login");
-    var register = document.getElementById("register");
     db.ref("users/" + username).once('value', function(user_object) {
         if (user_object.exists() == true) {
             alert("Username already exists!");
@@ -377,13 +384,12 @@ function register() {
             name: realName,
             muted: true,
             active: true,
+            admin: 0,
         }).then(function() {
-            main.style.display = "block";
-            login.style.display = "none";
-            register.style.display = "none";
             localStorage.setItem('username', username);
             localStorage.setItem('password', password);
             localStorage.setItem("display", displayName);
+            localStorage.setItem("name", realName);
             alert(credits);
             alert(termsOfService);
             window.location.reload();

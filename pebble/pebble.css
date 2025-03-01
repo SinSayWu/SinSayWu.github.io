@@ -1,6 +1,5 @@
 body {
     background-color: #202225;
-    height: 100%;
     font-family: Arial;
     border-width: 0px;
 }
@@ -174,24 +173,29 @@ a {
 }
 
 .box-message {
+    font-family: Arial;
     background-color: #292b2f;
     border-radius: 30px;
     height: 60%;
     width: 90%;
     margin-left: 2.5%;
-    margin-top: 0.5%;
+    margin-top: 1%;
     padding-left: 2%;
+    padding-top: 2%;
     border-width: 0px;
     color: white;
+    float: left;
 }
 
 .send-message {
     color: white;
     background-color: #5864f1;
     border-radius: 10px;
-    margin-left: 0.5%;
+    margin-right: 2%;
     width: 4.5%;
     height: 65%;
+    float: right;
+    margin-top: 1%;
 }
 
 .message {
@@ -293,6 +297,20 @@ input {
 }
 
 input:focus {
+    outline: none;
+}
+
+textarea {
+    width: 100%;
+    min-height: 50px;
+    max-height: 300px;
+    padding: 10px;
+    font-size: 16px;
+    resize: none;
+    overflow-y: hidden;
+}
+
+textarea:focus {
     outline: none;
 }
 

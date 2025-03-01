@@ -77,6 +77,7 @@
                 <div class="profile" id="profile">
                     <div class="user-changer" id="userdisplay"></div>
                     <button class="profile-button" onclick="logout()">Log Out</button>
+                    <button class="profile-button" onclick="window.location.replace('../profile/profile.html');">Profile Settings</button>
                 </div>
             </div>
             <div class="message-box" id="messagebox">
@@ -87,7 +88,7 @@
                     
                 </div>
                 <div class="text-area" id="downbar">
-                    <input class="box-message" placeholder="Message" id="text-box" type="text">
+                    <textarea class="box-message" placeholder="Message" id="text-box"></textarea>
                     <button class="send-message" onclick="send_message()">➤</button>
                 </div>
             </div>
