@@ -244,12 +244,12 @@ a {
 }
 
 .login-input {
-    margin-left: 5px;
     margin: auto;
     border-radius: 10px;
     width: 80%;
     height: 8%;
     color: white;
+    margin-top: 0.5%;
 }
 
 .register-input {
@@ -258,12 +258,13 @@ a {
     width: 80%;
     height: 8%;
     color: white;
+    margin-top: 0.5%;
 }
 
 .login-text {
     color: white;
     font-size: 12px;
-    margin-left: 10%;
+    margin-left: 11%;
     float: left;
 }
 
