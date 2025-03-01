@@ -3,7 +3,7 @@
         <link rel="stylesheet" href="pebble.css">
         <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-app.js"></script>
         <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-database.js"></script>
-        <script src="pebble.js"></script>
+        <script src="test.js"></script>
         <link rel="shortcut icon" href="../images/pebblePic.png" type="image/">
         <title>
             Pebble
@@ -20,6 +20,8 @@
                     <div class="login-text">Password</div>
                     <input class="login-input" type="password" id="password-login">
                 </div>
+                <button class="login-button" onclick="login()">Login</button>
+                <button class="login-button" style="margin-top:5px" onclick="regMenu()">Register</button>
             </div>
         </div>
         <div class="register-wrapper" id="register">
@@ -40,6 +42,8 @@
                     <div class="login-text">Real Name</div>
                     <input class="register-input" type="text" id="name-register" maxlength="30">
                 </div>
+                <button class="login-button" onclick="register()">Register</button>
+                <button class="login-button" style="margin-top:5px" onclick="back()">Back</button>
             </div>
         </div>
         <div class="wrapper" id="main">
@@ -72,6 +76,7 @@
                 </div>
                 <div class="profile" id="profile">
                     <div class="user-changer" id="userdisplay"></div>
+                    <button class="profile-button" onclick="logout()">Log Out</button>
                 </div>
             </div>
             <div class="message-box" id="messagebox">
@@ -83,6 +88,7 @@
                 </div>
                 <div class="text-area" id="downbar">
                     <input class="box-message" placeholder="Message" id="text-box" type="text">
+                    <button class="send-message" onclick="send_message()">➤</button>
                 </div>
             </div>
             <div class="game-area" id="gamearea">
