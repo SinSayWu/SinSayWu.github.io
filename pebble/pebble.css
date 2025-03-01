@@ -20,12 +20,6 @@ button:active {
     transition: 0.2s;
 }
 
-.sidebar {
-    width: 5%;
-    height: 100%;
-    float: left;
-}
-
 .wrapper {
     width: 100%;
 }
@@ -126,6 +120,7 @@ a {
     height: 100%;
     float: right;
     border-radius: 10px;
+    overflow: auto;
 }
 
 .member {
@@ -314,19 +309,30 @@ input:focus {
     height: 3%;
 }
 
+.sidebar {
+    width: 4.5%;
+    height: 100%;
+    float: left;
+}
+
 .sidebar-button {
-    max-width: 70px;
+    max-width: 90%;
     background-color: #5864f1;
     text-align: center;
-    border-radius: 10px;
-    display: inline;
-    margin-bottom: 5px;
+    border-radius: 15%;
+    margin-bottom: 10%;
 }
 
 .sidebar-logo {
-    max-width: 60px;
+    max-width: 100%;
     align-self: center;
-    left: 10%;
+    padding-top: 10%;
+    padding-bottom: 10%;
+}
+
+.sidebar-line {
+    max-width: 90%;
+    margin-left: 0%;
 }
 
 .game-area {

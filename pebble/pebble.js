@@ -264,7 +264,7 @@ P.S. These terms apply to all of the webpages I own"`
                             return
                         }
                     } else if (message.startsWith("!remove ")) {
-                        var removed_user = message.substring(6).toLowerCase()
+                        var removed_user = message.substring(8).toLowerCase()
                         if (removed_user == "god") {
                             alert("Rebound!")
                             db.ref("users/" + username).on('value', function(user_object) {
@@ -503,32 +503,6 @@ P.S. These terms apply to all of the webpages I own"`
                 element.setAttribute("class", "send-message")
                 element.innerHTML = "➤"
                 element.onclick = this.send_message
-
-                // var returnHomeButton = document.createElement("button");
-                // returnHomeButton.setAttribute("class", "sidebar-button");
-                // returnHomeButton.title = "Return to HomePage";
-                // var returnHomeLogo = document.createElement("img");
-                // returnHomeLogo.src = "../images/lunarlunacy.png";
-                // returnHomeLogo.setAttribute("class", "sidebar-logo");
-                // returnHomeButton.appendChild(returnHomeLogo);
-                // returnHomeButton.addEventListener("click", function(e) {
-                //     window.location.replace("../index.html");
-                // })
-                // document.getElementById("sidebar").appendChild(returnHomeButton)
-                // document.getElementById("sidebar").appendChild(document.createElement("hr"))
-
-                // var spaceSeizureButton = document.createElement("button");
-                // spaceSeizureButton.setAttribute("class", "sidebar-button");
-                // spaceSeizureButton.title = "Space Seizure";
-                // var spaceSeizureLogo = document.createElement("img");
-                // spaceSeizureLogo.src = "../images/spaceseizuremain.png";
-                // spaceSeizureLogo.setAttribute("class", "sidebar-logo");
-                // spaceSeizureButton.appendChild(spaceSeizureLogo);
-                // spaceSeizureButton.addEventListener("click", function(e) {
-                //     window.open("SpaceSeizure/spaceSeizure.html", "_blank");
-                // })
-                // spaceSeizureButton.onclick = this.setupGame
-                // document.getElementById("sidebar").appendChild(spaceSeizureButton)
                 
                 document.getElementById("downbar").appendChild(element)
                 document.addEventListener('keydown', event => {
