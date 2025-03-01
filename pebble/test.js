@@ -10,7 +10,8 @@ measurementId: "G-4CGJ1JFX58"
 firebase.initializeApp(firebaseConfig);
 var db = firebase.database();
 var credits = `Credit to Mr. BungoChungo for cooperating with me (at least for a short time) on this project.
-Credit to Mr. WagnerRizzer for the logo of this site, which originated from a school project.`;
+Credit to Mr. WagnerRizzer for the logo of this site, which originated from a school project.
+Credit to Mr. Tschaun for assisting me in updating and upkeeping this site.`;
 var termsOfService = `TERMS OF SERVICE:
 Please note that these Terms of Service will hold until ... forever.
 1. By clicking the button below, or exiting out of this alert in any way, shape, or form, but continuing to use this chat room, you, the user, are agreeing to the following terms.
@@ -29,7 +30,25 @@ Please note that these Terms of Service will hold until ... forever.
 
 P.S. These terms apply to all of the webpages I own"`;
 
-function refresh_chat() {
+
+function getUsername() {
+    if (localStorage.getItem("username") != null) {
+        return localStorage.getItem("username");
+    } else {
+        return null
+    }
+}
+
+function getPassword() {
+    if (localStorage.getItem("password") != null) {
+        return localStorage.getItem("password");
+    } else {
+        return null
+    }
+}
+
+function refreshChat() {
+    // alert("Refresh Chat");
     var textarea = document.getElementById('textarea');
 
     // Get the chats from firebase
@@ -104,13 +123,15 @@ function refresh_chat() {
         });
         textarea.scrollTop = textarea.scrollHeight;
     })
-    var username = this.get_name();
+    var username = getUsername();
     db.ref("users/" + username).update({
         active: true
     })
+    // alert("Refreshed Chat");
 }
 
-function display_members() {
+function displayMembers() {
+    // alert("Display Members");
     var members = document.getElementById('members');
 
     // Get the users from firebase
@@ -152,9 +173,10 @@ function display_members() {
         });
         members.scrollTop = members.scrollHeight;
     })
+    // alert("Displayed members");
 }
 
-function send_server_message(message) {
+function sendServerMessage(message) {
     var message = message;
     db.ref('chats/').once('value', function(message_object) {
         var index = parseFloat(message_object.numChildren()) + 1
@@ -163,18 +185,18 @@ function send_server_message(message) {
             message: message,
             display_name: "[SERVER]",
             index: index
-        }).then(this.refresh_chat())
+        }).then(refreshChat())
     })
 }
 
 // Auto-login
-function check_creds() {
-    var username = localStorage.getItem('username')
-    var password = localStorage.getItem('password')
+function checkCreds() {
+    var username = getUsername()
+    var password = getPassword()
     db.ref("users/" + username).once('value', function(user_object) {
         if (user_object.exists() == true) {
             var obj = user_object.val()
-            if (obj.password != password) {
+            if (obj.password == password) {
                 return;
             }
             var main = document.getElementById("main");
@@ -189,8 +211,8 @@ function check_creds() {
 function send_message() {
     // var textarea = document.getElementById("textarea")
     var message = document.getElementById("text-box").value;
-    this.check_creds();
-    var username = localStorage.getItem('username');
+    checkCreds();
+    var username = getUsername();
     if (username == null || username == "") {
         return;
     }
@@ -225,7 +247,7 @@ function send_message() {
         //             display_name: "[SERVER]",
         //             index: index
         //         }).then(function() {
-        //             this.refresh_chat()
+        //             refreshChat()
         //         })
         //     })
         //     return
@@ -248,7 +270,7 @@ function send_message() {
         //             display_name: "[SERVER]",
         //             index: index
         //         }).then(function() {
-        //             this.refresh_chat()
+        //             refreshChat()
         //         })
         //     })
         //     return
@@ -266,52 +288,28 @@ function send_message() {
                 display_name: display_name,
                 index: index,
             }).then(function() {
-                this.refresh_chat();
+                refreshChat();
             })
         })
     })
 }
+function logout() {
+    db.ref("users/" + getUsername()).update({
+        active: false
+    })
+    displayMembers();
+    localStorage.clear();
+    window.location.reload();
+}
 
-// function alertDisclaimer() {
-//     const fs = require('fs')
-//     fs.readFile('pebbleCredits.txt', function (err, data) {
-//         alert(data)
-//     })
-// }
-
-// function get_name() {
-//     if (localStorage.getItem('username') != null) {
-//         return localStorage.getItem('username')
-//     } else {
-//         return null
-//     }
-// }
-
-// 
+// updates display name
 function update_name() {
-    var name = localStorage.getItem('username');
+    var name = getUsername();
     db.ref("users/" + name).once('value', function(user_object) {
         var obj = user_object.val();
         var display_name = obj.display_name;
         localStorage.setItem("display", display_name);
         document.getElementById("userdisplay").innerHTML = display_name + ` (@${name})`;
-        var dash = document.getElementById("profile")
-        
-        // TODO: Make with HTML
-        // var logoutButton = document.createElement("button")
-        // logoutButton.onclick = logout
-        // logoutButton.innerHTML = "Logout"
-        // logoutButton.setAttribute("class", "profile-button")
-        // dash.appendChild(logoutButton)
-        
-        // function logout() {
-        //     localStorage.clear()
-        //     window.location.reload()
-        //     db.ref("users/" + this.get_name()).update({
-        //         active: false
-        //     })
-        //     this.display_members()
-        // }
     })
 }
 
@@ -320,20 +318,20 @@ function login() {
     username = username.toLowerCase();
     var password = document.getElementById("password-login").value;
     if (password == "") {
-        return
+        return;
     }
     db.ref("users/" + username).once('value', function(user_object) {
         if (user_object.exists()) {
             var obj = user_object.val();
             if (obj.password == password) {
-                var main = document.getElementById("main");
-                var login = document.getElementById("login");
-                main.style.display = "block";
-                login.style.display = "none";
+                // var main = document.getElementById("main");
+                // var login = document.getElementById("login");
+                // main.style.display = "block";
+                // login.style.display = "none";
                 localStorage.setItem('username', username);
                 localStorage.setItem('password', password);
                 localStorage.setItem("display", obj.display_name);
-                localStorage.setItem("planets", obj.planets);
+                // alert(credits);
                 alert(credits);
                 alert(termsOfService);
                 window.location.reload();
@@ -341,7 +339,7 @@ function login() {
                 alert("Incorrect password!");
             }
         } 
-    })
+    });
 }
 
 function register() {
@@ -359,9 +357,7 @@ function register() {
         return;
     }
 
-    // TODO: RIKU CHANGE THIS
-    // var format = /[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
-    if (/^[A-Za-z0-9]+$/.test(username) || /^[A-Za-z0-9]+$/.test(password) || /^[A-Za-z0-9]+$/.test(displayName) || /^[A-Za-z0-9]+$/.test(realName)) {
+    if (!(/^[a-zA-Z0-9]+$/.test(username) && /^[a-zA-Z0-9]+$/.test(password) && /^[a-zA-Z0-9]+$/.test(displayName) && /^[a-zA-Z0-9]+$/.test(realName))) {
         alert("No special characters allowed.");
         return;
     }
@@ -395,8 +391,8 @@ function register() {
     })
 }
             
-function check_mute() {
-    db.ref("users/" + localStorage.getItem("username")).on('value', function(user_object) {
+function checkMute() {
+    db.ref("users/" + getUsername()).on('value', function(user_object) {
         var obj = user_object.val();
         if (obj.muted) {
             document.getElementById("text-box").disabled = true;
@@ -408,8 +404,24 @@ function check_mute() {
     })
 }
 
+function regMenu() {
+    var register = document.getElementById("register");
+    var loginBlock = document.getElementById("login");
+    register.style.display = "block";
+    loginBlock.style.display = "none";
+}
+
+function back() {
+    var loginBlock = document.getElementById("login");
+    var register = document.getElementById("register")
+    register.style.display = "none";
+    loginBlock.style.display = "block";
+}
+
+
 function setup() {
     // TODO: MAKE NOTIFICATIONS WORK
+
     // if (!("Notification" in window)) {
     //     // Check if the browser supports notifications
     //     alert("This browser does not support desktop notification");
@@ -429,81 +441,60 @@ function setup() {
     //         }
     //     });
     // }
-    this.check_creds();
-    this.update_name();
-    // TODO: MAKE IN HTML
-    var element = document.createElement("button");
-    element.setAttribute("class", "send-message");
-    element.innerHTML = "➤";
-    element.onclick = this.send_message;
-    document.getElementById("downbar").appendChild(element)
+
+    checkCreds();
+    update_name();
+    // Login and Register Screens
+    var main = document.getElementById("main");
+    var loginBlock = document.getElementById("login");
+    if (getUsername() != null) {
+        main.style.display = "block";
+        loginBlock.style.display = "none";
+        sendServerMessage(localStorage.getItem("display") + " has joined the chat");
+    } else {
+        main.style.display = "none";
+        loginBlock.style.display = "block";
+    }
 
     // TODO: MAKE SHIFT-ENTER NOT SEND THE MESSAGE
     document.addEventListener('keydown', event => {
         const key = event.key.toLowerCase();
         if (document.getElementById("text-box") == document.activeElement) {
             if (key == "enter") {
-                this.send_message();
+                send_message();
             }
         } else if (document.getElementById("password-login") == document.activeElement) {
             if (key == "enter") {
-                this.login();
+                login();
+            }
+        } else if (document.getElementById("name-register") == document.activeElement) {
+            if (key == "enter") {
+                register();
             }
         }
     })
-    this.refresh_chat();
-    this.display_members();
-    this.check_mute();
-
-    //Login and Register Screens
-    var main = document.getElementById("main");
-    var login = document.getElementById("login");
-    if (this.get_name() != null) {
-        main.style.display = "block";
-        login.style.display = "none";
-        this.send_server_message(localStorage.getItem("display") + " has joined the chat");
-    } else {
-        main.style.display = "none";
-        login.style.display = "block";
-    }
-    var element = document.createElement("button");
-    element.setAttribute("class", "login-button");
-    element.innerHTML = "Login";
-    element.onclick = this.login;
-    
-    var reg = document.createElement("button");
-    reg.setAttribute("class", "login-button");
-    reg.innerHTML = "Register";
-    reg.style.marginTop = "5px";
-    reg.onclick = regMenu;
-    
-    function regMenu() {
-        var register = document.getElementById("register");
-        register.style.display = "block";
-        login.style.display = "none";
-    }
-    
-    logincontain.appendChild(element);
-    logincontain.appendChild(reg);
-    
-    var registercontain = document.getElementById("registercontain");
-    
-    var regbutton = document.createElement("button");
-    regbutton.setAttribute("class", "login-button");
-    regbutton.innerHTML = "Register";
-    regbutton.onclick = this.register;
-    
-    var backbutton = document.createElement("button");
-    backbutton.setAttribute("class", "login-button");
-    backbutton.innerHTML = "Back";
-    backbutton.style.marginTop = "5px";
-    backbutton.onclick = function() {
-        register.style.display = "none";
-        login.style.display = "block";
-    }
-    
-    registercontain.appendChild(regbutton)
-    registercontain.appendChild(backbutton);
+    refreshChat();
+    // alert("Refreshed Chat");
+    displayMembers();
+    // alert("Displayed Members");
+    checkMute();
+    // alert("Checked Mute");
 }
 
-window.onload = setup;
+window.addEventListener('beforeunload', function(event) {
+    closeWindow();
+});
+function closeWindow() {
+    db.ref("users/" + getUsername()).update({
+        active: false
+    })
+    displayMembers();
+}
+
+window.onload = function() {
+    try {
+        setup();
+    } catch(err) {
+        alert(err);
+    }
+};
