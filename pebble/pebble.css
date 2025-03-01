@@ -245,6 +245,7 @@ a {
 
 .login-input {
     margin: auto;
+    margin-left: 5px;
     border-radius: 10px;
     width: 80%;
     height: 8%;
