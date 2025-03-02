@@ -1,9 +1,14 @@
-currAmount = 0;
 function updateAmount() {
-    document.getElementById('amount').innerHTML = currAmount;
+    db.ref("amountDonated").once("value").then(function (amount) {
+        document.getElementById('amount').innerHTML = amount.val();
+    })
 }
 
 function addAmount(amount) {
-    currAmount += amount;
+    db.ref("amountDonated").set(getAmount() + amount)
+    updateAmount();
+}
+
+window.onload = function() {
     updateAmount();
 }

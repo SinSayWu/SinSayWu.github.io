@@ -187,6 +187,7 @@ a {
     background-color: #292b2f;
     border-radius: 30px;
     width: 90%;
+    height: 70%;
     margin-left: 2.5%;
     margin-top: 1%;
     padding-left: 2%;
@@ -406,8 +407,8 @@ textarea:focus {
 }
 
 /* Style the 3-dot button */
-.menu-btn {
-    border-radius: 5px;
+#menu-btn {
+    width: 100%;
 }
 
 /* Menu content (hidden by default) */

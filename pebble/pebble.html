@@ -1,9 +1,14 @@
 <html>
     <head>
-        <link rel="stylesheet" href="pebble.css">
         <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-app.js"></script>
         <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-database.js"></script>
+        
+        <script src="../universal.js"></script>
+        <link rel="stylesheet" href="universal.css">
+
+        <script src="credits.js"></script>
         <script src="test.js"></script>
+        <link rel="stylesheet" href="pebble.css">
         <link rel="shortcut icon" href="../images/pebblePic.png" type="image/">
         <title>
             Pebble
@@ -79,10 +84,10 @@
                     <button class="profile-button" onclick="logout()">Log Out</button>
                     <button class="profile-button" onclick="window.location.replace('../profile/profile.html');">Profile Settings</button>
                     <div class="admin-controls" id="adminControls">
-                        <button class="menu-btn" onclick="toggleMenu()">⋮</button>
+                        <button class="profile-button" id='menu-btn'onclick="toggleMenu()">⋮</button>
                         <div class="menu-content" id="menu">
                             <a onclick="wipeChat()">Wipe Chat</a>
-                            <a href="#">Option 2</a>
+                            <a onclick="announce()">Announce <span id='announce-toggle'></span></a>
                             <a href="#">Option 3</a>
                         </div>
                     </div>

@@ -1,35 +1,3 @@
-const firebaseConfig = {
-apiKey: "AIzaSyDOAj76E00Rg8Qyc5DQndWXHtCy2umC6vA",
-authDomain: "chatter-97e8c.firebaseapp.com",
-projectId: "chatter-97e8c",
-storageBucket: "chatter-97e8c.appspot.com",
-messagingSenderId: "281722915171",
-appId: "1:281722915171:web:3b136d8a0b79389f2f6b56",
-measurementId: "G-4CGJ1JFX58"
-};
-firebase.initializeApp(firebaseConfig);
-var db = firebase.database();
-var credits = `Credit to Mr. BungoChungo for cooperating with me (at least for a short time) on this project.
-Credit to Mr. WagnerRizzer for the logo of this site, which originated from a school project.
-Credit to Mr. Tschaun for assisting me in updating and upkeeping this site.`;
-var termsOfService = `TERMS OF SERVICE:
-Please note that these Terms of Service will hold until ... forever.
-1. By clicking the button below, or exiting out of this alert in any way, shape, or form, but continuing to use this chat room, you, the user, are agreeing to the following terms.
-
-2. I, the creator of this chat room, or anybody who I cooperated with to create this chatroom, are not responsible for anything that occurs in this chatroom, or its uses. This includes anything that goes against these terms.
-
-3. No hate speech or slurs. Any hate speech or slurs will not be accepted in this chatroom. The consequences include being banned (for an indefinite amount of time), and notifying the police if necessary.
-
-4. No illegal activites. Planning or carrying out illegal activities, including world domination, is not permitted in this chatroom. If this does happen, the police WILL be notified.
-
-5. Hacking is not permitted. If you are caught hacking this chatroom, then you will be be banned (the length of time varies depending on the severity).
-
-6. No doxxing. Doxers will be evicted.
-
-7. As long as you, the user, have seen these Terms, you may not claim ignorance of these terms for your actions.
-
-P.S. These terms apply to all of the webpages I own"`;
-
 
 function getUsername() {
     if (localStorage.getItem("username") != null) {
@@ -509,23 +477,32 @@ function toggleMenu() {
 }
 
 function wipeChat() {
-    var name = localStorage.getItem("name");
-    var wipeMessage = " ";
-    db.ref("wipeMessage").on("value", (message) => {
-        wipeMessage = message.val();
-    })
-    db.ref("chats/").remove();
-    db.ref('chats/').once('value', function(message_object) {
-        var index = parseFloat(message_object.numChildren()) + 1
-        db.ref('chats/' + `message_${index}`).set({
-            name: "[SERVER]",
-            message: name + " wiped the chat<br/>" + wipeMessage,
-            display_name: "[SERVER]",
-            index: index
-        }).then(function() {
-            this.refresh_chat()
+    var name = localStorage.getItem("display");
+    db.ref("wipeMessage").on("value", function(message) {
+        var wipeMessage = message.val();
+        db.ref("chats/").remove();
+        db.ref('chats/').once('value', function(message_object) {
+            var index = parseFloat(message_object.numChildren()) + 1
+            db.ref('chats/' + `message_${index}`).set({
+                name: "[SERVER]",
+                message: name + " wiped the chat<br/>" + wipeMessage,
+                display_name: "[SERVER]",
+                index: index
+            }).then(function() {
+                this.refresh_chat()
+            })
         })
     })
+    
+}
+
+let toggle = false;
+function announce() {
+    if (toggle) {
+        document.getElementById("announce-toggle").innerHTML = '✓';
+    }
+    
+    toggle = !toggle
 }
 
 function closeWindow() {

@@ -1,0 +1,26 @@
+body {
+    background-color: #202225;
+    height: 100%;
+    font-family: Arial;
+    border-width: 0px;
+    color: white;
+}
+
+button {
+    cursor: pointer;
+    background-color: #5864f1;
+    color: black;
+    box-shadow: 2px 5px 0px 0px rgb(0,0,0);
+    border-radius: 10px;
+    font-size: 30px
+}
+
+button:hover {
+    background-color:#949494;
+    transition: 0.2s;
+}
+
+button:active {
+    box-shadow: 0px 0px 0px 0px rgb(0,0,0);
+    transition: 0.2s;
+}
