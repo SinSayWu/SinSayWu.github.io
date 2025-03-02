@@ -1,6 +1,5 @@
 body {
     background-color: #202225;
-    height: 100%;
     font-family: Arial;
     border-width: 0px;
 }
@@ -8,6 +7,9 @@ body {
 button {
     cursor: pointer;
     box-shadow: 2px 5px 0px 0px rgb(0,0,0);
+    border-radius: 10px;
+    background-color: #5864f1;
+    color: white;
 }
 
 button:hover {
@@ -25,14 +27,14 @@ button:active {
 }
 
 .login-wrapper {
-    width: 50%;
-    height: 50%;
+    width: 800px;
+    height: 300px;
     margin: auto;
 }
 
 .register-wrapper {
-    width: 50%;
-    height: 50%;
+    width: 800px;
+    height: 430px;
     margin: auto;
     display: none;
 }
@@ -116,10 +118,13 @@ a {
 
 .member-list {
     background-color: #2f3135;
-    width: 20%;
-    height: 100%;
+    width: 19%;
+    height: 98%;
     float: right;
-    border-radius: 10px;
+    position: absolute;
+    margin-left: 79.4%;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
     overflow: auto;
 }
 
@@ -139,19 +144,22 @@ a {
 }
 
 .message-box {
-    width: 54%;
+    width: 55%;
     margin-left: 0.5%;
     margin-right: 0.5%;
     height: 100%;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
     background-color: #35393f;
     float: left;
 }
 
 .profile {
-    height: 10%;
+    height: 9.6%;
     width: 100%;
     background-color: #292b2f;
-    border-radius: 10px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
 }
 
 .message-channel {
@@ -174,24 +182,30 @@ a {
 }
 
 .box-message {
+    font-size: 70%;
+    font-family: Arial;
     background-color: #292b2f;
     border-radius: 30px;
-    height: 60%;
     width: 90%;
+    height: 70%;
     margin-left: 2.5%;
-    margin-top: 0.5%;
+    margin-top: 1%;
     padding-left: 2%;
+    padding-top: 1.5%;
     border-width: 0px;
     color: white;
+    float: left;
 }
 
 .send-message {
     color: white;
     background-color: #5864f1;
     border-radius: 10px;
-    margin-left: 0.5%;
+    margin-right: 2%;
     width: 4.5%;
     height: 65%;
+    float: right;
+    margin-top: 1%;
 }
 
 .message {
@@ -212,7 +226,7 @@ a {
 }
 
 .message-text {
-    width: 100%;
+    width: 99%;
     word-wrap: break-word;
     height: auto;
     color: white;
@@ -221,11 +235,18 @@ a {
     margin-top: 2.5px;
 }
 
+#ping-text {
+    background-color:  rgba(80, 114, 0, 0.5);
+    border-radius: 5px;
+    padding: 1%;
+}
+
 .user-changer {
     padding-left: 5%;
+    padding-top: 2%;
     border-radius: 10px;
     width: 100%;
-    height: 50%;
+    height: 40%;
     color: white;
 }
 
@@ -244,32 +265,35 @@ a {
 }
 
 .login-input {
-    margin-left: 5px;
     margin: auto;
+    margin-left: 5px;
     border-radius: 10px;
-    width: 80%;
-    height: 8%;
+    width: 90%;
+    height: 30px;
     color: white;
+    margin-top: 0.5%;
 }
 
 .register-input {
+    margin: auto;
     margin-left: 5px;
     border-radius: 10px;
-    width: 80%;
-    height: 8%;
+    width: 90%;
+    height: 30px;
     color: white;
+    margin-top: 0.5%;
 }
 
 .login-text {
     color: white;
     font-size: 12px;
-    margin-left: 10%;
+    margin-left: 6%;
     float: left;
 }
 
 .login-button {
-    width: 80%;
-    height: 10%;
+    width: 90%;
+    height: 50px;
     background-color: #5864f1;
     border-radius: 10px;
     color: white;
@@ -295,12 +319,24 @@ input:focus {
     outline: none;
 }
 
+textarea {
+    width: 100%;
+    height: 30px;
+    font-size: 16px;
+    resize: none;
+    overflow-y: hidden;
+}
+
+textarea:focus {
+    outline: none;
+}
+
 .profile-button {
     background-color: #5864f1;
     border-radius: 10px;
     color: white;
     margin-left: 5px;
-    height: 50%;
+    height: 40%;
 }
 
 .profile-button:hover {
@@ -352,4 +388,79 @@ input:focus {
 .messagechannelimg {
     max-height: 100%;
     text-align: center;
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #888;
+}
+
+/* Positioning for the container */
+.admin-controls {
+    position: relative;
+    float: right;
+    margin-right: 3%;
+    display: none;
+}
+
+/* Style the 3-dot button */
+#menu-btn {
+    width: 100%;
+}
+
+/* Menu content (hidden by default) */
+.menu-content {
+    display: none;
+    position: absolute;
+    bottom: 35px; /* Spawns ABOVE the button */
+    right: 0; /* Aligns to the right */
+    background-color: #5864f1;
+    min-width: 120px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    z-index: 1;
+}
+
+/* Menu items */
+.menu-content a {
+    color: white;
+    text-decoration: none;
+    background-color: #2f3135;
+    padding: 10px;
+    display: block;
+}
+
+/* Change background on hover */
+.menu-content a:hover {
+    background-color: #292b2f;
+}
+
+/* Show menu when .show class is added */
+.show {
+    display: block;
+}
+
+.time {
+    vertical-align: middle;
+    width: auto;
+    word-wrap: break-word;
+    height: auto;
+    color: gray;
+    font-size: 12px;
+    margin-top: 2.5px;
+    float: right;
+    padding: 0;
+    position: relative;
 }

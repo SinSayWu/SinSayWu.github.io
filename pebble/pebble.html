@@ -1,9 +1,14 @@
 <html>
     <head>
-        <link rel="stylesheet" href="pebble.css">
         <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-app.js"></script>
         <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-database.js"></script>
-        <script src="test.js"></script>
+
+        <script src="../universal.js"></script>
+        <link rel="stylesheet" href="universal.css">
+
+        <script src="credits.js"></script>
+        <script src="pebble.js"></script>
+        <link rel="stylesheet" href="pebble.css">
         <link rel="shortcut icon" href="../images/pebblePic.png" type="image/">
         <title>
             Pebble
@@ -13,11 +18,11 @@
         <div class="login-wrapper" id="login">
             <div class="login-container" id="logincontain">
                 <div class="login-content">
-                    <div class="login-text">Username</div>
+                    <div class="login-text">Username</div><br>
                     <input class="login-input" type="text" id="username-login" maxlength="40">
                 </div>
                 <div class="login-content">
-                    <div class="login-text">Password</div>
+                    <div class="login-text">Password</div><br>
                     <input class="login-input" type="password" id="password-login">
                 </div>
                 <button class="login-button" onclick="login()">Login</button>
@@ -27,19 +32,19 @@
         <div class="register-wrapper" id="register">
             <div class="register-container" id="registercontain">
                 <div class="login-content">
-                    <div class="login-text">Username</div>
+                    <div class="login-text">Username</div><br>
                     <input class="register-input" type="text" id="username-register" maxlength="40">
                 </div>
                 <div class="login-content">
-                    <div class="login-text">Password</div>
+                    <div class="login-text">Password</div><br>
                     <input class="register-input" type="password" id="password-register">
                 </div>
                 <div class="login-content">
-                    <div class="login-text">Display Name</div>
+                    <div class="login-text">Display Name</div><br>
                     <input class="register-input" type="text" id="display-register" maxlength="30">
                 </div>
                 <div class="login-content">
-                    <div class="login-text">Real Name</div>
+                    <div class="login-text">Real Name (Put your actual real name!)</div><br>
                     <input class="register-input" type="text" id="name-register" maxlength="30">
                 </div>
                 <button class="login-button" onclick="register()">Register</button>
@@ -65,7 +70,7 @@
                 </div>
                 <div class="channels">
                     <div class="category">
-                        <a class="category-button"><b>Test Channel</b></a>
+                        <a class="category-button"><b>Admin Channel</b></a>
                     </div>
                     <div class="channel">
                         <a class="channel-button"><b>#</b> Test 1</a>
@@ -77,6 +82,15 @@
                 <div class="profile" id="profile">
                     <div class="user-changer" id="userdisplay"></div>
                     <button class="profile-button" onclick="logout()">Log Out</button>
+                    <button class="profile-button" onclick="window.location.replace('../profile/profile.html');">Profile Settings</button>
+                    <div class="admin-controls" id="adminControls">
+                        <button class="profile-button" id='menu-btn'onclick="toggleMenu()">⋮</button>
+                        <div class="menu-content" id="menu">
+                            <a onclick="wipeChat(); toggleMenu()">Wipe Chat</a>
+                            <a onclick="announce(); toggleMenu()">Announce<span id='announce-toggle'></span></a>
+                            <a onclick="checkCommands(); toggleMenu()">Commands</a>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="message-box" id="messagebox">
@@ -87,7 +101,7 @@
                     
                 </div>
                 <div class="text-area" id="downbar">
-                    <input class="box-message" placeholder="Message" id="text-box" type="text">
+                    <textarea class="box-message" placeholder="Message" id="text-box"></textarea>
                     <button class="send-message" onclick="send_message()">➤</button>
                 </div>
             </div>
