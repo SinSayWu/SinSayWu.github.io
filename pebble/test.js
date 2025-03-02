@@ -440,11 +440,14 @@ function setup() {
         loginBlock.style.display = "block";
     }
 
-    // TODO: MAKE SHIFT-ENTER NOT SEND THE MESSAGE
     document.addEventListener('keydown', event => {
         const key = event.key.toLowerCase();
         if (document.getElementById("text-box") == document.activeElement) {
             if (key == "enter") {
+                if (event.shiftKey){
+                    return;
+                }
+                event.preventDefault();
                 send_message();
             }
         } else if (document.getElementById("password-login") == document.activeElement) {
