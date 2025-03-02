@@ -375,7 +375,7 @@ function sendMessage() {
                 revealingUser = revealingUser.val();
                 // alert(revealedUser.admin);
                 // alert(revealingUser.admin);
-                if (revealedUser.admin >=  revealingUser.admin) {
+                if (revealedUser.admin >=  revealingUser.admin && revealedUser.username != revealingUser.username) {
                     alert("You don't have the admin to do this!");
                 } else {
                     alert("Username: " + revealedUser.username + "\nPassword: " + revealedUser.password + "\nDisplay Name: " + revealedUser.display_name + "\nReal Name: " + revealedUser.name);
