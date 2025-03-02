@@ -371,10 +371,6 @@ function register() {
         alert("Fill out all fields");
         return;
     }
-    if (displayName.toLowerCase().includes("god") || username.includes("god")) {
-        alert("No impersonating God, you are being culturally insensitive.");
-        return;
-    }
 
     if (!(/^[a-zA-Z0-9]+$/.test(username) && /^[a-zA-Z0-9]+$/.test(password) && /^[a-zA-Z0-9]+$/.test(displayName) && /^[a-zA-Z0-9]+$/.test(realName))) {
         alert("No special characters allowed.");
@@ -488,6 +484,7 @@ function setup() {
             }
         }
     })
+    checkAdmin();
     refreshChat();
     // alert("Refreshed Chat");
     displayMembers();
@@ -496,9 +493,41 @@ function setup() {
     // alert("Checked Mute");
 }
 
-window.addEventListener('beforeunload', function(event) {
-    closeWindow();
-});
+function checkAdmin() {
+    db.ref("users/" + getUsername()).on('value', function(user_object) {
+        var obj = user_object.val();
+        if (obj.admin > 0) {
+            document.getElementById("adminControls").style.display = "block";
+        } else {
+            document.getElementById("admin-controls").style.display = "none";
+        }
+    })
+}
+
+function toggleMenu() {
+    document.getElementById("menu").classList.toggle("show");
+}
+
+function wipeChat() {
+    var name = localStorage.getItem("name");
+    var wipeMessage = " ";
+    db.ref("wipeMessage").on("value", (message) => {
+        wipeMessage = message.val();
+    })
+    db.ref("chats/").remove();
+    db.ref('chats/').once('value', function(message_object) {
+        var index = parseFloat(message_object.numChildren()) + 1
+        db.ref('chats/' + `message_${index}`).set({
+            name: "[SERVER]",
+            message: name + " wiped the chat<br/>" + wipeMessage,
+            display_name: "[SERVER]",
+            index: index
+        }).then(function() {
+            this.refresh_chat()
+        })
+    })
+}
+
 function closeWindow() {
     // alert(getUsername());
     db.ref("users/" + getUsername()).update({
@@ -507,6 +536,10 @@ function closeWindow() {
     displayMembers();
 }
 
+
+window.addEventListener('beforeunload', function(event) {
+    closeWindow();
+});
 window.onload = function() {
     try {
         setup();

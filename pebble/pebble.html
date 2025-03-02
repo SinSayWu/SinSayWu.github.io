@@ -78,6 +78,14 @@
                     <div class="user-changer" id="userdisplay"></div>
                     <button class="profile-button" onclick="logout()">Log Out</button>
                     <button class="profile-button" onclick="window.location.replace('../profile/profile.html');">Profile Settings</button>
+                    <div class="admin-controls" id="adminControls">
+                        <button class="menu-btn" onclick="toggleMenu()">⋮</button>
+                        <div class="menu-content" id="menu">
+                            <a onclick="wipeChat()">Wipe Chat</a>
+                            <a href="#">Option 2</a>
+                            <a href="#">Option 3</a>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="message-box" id="messagebox">
