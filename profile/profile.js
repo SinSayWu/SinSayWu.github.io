@@ -61,7 +61,7 @@ function submit() {
     document.getElementById("new-input").value = "";
     document.getElementById("copy-input").value = "";
     document.getElementById("old-input").value = "";
-    alert("Done!");
+    window.location.replace('../pebble/pebble.html');
 }
 
 window.onload = function() {

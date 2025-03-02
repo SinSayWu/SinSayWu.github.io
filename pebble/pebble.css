@@ -24,14 +24,14 @@ button:active {
 }
 
 .login-wrapper {
-    width: 50%;
-    height: 50%;
+    width: 800px;
+    height: 300px;
     margin: auto;
 }
 
 .register-wrapper {
-    width: 50%;
-    height: 50%;
+    width: 800px;
+    height: 430px;
     margin: auto;
     display: none;
 }
@@ -115,10 +115,13 @@ a {
 
 .member-list {
     background-color: #2f3135;
-    width: 20%;
-    height: 100%;
+    width: 19%;
+    height: 98%;
     float: right;
-    border-radius: 10px;
+    position: absolute;
+    margin-left: 79.4%;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
     overflow: auto;
 }
 
@@ -138,19 +141,22 @@ a {
 }
 
 .message-box {
-    width: 54%;
+    width: 55%;
     margin-left: 0.5%;
     margin-right: 0.5%;
     height: 100%;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
     background-color: #35393f;
     float: left;
 }
 
 .profile {
-    height: 10%;
+    height: 9.6%;
     width: 100%;
     background-color: #292b2f;
-    border-radius: 10px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
 }
 
 .message-channel {
@@ -174,14 +180,14 @@ a {
 
 .box-message {
     font-family: Arial;
+    font-size: 12px;
     background-color: #292b2f;
     border-radius: 30px;
-    height: 60%;
     width: 90%;
     margin-left: 2.5%;
     margin-top: 1%;
     padding-left: 2%;
-    padding-top: 2%;
+    padding-top: 7px;
     border-width: 0px;
     color: white;
     float: left;
@@ -250,17 +256,16 @@ a {
 .login-input {
     margin: auto;
     border-radius: 10px;
-    width: 80%;
-    height: 8%;
+    width: 90%;
+    height: 30px;
     color: white;
     margin-top: 0.5%;
 }
 
 .register-input {
-    margin-left: 5px;
     border-radius: 10px;
-    width: 80%;
-    height: 8%;
+    width: 90%;
+    height: 30px;
     color: white;
     margin-top: 0.5%;
 }
@@ -268,13 +273,13 @@ a {
 .login-text {
     color: white;
     font-size: 12px;
-    margin-left: 11%;
+    margin-left: 6%;
     float: left;
 }
 
 .login-button {
-    width: 80%;
-    height: 10%;
+    width: 90%;
+    height: 50px;
     background-color: #5864f1;
     border-radius: 10px;
     color: white;
@@ -302,9 +307,7 @@ input:focus {
 
 textarea {
     width: 100%;
-    min-height: 50px;
-    max-height: 300px;
-    padding: 10px;
+    height: 30px;
     font-size: 16px;
     resize: none;
     overflow-y: hidden;
@@ -371,4 +374,21 @@ textarea:focus {
 .messagechannelimg {
     max-height: 100%;
     text-align: center;
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #888;
 }

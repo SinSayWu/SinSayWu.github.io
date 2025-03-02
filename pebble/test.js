@@ -124,9 +124,11 @@ function refreshChat() {
         textarea.scrollTop = textarea.scrollHeight;
     })
     var username = getUsername();
+    // alert(username);
     db.ref("users/" + username).update({
         active: true
     })
+    db.ref("users/null").remove();
     // alert("Refreshed Chat");
 }
 
@@ -201,6 +203,9 @@ function sendServerMessage(message) {
 function checkCreds() {
     var username = getUsername()
     var password = getPassword()
+    if (!username || !password) {
+        return;
+    }
     db.ref("users/" + username).once('value', function(user_object) {
         if (user_object.exists() == true) {
             var obj = user_object.val()
@@ -303,17 +308,21 @@ function send_message() {
     })
 }
 function logout() {
+    // alert(getUsername() + " logged out");
     db.ref("users/" + getUsername()).update({
         active: false
+    }).then(function() {
+        localStorage.clear();
+        window.location.reload();
     })
-    displayMembers();
-    localStorage.clear();
-    window.location.reload();
 }
 
 // updates display name
 function update_name() {
     var name = getUsername();
+    if (name == null) {
+        return;
+    }
     db.ref("users/" + name).once('value', function(user_object) {
         var obj = user_object.val();
         var display_name = obj.display_name;
@@ -491,6 +500,7 @@ window.addEventListener('beforeunload', function(event) {
     closeWindow();
 });
 function closeWindow() {
+    // alert(getUsername());
     db.ref("users/" + getUsername()).update({
         active: false
     })
