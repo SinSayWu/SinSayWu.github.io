@@ -221,6 +221,10 @@ function sendMessage() {
     } else if (message == "sos") {
         window.location.replace("https://schoology.pickens.k12.sc.us/home")
         return
+    } else if (announceToggle) {
+        sendServerMessage(message)
+        document.getElementById("text-box").value = "";
+        return;
     } else if (message.startsWith("!mute @")) {
         var muted_user = message.substring(7).toLowerCase();
         db.ref("users/" + muted_user).once('value', function(mutedUser) {
@@ -350,10 +354,6 @@ function sendMessage() {
         //     })
         //     return
         // }
-    } else if (announceToggle) {
-        sendServerMessage(message)
-        document.getElementById("text-box").value = "";
-        return;
     }
     db.ref("users/" + username).once('value', function(user_object) {
         var obj = user_object.val();
