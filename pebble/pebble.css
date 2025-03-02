@@ -260,6 +260,7 @@ a {
 
 .login-input {
     margin: auto;
+    margin-left: 5px;
     border-radius: 10px;
     width: 90%;
     height: 30px;
