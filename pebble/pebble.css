@@ -451,3 +451,16 @@ textarea:focus {
 .show {
     display: block;
 }
+
+.time {
+    vertical-align: middle;
+    width: auto;
+    word-wrap: break-word;
+    height: auto;
+    color: gray;
+    font-size: 12px;
+    margin-top: 2.5px;
+    float: right;
+    padding: 0;
+    position: relative;
+}

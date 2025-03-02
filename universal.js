@@ -8,7 +8,7 @@ const firebaseConfig = {
     measurementId: "G-4CGJ1JFX58",
 };
 firebase.initializeApp(firebaseConfig);
-var db = firebase.database();
+const db = firebase.database();
 
 function checkInput(input) {
     if (input == "") {

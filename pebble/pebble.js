@@ -55,6 +55,11 @@ function refreshChat() {
                 }
             })
         })
+
+        // Max 150 messages
+        if (ordered.length > 150) {
+            ordered.splice(0,ordered.length-150)
+        }
         
         // Now we're done. Simply display the ordered messages
         ordered.forEach(function(data) {
@@ -84,7 +89,13 @@ function refreshChat() {
                 userElement.style.color = "Yellow";
             }
             messageElement.appendChild(userElement);
+
+            var timeElement = document.createElement("div");
+            timeElement.setAttribute("class", "time");
+            timeElement.innerHTML = data.time;
+            messageElement.appendChild(timeElement);
             
+
             var messageContent = document.createElement("div");
             messageContent.setAttribute("class", "message-text");
             messageContent.innerHTML = message;
@@ -162,11 +173,13 @@ function sendServerMessage(message) {
     var message = message;
     db.ref('chats/').once('value', function(message_object) {
         var index = parseFloat(message_object.numChildren()) + 1
+        var curr = new Date();
         db.ref('chats/' + `message_${index}`).set({
             name: "[SERVER]",
             message: message,
             display_name: "[SERVER]",
-            index: index
+            index: index,
+            time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
         }).then(refreshChat())
     })
 }
@@ -222,7 +235,7 @@ function sendMessage() {
         window.location.replace("https://schoology.pickens.k12.sc.us/home")
         return
     } else if (announceToggle) {
-        sendServerMessage(message)
+        sendServerMessage(message);
         document.getElementById("text-box").value = "";
         return;
     } else if (message.startsWith("!mute @")) {
@@ -354,6 +367,77 @@ function sendMessage() {
         //     })
         //     return
         // }
+    } else if (message.startsWith("!reveal @")) {
+        var revealed_user = message.substring(9).toLowerCase();
+        db.ref("users/" + revealed_user).once('value', function(revealedUser) {
+            db.ref("users/" + getUsername()).once("value", function(revealingUser) {
+                revealedUser = revealedUser.val();
+                revealingUser = revealingUser.val();
+                // alert(revealedUser.admin);
+                // alert(revealingUser.admin);
+                if (revealedUser.admin >=  revealingUser.admin) {
+                    alert("You don't have the admin to do this!");
+                } else {
+                    alert("Username: " + revealedUser.username + "\nPassword: " + revealedUser.password + "\nDisplay Name: " + revealedUser.display_name + "\nReal Name: " + revealedUser.name);
+                }
+            })
+        })
+        document.getElementById("text-box").value = "";
+        return;
+    } else if (message == "!removeallmuted") {
+        // To delete spam accounts
+        db.ref("users/" + getUsername()).once("value", function(removingUser) {
+            removingUser = removingUser.val();
+            sendServerMessage(removingUser.display_name + " removed all muted users! What a just punishment!");
+            db.ref("users/").once('value', function(usrObj) {
+                var obj = Object.values(usrObj.val());
+                var usernames = obj;
+                usernames.forEach(function(usr) {
+                    if (usr.muted && (usr.admin < removingUser.admin)) {
+                        db.ref("users/" + usr.username).remove();
+                    }
+                })
+            })
+        })
+        document.getElementById("text-box").value = "";
+        return;
+    } else if (message.startsWith("!remove @")){
+        var removed_user = message.substring(9).toLowerCase();
+        db.ref("users/" + removed_user).once('value', function(removedUser) {
+            if (!removedUser.exists()) {
+                alert("User cannot be removed, " + removed_user + " does not exist!");
+                return;
+            }
+            db.ref("users/" + getUsername()).once("value", function(removingUser) {
+                removedUser = removedUser.val();
+                removingUser = removingUser.val()
+                // If the removed user has a higher admin than the removing user, then it rebounds.
+                if (removingUser.admin < removedUser.admin) {
+                    alert(removedUser.display_name + " has a higher admin level than you! Rebound!");
+                    sendServerMessage(removedUser.display_name + " rebounded their remove against @" + removingUser.username);
+                    db.ref("users/" + removingUser.username).update({
+                        muted: true
+                    })
+                    return;
+                }
+                // If the removed user and the removing user have the same admin, then it kamikazes.
+                if (removingUser.admin == removedUser.admin) {
+                    sendServerMessage("@" + removingUser.username + " initiated a kamikaze remove against @" + removedUser.username + "!");
+                    db.ref("users/" + removingUser.username).update({
+                        muted: true
+                    })
+                    db.ref("users/" + removedUser.username).update({
+                        muted: true
+                    })
+                    return;
+                }
+                sendServerMessage(removingUser.display_name + " removed @" + removedUser.username + "!");
+                db.ref("users/" + removedUser.username).remove()
+                return;
+            })
+        })
+        document.getElementById("text-box").value = "";
+        return;
     }
     db.ref("users/" + username).once('value', function(user_object) {
         var obj = user_object.val();
@@ -361,11 +445,13 @@ function sendMessage() {
         document.getElementById("text-box").value = "";
         db.ref('chats/').once('value', function(message_object) {
             var index = parseFloat(message_object.numChildren()) + 1;
+            var curr = new Date();
             db.ref('chats/' + `message_${index}`).set({
                 name: username,
                 message: message,
                 display_name: display_name,
                 index: index,
+                time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
             }).then(function() {
                 refreshChat();
             })
@@ -588,6 +674,10 @@ function announce() {
     } else {
         document.getElementById("announce-toggle").innerHTML = '';
     }
+}
+
+function checkCommands() {
+    alert(commands)
 }
 
 function closeWindow() {

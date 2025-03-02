@@ -44,7 +44,7 @@
                     <input class="register-input" type="text" id="display-register" maxlength="30">
                 </div>
                 <div class="login-content">
-                    <div class="login-text">Real Name</div><br>
+                    <div class="login-text">Real Name (Put your actual real name!)</div><br>
                     <input class="register-input" type="text" id="name-register" maxlength="30">
                 </div>
                 <button class="login-button" onclick="register()">Register</button>
@@ -88,7 +88,7 @@
                         <div class="menu-content" id="menu">
                             <a onclick="wipeChat(); toggleMenu()">Wipe Chat</a>
                             <a onclick="announce(); toggleMenu()">Announce<span id='announce-toggle'></span></a>
-                            <a href="#">Option 3</a>
+                            <a onclick="checkCommands(); toggleMenu()">Commands</a>
                         </div>
                     </div>
                 </div>

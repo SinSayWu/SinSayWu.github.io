@@ -23,14 +23,6 @@ h1 {
     left: 15%;
 }
 
-#specialPebble {
-    position: absolute;
-    margin: auto;
-    /*top: 379px;
-    left: 766px;*/
-    opacity: 0;
-}
-
 #king-img {
     border: 4px;
     border-color: white;

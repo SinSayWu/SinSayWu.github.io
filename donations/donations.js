@@ -1,14 +1,20 @@
-function updateAmount() {
-    db.ref("amountDonated").once("value").then(function (amount) {
-        document.getElementById('amount').innerHTML = amount.val();
-    })
+function updateAmount(amount) {
+    document.getElementById('amount').innerHTML = amount;
 }
 
 function addAmount(amount) {
-    db.ref("amountDonated").set(getAmount() + amount);
-    updateAmount();
+    amount += parseInt(document.getElementById('amount').innerHTML);
+    db.ref("amountDonated").set({
+        amountDonated: amount,
+    }).then(() => {
+        db.ref("amountDonated").once("value").then(function (amount) {
+            document.getElementById('amount').innerHTML = amount.val().amountDonated;
+        })
+    })
 }
 
-window.onload = function() {
-    updateAmount();
-}
+
+
+db.ref("/amountDonated").on("value", (amount) => {
+    document.getElementById('amount').innerHTML = amount.val().amountDonated;
+})

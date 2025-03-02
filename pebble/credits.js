@@ -1,7 +1,9 @@
-var credits = `Credit to Mr. BungoChungo for cooperating with me (at least for a short time) on this project.
+const credits = `Credit to Mr. BungoChungo for cooperating with me (at least for a short time) on this project.
 Credit to Mr. WagnerRizzer for the logo of this site, which originated from a school project.
 Credit to Mr. Tschaun for assisting me in updating and upkeeping this site.`;
-var termsOfService = `TERMS OF SERVICE:
+
+
+const termsOfService = `TERMS OF SERVICE:
 Please note that these Terms of Service will hold until ... forever.
 1. By clicking the button below, or exiting out of this alert in any way, shape, or form, but continuing to use this chat room, you, the user, are agreeing to the following terms.
 
@@ -17,4 +19,16 @@ Please note that these Terms of Service will hold until ... forever.
 
 7. As long as you, the user, have seen these Terms, you may not claim ignorance of these terms for your actions.
 
-P.S. These terms apply to all of the webpages I own"`;
+P.S. These terms apply to all of the webpages I own`;
+
+
+
+const commands = `!mute @[username] -- mutes the specified user (@everyone compatible)
+
+!unmute @[username] -- unmutes the specified user (@everyone compatible)
+
+!remove @[username] -- removes the specified user (uncompatible with @everyone)
+
+!reveal @[username] -- shows the specified user's username, password, display name, and real name (uncompatible with @everyone)
+
+!removeallmuted -- removes all accounts that are muted`
