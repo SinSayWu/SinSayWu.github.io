@@ -257,6 +257,11 @@ function send_message() {
         //     })
         //     return
         // }
+    } else if (toggle) {
+        sendServerMessage(message)
+        document.getElementById("text-box").value = "";
+        refreshChat()
+        return;
     }
     db.ref("users/" + username).once('value', function(user_object) {
         var obj = user_object.val();
@@ -496,14 +501,14 @@ function wipeChat() {
     
 }
 
-let toggle = false;
+var toggle = false;
 function announce() {
+    toggle = !toggle
     if (toggle) {
-        document.getElementById("announce-toggle").innerHTML = '✓';
+        document.getElementById("announce-toggle").innerHTML = ' ✓';
     } else {
         document.getElementById("announce-toggle").innerHTML = '';
     }
-    toggle = !toggle
 }
 
 function closeWindow() {
