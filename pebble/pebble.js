@@ -56,9 +56,9 @@ function refreshChat() {
             })
         })
 
-        // Max 150 messages
-        if (ordered.length > 150) {
-            ordered.splice(0,ordered.length-150)
+        // Max 50 messages
+        if (ordered.length > 50) {
+            ordered.splice(0,ordered.length-50)
         }
         
         // Now we're done. Simply display the ordered messages
@@ -174,7 +174,7 @@ function sendServerMessage(message) {
     db.ref('chats/').once('value', function(message_object) {
         var index = parseFloat(message_object.numChildren()) + 1
         var curr = new Date();
-        db.ref('chats/' + `message_${index}`).set({
+        db.ref('chats/' + `${index.toString().padStart(4, '0')}_message`).set({
             name: "[SERVER]",
             message: message,
             display_name: "[SERVER]",
@@ -446,7 +446,7 @@ function sendMessage() {
         db.ref('chats/').once('value', function(message_object) {
             var index = parseFloat(message_object.numChildren()) + 1;
             var curr = new Date();
-            db.ref('chats/' + `message_${index}`).set({
+            db.ref('chats/' + `${index.toString().padStart(4, '0')}_message`).set({
                 name: username,
                 message: message,
                 display_name: display_name,
