@@ -500,8 +500,9 @@ let toggle = false;
 function announce() {
     if (toggle) {
         document.getElementById("announce-toggle").innerHTML = '✓';
+    } else {
+        document.getElementById("announce-toggle").innerHTML = '';
     }
-    
     toggle = !toggle
 }
 
