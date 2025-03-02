@@ -9,3 +9,24 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 var db = firebase.database();
+
+function checkInput(input) {
+    if (input == "") {
+        alert("Cannot be blank");
+        return false;
+    }
+    if (!/^[a-zA-Z0-9]+$/.test(input)) {
+        alert("Invalid Characters. Only alphanumeric characters allowed.")
+        return false;
+    }
+    if (input.includes("everyone")) {
+        alert("No mention of everyone allowed.");
+        return false;
+    }
+    if (input.includes("admin")) {
+        alert("No impersonating admins");
+        return false;
+    }
+    return true;
+}
+

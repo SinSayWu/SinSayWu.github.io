@@ -5,7 +5,7 @@ function updateAmount() {
 }
 
 function addAmount(amount) {
-    db.ref("amountDonated").set(getAmount() + amount)
+    db.ref("amountDonated").set(getAmount() + amount);
     updateAmount();
 }
 

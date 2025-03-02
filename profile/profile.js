@@ -1,9 +1,3 @@
-function checkInput(input) {
-    if (input == "") return false;
-    if (!/^[a-zA-Z0-9]+$/.test(input)) return false;
-    return true;
-}
-
 function getUsername() {
     if (localStorage.getItem("username") != null) {
         return localStorage.getItem("username");
@@ -11,13 +5,6 @@ function getUsername() {
         return null;
     }
 }
-
-function checkInput(input) {
-    if (input == "") return false;
-    if (!/^[a-zA-Z0-9]+$/.test(input)) return false;
-    return true;
-}
-
 
 function submit() {
     var newDisplay = document.getElementById("display-input").value;

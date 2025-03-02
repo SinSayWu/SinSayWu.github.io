@@ -182,8 +182,8 @@ a {
 }
 
 .box-message {
+    font-size: 70%;
     font-family: Arial;
-    font-size: 12px;
     background-color: #292b2f;
     border-radius: 30px;
     width: 90%;
@@ -191,7 +191,7 @@ a {
     margin-left: 2.5%;
     margin-top: 1%;
     padding-left: 2%;
-    padding-top: 7px;
+    padding-top: 1.5%;
     border-width: 0px;
     color: white;
     float: left;
@@ -226,13 +226,19 @@ a {
 }
 
 .message-text {
-    width: 100%;
+    width: 99%;
     word-wrap: break-word;
     height: auto;
     color: white;
     margin-left: 5px;
     font-size: 12px;
     margin-top: 2.5px;
+}
+
+#ping-text {
+    background-color:  rgba(80, 114, 0, 0.5);
+    border-radius: 5px;
+    padding: 1%;
 }
 
 .user-changer {
@@ -269,6 +275,8 @@ a {
 }
 
 .register-input {
+    margin: auto;
+    margin-left: 5px;
     border-radius: 10px;
     width: 90%;
     height: 30px;
