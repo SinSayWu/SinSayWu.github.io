@@ -438,7 +438,29 @@ function sendMessage() {
         })
         document.getElementById("text-box").value = "";
         return;
-    }
+    } else if (message.startsWith("!trap @")){
+        var trapped_user = message.substring(7).toLowerCase();
+        db.ref("users/" + trapped_user).once('value', function(trappedUser) {
+            if (!trappedUser.exists()) {
+                alert("User cannot be trapped, " + trapped_user + " does not exist!");
+                return;
+            }
+            db.ref("users/" + getUsername()).once("value", function(trappingUser) {
+                trappedUser = trappedUser.val();
+                trappingUser = trappingUser.val()
+                if (trappingUser.admin > trappedUser.admin) {
+                    sendServerMessage(trappingUser.display_name + " trapped @" + trappedUser.username + "!");
+                    db.ref("users/" + trappedUser.username).update({
+                        trapped: true,
+                        reload: true,
+                    })
+                }
+                return;
+            })
+        })
+        document.getElementById("text-box").value = "";
+        return;
+    } 
     db.ref("users/" + username).once('value', function(user_object) {
         var obj = user_object.val();
         var display_name = obj.display_name;
@@ -634,6 +656,8 @@ function setup() {
         }
     })
     checkAdmin();
+    checkTrapped();
+    reloadTrapped();
     refreshChat();
     // alert("Refreshed Chat");
     displayMembers();
@@ -651,6 +675,28 @@ function checkAdmin() {
             document.getElementById("admin-controls").style.display = "none";
         }
     })
+}
+
+function checkTrapped() {
+    db.ref("users/" + getUsername()).on('value', function(user_object) {
+        var obj = user_object.val();
+        if (!obj.trapped) {
+            document.getElementById("logoutButton").style.display = "block";
+        } else {
+            document.getElementById("logoutButton").style.display = "none";
+        }
+    })
+}
+
+
+function reloadTrapped() {
+    db.ref("users/" + getUsername() +"/reload").on("value", (snapshot) => {
+        if (snapshot.val() === true) {
+            location.reload();
+            db.ref("users/" + getUsername() +"/reload").set(false);
+        }
+    });
+    
 }
 
 function toggleMenu() {

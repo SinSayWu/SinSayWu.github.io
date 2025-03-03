@@ -1,0 +1,32 @@
+<html>
+    <head>
+        <title>Notifications</title>
+
+        <script src="../universal.js"></script>
+        <link rel="stylesheet" href="../universal.css">
+
+        <script src="notifications.js"></script>
+        <link rel="stylesheet" href="notifications.css">
+    </head>
+    <body>
+        <div class="text" id="notif-title">Notification Settings</div>
+        <div id="menu">
+            <div class="text" id="announcements-text">Toggle Server Announcement Notifications</div>
+            <label class="switch">
+                <input type="checkbox" id="server-announcements">
+                <span class="slider round"></span>
+            </label>
+            <div class="text" id="message-text">Toggle Message Notifications</div>
+            <label class="switch">
+                <input type="checkbox" id="message">
+                <span class="slider round"></span>
+            </label>
+            <div class="text" id="mention-text">Toggle @Mention Notifications</div>
+            <label class="switch">
+                <input type="checkbox" id="mention">
+                <span class="slider round"></span>
+            </label><br>
+            <button type="button" onclick="window.location.replace('../pebble/pebble.html')">Back</button>
+        </div>
+    </body>
+</html>
