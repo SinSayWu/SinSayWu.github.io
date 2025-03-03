@@ -8,6 +8,7 @@
 
         <script src="credits.js"></script>
         <script src="pebble.js"></script>
+        <script src="notifications.js"></script>
         <link rel="stylesheet" href="pebble.css">
         <link rel="shortcut icon" href="../images/pebblePic.png" type="image/">
         <title>
@@ -81,7 +82,7 @@
                 </div>
                 <div class="profile" id="profile">
                     <div class="user-changer" id="userdisplay"></div>
-                    <button class="profile-button" onclick="logout()">Log Out</button>
+                    <button class="profile-button" id="logoutButton" onclick="logout()">Log Out</button>
                     <button class="profile-button" onclick="window.location.replace('../profile/profile.html');">Profile Settings</button>
                     <div class="admin-controls" id="adminControls">
                         <button class="profile-button" id='menu-btn'onclick="toggleMenu()">⋮</button>
@@ -89,6 +90,7 @@
                             <a onclick="wipeChat(); toggleMenu()">Wipe Chat</a>
                             <a onclick="announce(); toggleMenu()">Announce<span id='announce-toggle'></span></a>
                             <a onclick="checkCommands(); toggleMenu()">Commands</a>
+                            <a onclick="window.location.replace('../notifications/notifications.html')">Notifications</a>
                         </div>
                     </div>
                 </div>
