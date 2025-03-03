@@ -108,9 +108,6 @@ function refreshChat() {
     })
     var username = getUsername();
     // alert(username);
-    db.ref("users/" + username).update({
-        active: true
-    })
     db.ref("users/null").remove();
     // alert("Refreshed Chat");
 }
@@ -432,7 +429,7 @@ function sendMessage() {
                     return;
                 }
                 sendServerMessage(removingUser.display_name + " removed @" + removedUser.username + "!");
-                db.ref("users/" + removedUser.username).remove()
+                db.ref("users/" + removedUser.username).remove();
                 return;
             })
         })
@@ -630,6 +627,13 @@ function setup() {
         main.style.display = "block";
         loginBlock.style.display = "none";
         sendServerMessage(localStorage.getItem("display") + " has joined the chat<span style='visibility: hidden;'>@" + getUsername() + "</span>");
+        db.ref("users/" + getUsername()).once('value').then(snapshot => {
+            if (snapshot.exists()) {
+                db.ref("users/" + getUsername()).update({
+                    active: true
+                })
+            }
+        })
     } else {
         main.style.display = "none";
         loginBlock.style.display = "block";
@@ -728,8 +732,12 @@ function checkCommands() {
 
 function closeWindow() {
     // alert(getUsername());
-    db.ref("users/" + getUsername()).update({
-        active: false
+    db.ref("users/" + getUsername()).once('value').then(snapshot => {
+        if (snapshot.exists()) {
+            db.ref("users/" + getUsername()).update({
+                active: false
+            })
+        }
     })
     displayMembers();
 }
