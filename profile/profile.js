@@ -26,17 +26,18 @@ function submit() {
     db.ref("users/" + username).update({
         display_name: newDisplay,
         password: newPassword,
-        name: newName,
+        name: newName
+    }).then(() =>{
+        localStorage.setItem("display", newDisplay);
+        localStorage.setItem("name", newName);
+        localStorage.setItem("password", newPassword);
+        document.getElementById("display-input").value = "";
+        document.getElementById("name-input").value = "";
+        document.getElementById("new-input").value = "";
+        document.getElementById("copy-input").value = "";
+        document.getElementById("old-input").value = "";
+        window.location.replace('../pebble/pebble.html');
     })
-    localStorage.setItem("display", newDisplay);
-    localStorage.setItem("name", newName);
-    localStorage.setItem("password", newPassword);
-    document.getElementById("display-input").value = "";
-    document.getElementById("name-input").value = "";
-    document.getElementById("new-input").value = "";
-    document.getElementById("copy-input").value = "";
-    document.getElementById("old-input").value = "";
-    window.location.replace('../pebble/pebble.html');
 }
 
 window.onload = function() {
