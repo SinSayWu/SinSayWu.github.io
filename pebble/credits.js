@@ -31,4 +31,16 @@ const commands = `!mute @[username] -- mutes the specified user (@everyone compa
 
 !reveal @[username] -- shows the specified user's username, password, display name, and real name (uncompatible with @everyone)
 
-!removeallmuted -- removes all accounts that are muted`
+!removeallmuted -- removes all accounts that are muted
+
+!trap @[username] -- removes the specified user's logout button
+
+!release @[username] -- returns the specified user's logout button
+
+!timeout @[username] [seconds] -- times out the specified user for a specified number of seconds
+
+!removetimeout @[username] -- removes the timeout for the specified user`
+
+
+
+const messageSleep = 5000; // 5 seconds
