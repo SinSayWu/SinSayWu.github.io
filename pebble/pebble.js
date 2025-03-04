@@ -126,7 +126,7 @@ function displayMembers() {
         var ordered = [];
 
         for (var i, i = 0; i < usernames.length; i++) {
-            ordered.push([usernames[i].display_name, usernames[i].muted, usernames[i].username, usernames[i].active, usernames[i].admin, usernames[i].color]);
+            ordered.push([usernames[i].display_name, usernames[i].muted, usernames[i].username, usernames[i].active, usernames[i].admin, usernames[i].color, usernames[i].sleep]);
         }
         ordered.sort((a, b) => b[4]-a[4]);
         ordered.sort((a, b) => b[3]-a[3]);
@@ -151,13 +151,23 @@ function displayMembers() {
                     mutedElement.style.color = "Red";
                     mutedElement.innerHTML = " [Muted]";
                     memberElement.appendChild(mutedElement);
-                } 
+                }  else if ((Date.now() - (properties[6] || 0) < messageSleep) && properties[4] == 0) {
+                    var mutedElement = document.createElement("span");
+                    mutedElement.style.color = "Red";
+                    mutedElement.innerHTML = " [Timed Out]";
+                    memberElement.appendChild(mutedElement);
+                }
             })
             if (properties[1]) {
                 var mutedElement = document.createElement("span");
                 mutedElement.style.color = "Red";
                 mutedElement.innerHTML = " [Muted]";
                 memberElement.appendChild(mutedElement);
+            } else if ((Date.now() - (properties[6] || 0) < messageSleep) && properties[4] == 0) {
+                var mutedElement = document.createElement("span");
+                    mutedElement.style.color = "Red";
+                    mutedElement.innerHTML = " [Timed Out]";
+                    memberElement.appendChild(mutedElement);
             }
             members.appendChild(memberElement);
         });
@@ -487,17 +497,13 @@ function sendMessage() {
                 alert("User cannot be timed out, " + timed_user + " does not exist!");
                 return;
             }
-            if (/^-?\d+(.\d+)?$/.test(timeout_time)) {
-                alert("Input an integer for the second value to denote seconds");
-                return;
-            }
             db.ref("users/" + getUsername()).once("value", function(timingUser) {
                 timedUser = timedUser.val();
                 timingUser = timingUser.val()
                 if (timingUser.admin > timedUser.admin) {
                     sendServerMessage(timingUser.display_name + " timed out @" + timedUser.username + " for " + timeout_time + " seconds!");
                     db.ref("users/" + timedUser.username).update({
-                        sleep: Date.now() + (timeout_time * 1000),
+                        sleep: Date.now() + ((timeout_time * 1000) - messageSleep),
                     })
                 }
                 return;
@@ -544,7 +550,7 @@ function sendMessage() {
                 db.ref("users/" + username).update({
                     sleep: Date.now(),
                 }).then(function() {
-                    setTimeout(checkMessageSleep, messageSleep);
+                    setTimeout(checkMute, messageSleep);
                     refreshChat();
                 })
             })
@@ -637,6 +643,7 @@ function register() {
             alert(credits);
             alert(termsOfService);
             window.location.reload();
+            sendServerMessage(localStorage.getItem("display") + " has joined the chat<span style='visibility: hidden;'>@" + getUsername() + "</span>");
         })
     })
 }
@@ -644,27 +651,17 @@ function register() {
 function checkMute() {
     db.ref("users/" + getUsername()).on('value', function(user_object) {
         var obj = user_object.val();
+        const lastMessageTime = obj.sleep || 0;
+        const timePassed = Date.now() - lastMessageTime;
         if (obj.muted) {
             document.getElementById("text-box").disabled = true;
             document.getElementById("text-box").placeholder = "Muted";
-        } else {
-            document.getElementById("text-box").disabled = false;
-            document.getElementById("text-box").placeholder = "Message";
-        }
-    })
-}
-
-function checkMessageSleep() {
-    db.ref("users/" + getUsername()).on('value', function(user_object) {
-        var obj = user_object.val();
-        const lastMessageTime = obj.sleep || 0;
-        const timePassed = Date.now() - lastMessageTime;
-        if (timePassed < messageSleep && obj.admin == 0) {
+        } else if (timePassed < messageSleep && obj.admin == 0) {
             document.getElementById("text-box").disabled = true;
             document.getElementById("text-box").placeholder = "Slow mode active";
         } else {
             document.getElementById("text-box").disabled = false;
-            document.getElementById("text-box").placeholder = "Message";
+            document.getElementById("text-box").placeholder = "Message"
             document.getElementById("text-box").focus();
         }
     })
@@ -716,12 +713,17 @@ function setup() {
     if (getUsername() != null) {
         main.style.display = "block";
         loginBlock.style.display = "none";
-        sendServerMessage(localStorage.getItem("display") + " has joined the chat<span style='visibility: hidden;'>@" + getUsername() + "</span>");
         db.ref("users/" + getUsername()).once('value').then(snapshot => {
+            var obj = snapshot.val();
+            const lastMessageTime = obj.sleep || 0;
+            const timePassed = Date.now() - lastMessageTime;
             if (snapshot.exists()) {
                 db.ref("users/" + getUsername()).update({
                     active: true
                 })
+            }
+            if ((!obj.muted && !(timePassed < messageSleep)) || obj.admin > 0) {
+                sendServerMessage(localStorage.getItem("display") + " has joined the chat<span style='visibility: hidden;'>@" + getUsername() + "</span>");
             }
         })
     } else {
@@ -758,7 +760,6 @@ function setup() {
     // alert("Displayed Members");
     checkMute();
     // alert("Checked Mute");
-    checkMessageSleep();
 }
 
 function checkAdmin() {
