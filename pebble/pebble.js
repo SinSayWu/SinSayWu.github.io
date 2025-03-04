@@ -126,7 +126,7 @@ function displayMembers() {
         var ordered = [];
 
         for (var i, i = 0; i < usernames.length; i++) {
-            ordered.push([usernames[i].display_name, usernames[i].muted, usernames[i].username, usernames[i].active, usernames[i].admin, usernames[i].color]);
+            ordered.push([usernames[i].display_name, usernames[i].muted, usernames[i].username, usernames[i].active, usernames[i].admin, usernames[i].color, usernames[i].sleep]);
         }
         ordered.sort((a, b) => b[4]-a[4]);
         ordered.sort((a, b) => b[3]-a[3]);
@@ -151,13 +151,23 @@ function displayMembers() {
                     mutedElement.style.color = "Red";
                     mutedElement.innerHTML = " [Muted]";
                     memberElement.appendChild(mutedElement);
-                } 
+                }  else if ((Date.now() - (properties[6] || 0) < messageSleep) && properties[4] == 0) {
+                    var mutedElement = document.createElement("span");
+                    mutedElement.style.color = "Red";
+                    mutedElement.innerHTML = " [Timed Out]";
+                    memberElement.appendChild(mutedElement);
+                }
             })
             if (properties[1]) {
                 var mutedElement = document.createElement("span");
                 mutedElement.style.color = "Red";
                 mutedElement.innerHTML = " [Muted]";
                 memberElement.appendChild(mutedElement);
+            } else if ((Date.now() - (properties[6] || 0) < messageSleep) && properties[4] == 0) {
+                var mutedElement = document.createElement("span");
+                    mutedElement.style.color = "Red";
+                    mutedElement.innerHTML = " [Timed Out]";
+                    memberElement.appendChild(mutedElement);
             }
             members.appendChild(memberElement);
         });
@@ -493,7 +503,7 @@ function sendMessage() {
                 if (timingUser.admin > timedUser.admin) {
                     sendServerMessage(timingUser.display_name + " timed out @" + timedUser.username + " for " + timeout_time + " seconds!");
                     db.ref("users/" + timedUser.username).update({
-                        sleep: Date.now() + (timeout_time * 1000),
+                        sleep: Date.now() + ((timeout_time * 1000) - messageSleep),
                     })
                 }
                 return;
@@ -705,12 +715,14 @@ function setup() {
         loginBlock.style.display = "none";
         db.ref("users/" + getUsername()).once('value').then(snapshot => {
             var obj = snapshot.val();
+            const lastMessageTime = obj.sleep || 0;
+            const timePassed = Date.now() - lastMessageTime;
             if (snapshot.exists()) {
                 db.ref("users/" + getUsername()).update({
                     active: true
                 })
             }
-            if (!obj.muted) {
+            if ((!obj.muted && !(timePassed < messageSleep)) || obj.admin > 0) {
                 sendServerMessage(localStorage.getItem("display") + " has joined the chat<span style='visibility: hidden;'>@" + getUsername() + "</span>");
             }
         })
