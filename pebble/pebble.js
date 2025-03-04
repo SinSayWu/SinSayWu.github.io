@@ -487,10 +487,6 @@ function sendMessage() {
                 alert("User cannot be timed out, " + timed_user + " does not exist!");
                 return;
             }
-            if (/^-?\d+(.\d+)?$/.test(timeout_time)) {
-                alert("Input an integer for the second value to denote seconds");
-                return;
-            }
             db.ref("users/" + getUsername()).once("value", function(timingUser) {
                 timedUser = timedUser.val();
                 timingUser = timingUser.val()
