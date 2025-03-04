@@ -540,7 +540,7 @@ function sendMessage() {
                 db.ref("users/" + username).update({
                     sleep: Date.now(),
                 }).then(function() {
-                    setTimeout(checkMessageSleep, messageSleep);
+                    setTimeout(checkMute, messageSleep);
                     refreshChat();
                 })
             })
@@ -633,6 +633,7 @@ function register() {
             alert(credits);
             alert(termsOfService);
             window.location.reload();
+            sendServerMessage(localStorage.getItem("display") + " has joined the chat<span style='visibility: hidden;'>@" + getUsername() + "</span>");
         })
     })
 }
@@ -640,27 +641,17 @@ function register() {
 function checkMute() {
     db.ref("users/" + getUsername()).on('value', function(user_object) {
         var obj = user_object.val();
+        const lastMessageTime = obj.sleep || 0;
+        const timePassed = Date.now() - lastMessageTime;
         if (obj.muted) {
             document.getElementById("text-box").disabled = true;
             document.getElementById("text-box").placeholder = "Muted";
-        } else {
-            document.getElementById("text-box").disabled = false;
-            document.getElementById("text-box").placeholder = "Message";
-        }
-    })
-}
-
-function checkMessageSleep() {
-    db.ref("users/" + getUsername()).on('value', function(user_object) {
-        var obj = user_object.val();
-        const lastMessageTime = obj.sleep || 0;
-        const timePassed = Date.now() - lastMessageTime;
-        if (timePassed < messageSleep && obj.admin == 0) {
+        } else if (timePassed < messageSleep && obj.admin == 0) {
             document.getElementById("text-box").disabled = true;
             document.getElementById("text-box").placeholder = "Slow mode active";
         } else {
             document.getElementById("text-box").disabled = false;
-            document.getElementById("text-box").placeholder = "Message";
+            document.getElementById("text-box").placeholder = "Message"
             document.getElementById("text-box").focus();
         }
     })
@@ -712,12 +703,15 @@ function setup() {
     if (getUsername() != null) {
         main.style.display = "block";
         loginBlock.style.display = "none";
-        sendServerMessage(localStorage.getItem("display") + " has joined the chat<span style='visibility: hidden;'>@" + getUsername() + "</span>");
         db.ref("users/" + getUsername()).once('value').then(snapshot => {
+            var obj = snapshot.val();
             if (snapshot.exists()) {
                 db.ref("users/" + getUsername()).update({
                     active: true
                 })
+            }
+            if (!obj.muted) {
+                sendServerMessage(localStorage.getItem("display") + " has joined the chat<span style='visibility: hidden;'>@" + getUsername() + "</span>");
             }
         })
     } else {
@@ -754,7 +748,6 @@ function setup() {
     // alert("Displayed Members");
     checkMute();
     // alert("Checked Mute");
-    checkMessageSleep();
 }
 
 function checkAdmin() {
