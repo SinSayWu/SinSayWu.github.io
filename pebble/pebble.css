@@ -339,6 +339,10 @@ textarea:focus {
     height: 40%;
 }
 
+#logoutButton {
+    float: left;
+}
+
 .profile-button:hover {
     background-color:#949494;
     transition: 0.2s;

@@ -457,7 +457,76 @@ function sendMessage() {
         })
         document.getElementById("text-box").value = "";
         return;
-    } 
+    } else if (message.startsWith("!release @")){
+        var untrapped_user = message.substring(10).toLowerCase();
+        db.ref("users/" + untrapped_user).once('value', function(untrappedUser) {
+            if (!untrappedUser.exists()) {
+                alert("User cannot be released, " + untrapped_user + " does not exist!");
+                return;
+            }
+            db.ref("users/" + getUsername()).once("value", function(untrappingUser) {
+                untrappedUser = untrappedUser.val();
+                untrappingUser = untrappingUser.val()
+                if (untrappingUser.admin > untrappedUser.admin) {
+                    sendServerMessage(untrappingUser.display_name + " released @" + untrappedUser.username + "!");
+                    db.ref("users/" + untrappedUser.username).update({
+                        trapped: false,
+                        reload: true,
+                    })
+                }
+                return;
+            })
+        })
+        document.getElementById("text-box").value = "";
+        return;
+    } else if (message.startsWith("!timeout @")){
+        var timed_user = message.split(" ")[1].substring(1).toLowerCase();
+        var timeout_time = message.split(" ")[2];
+        db.ref("users/" + timed_user).once('value', function(timedUser) {
+            if (!timedUser.exists()) {
+                alert("User cannot be timed out, " + timed_user + " does not exist!");
+                return;
+            }
+            if (/^-?\d+(.\d+)?$/.test(timeout_time)) {
+                alert("Input an integer for the second value to denote seconds");
+                return;
+            }
+            db.ref("users/" + getUsername()).once("value", function(timingUser) {
+                timedUser = timedUser.val();
+                timingUser = timingUser.val()
+                if (timingUser.admin > timedUser.admin) {
+                    sendServerMessage(timingUser.display_name + " timed out @" + timedUser.username + " for " + timeout_time + " seconds!");
+                    db.ref("users/" + timedUser.username).update({
+                        sleep: Date.now() + (timeout_time * 1000),
+                    })
+                }
+                return;
+            })
+        })
+        document.getElementById("text-box").value = "";
+        return;
+    } else if (message.startsWith("!removetimeout @")){
+        var removetimed_user = message.split(" ")[1].substring(1).toLowerCase();
+        db.ref("users/" + removetimed_user).once('value', function(removetimedUser) {
+            if (!removetimedUser.exists()) {
+                alert("User's timeout cannot be removed, " + timed_user + " does not exist!");
+                return;
+            }
+            db.ref("users/" + getUsername()).once("value", function(removetimingUser) {
+                removetimedUser = removetimedUser.val();
+                removetimingUser = removetimingUser.val()
+                if (removetimingUser.admin > removetimedUser.admin) {
+                    sendServerMessage(removetimingUser.display_name + " removed the timeout for @" + removetimedUser.username + "!");
+                    db.ref("users/" + removetimedUser.username).update({
+                        sleep: 0,
+                    })
+                }
+                return;
+            })
+        })
+        document.getElementById("text-box").value = "";
+        return;
+    }
     db.ref("users/" + username).once('value', function(user_object) {
         var obj = user_object.val();
         var display_name = obj.display_name;
@@ -472,7 +541,12 @@ function sendMessage() {
                 index: index,
                 time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
             }).then(function() {
-                refreshChat();
+                db.ref("users/" + username).update({
+                    sleep: Date.now(),
+                }).then(function() {
+                    setTimeout(checkMessageSleep, messageSleep);
+                    refreshChat();
+                })
             })
         })
     })
@@ -580,6 +654,22 @@ function checkMute() {
     })
 }
 
+function checkMessageSleep() {
+    db.ref("users/" + getUsername()).on('value', function(user_object) {
+        var obj = user_object.val();
+        const lastMessageTime = obj.sleep || 0;
+        const timePassed = Date.now() - lastMessageTime;
+        if (timePassed < messageSleep && obj.admin == 0) {
+            document.getElementById("text-box").disabled = true;
+            document.getElementById("text-box").placeholder = "Slow mode active";
+        } else {
+            document.getElementById("text-box").disabled = false;
+            document.getElementById("text-box").placeholder = "Message";
+            document.getElementById("text-box").focus();
+        }
+    })
+}
+
 function regMenu() {
     var register = document.getElementById("register");
     var loginBlock = document.getElementById("login");
@@ -668,6 +758,7 @@ function setup() {
     // alert("Displayed Members");
     checkMute();
     // alert("Checked Mute");
+    checkMessageSleep();
 }
 
 function checkAdmin() {
