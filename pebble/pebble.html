@@ -8,7 +8,6 @@
 
         <script src="credits.js"></script>
         <script src="pebble.js"></script>
-        <script src="notifications.js"></script>
         <link rel="stylesheet" href="pebble.css">
         <link rel="shortcut icon" href="../images/pebblePic.png" type="image/">
         <title>
@@ -90,6 +89,7 @@
                             <a onclick="wipeChat(); toggleMenu()">Wipe Chat</a>
                             <a onclick="announce(); toggleMenu()">Announce<span id='announce-toggle'></span></a>
                             <a onclick="checkCommands(); toggleMenu()">Commands</a>
+                            <a onclick="slowMode(); toggleMenu()">Slowmode<span id="slowmode-toggle"></span></a>
                             <a onclick="window.location.replace('../notifications/notifications.html')">Notifications</a>
                         </div>
                     </div>
@@ -104,7 +104,7 @@
                 </div>
                 <div class="text-area" id="downbar">
                     <textarea class="box-message" placeholder="Message" id="text-box"></textarea>
-                    <button class="send-message" onclick="send_message()">➤</button>
+                    <button class="send-message" onclick="sendMessage()">➤</button>
                 </div>
             </div>
             <div class="game-area" id="gamearea">

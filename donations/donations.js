@@ -4,10 +4,10 @@ function updateAmount(amount) {
 
 function addAmount(amount) {
     amount += parseInt(document.getElementById('amount').innerHTML);
-    db.ref("amountDonated").set({
+    db.ref("other").set({
         amountDonated: amount,
     }).then(() => {
-        db.ref("amountDonated").once("value").then(function (amount) {
+        db.ref("other").once("value").then(function (amount) {
             document.getElementById('amount').innerHTML = amount.val().amountDonated;
         })
     })
@@ -15,6 +15,6 @@ function addAmount(amount) {
 
 
 
-db.ref("/amountDonated").on("value", (amount) => {
+db.ref("other").on("value", (amount) => {
     document.getElementById('amount').innerHTML = amount.val().amountDonated;
 })

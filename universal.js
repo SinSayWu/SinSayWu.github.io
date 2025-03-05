@@ -10,6 +10,10 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
+const messageSleep = 5000; // 5 seconds
+
+const profilesleep = 86400000; // 1 day
+
 function checkInput(input) {
     if (input == "") {
         alert("Cannot be blank");

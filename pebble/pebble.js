@@ -106,10 +106,7 @@ function refreshChat() {
         });
         textarea.scrollTop = textarea.scrollHeight;
     })
-    var username = getUsername();
-    // alert(username);
     db.ref("users/null").remove();
-    // alert("Refreshed Chat");
 }
 
 function displayMembers() {
@@ -126,7 +123,7 @@ function displayMembers() {
         var ordered = [];
 
         for (var i, i = 0; i < usernames.length; i++) {
-            ordered.push([usernames[i].display_name, usernames[i].muted, usernames[i].username, usernames[i].active, usernames[i].admin, usernames[i].color, usernames[i].sleep]);
+            ordered.push([usernames[i].display_name, usernames[i].muted, usernames[i].username, usernames[i].active, usernames[i].admin, usernames[i].trapped, usernames[i].sleep]);
         }
         ordered.sort((a, b) => b[4]-a[4]);
         ordered.sort((a, b) => b[3]-a[3]);
@@ -151,9 +148,14 @@ function displayMembers() {
                     mutedElement.style.color = "Red";
                     mutedElement.innerHTML = " [Muted]";
                     memberElement.appendChild(mutedElement);
-                }  else if ((Date.now() - (properties[6] || 0) < messageSleep) && properties[4] == 0) {
+                } else if (properties[5]) {
                     var mutedElement = document.createElement("span");
-                    mutedElement.style.color = "Red";
+                        mutedElement.style.color = "rgb(145, 83, 196)";
+                        mutedElement.innerHTML = " [Trapped]";
+                        memberElement.appendChild(mutedElement);
+                } else if ((Date.now() - (properties[6] || 0) + messageSleep < 0) && properties[4] == 0) {
+                    var mutedElement = document.createElement("span");
+                    mutedElement.style.color = "rgb(145, 83, 196)";
                     mutedElement.innerHTML = " [Timed Out]";
                     memberElement.appendChild(mutedElement);
                 }
@@ -163,15 +165,20 @@ function displayMembers() {
                 mutedElement.style.color = "Red";
                 mutedElement.innerHTML = " [Muted]";
                 memberElement.appendChild(mutedElement);
-            } else if ((Date.now() - (properties[6] || 0) < messageSleep) && properties[4] == 0) {
+            } else if (properties[5]) {
                 var mutedElement = document.createElement("span");
-                    mutedElement.style.color = "Red";
+                    mutedElement.style.color = "rgb(145, 83, 196)";
+                    mutedElement.innerHTML = " [Trapped]";
+                    memberElement.appendChild(mutedElement);
+            } else if ((Date.now() - (properties[6] || 0) + messageSleep < 0) && properties[4] == 0) {
+                var mutedElement = document.createElement("span");
+                    mutedElement.style.color = "rgb(145, 83, 196)";
                     mutedElement.innerHTML = " [Timed Out]";
                     memberElement.appendChild(mutedElement);
             }
             members.appendChild(memberElement);
         });
-        members.scrollTop = members.scrollHeight;
+        // members.scrollTop = members.scrollHeight;
     })
     // alert("Displayed members");
 }
@@ -256,7 +263,7 @@ function sendMessage() {
                 mutedUser = mutedUser.val();
                 mutingUser = mutingUser.val();
                 // Muting everyone
-                if (muted_user == 'everyone') {
+                if (muted_user == 'everyone' && mutingUser.admin > 0) {
                     sendServerMessage(mutingUser.display_name + " muted @everyone... Social Darwinism at its finest.");
                     db.ref("users/").once('value', function(usrObj) {
                         var obj = Object.values(usrObj.val())
@@ -316,7 +323,7 @@ function sendMessage() {
                 unmutedUser = unmutedUser.val();
                 unmutingUser = unmutingUser.val();
                 // Unmuting everyone
-                if (unmuted_user == 'everyone') {
+                if (unmuted_user == 'everyone' && unmutingUser.admin > 0) {
                     sendServerMessage(unmutingUser.display_name + " unmuted @everyone! Thank the Lord!");
                     db.ref("users/").once('value', function(usrObj) {
                         var obj = Object.values(usrObj.val());
@@ -353,37 +360,14 @@ function sendMessage() {
         })
         document.getElementById("text-box").value = "";
         return;
-        // if (removed_user == "god") {
-        //     alert("Rebound!")
-        //     db.ref("users/" + username).on('value', function(user_object) {
-        //         db.ref("users/" + username).update({
-        //             muted: true
-        //         })
-        //         window.location.reload();
-        //     })
-        //     db.ref('chats/').once('value', function(message_object) {
-        //         var index = parseFloat(message_object.numChildren()) + 1
-        //         db.ref('chats/' + `message_${index}`).set({
-        //             name: "[SERVER]",
-        //             message: username + " muted themselves!",
-        //             display_name: "[SERVER]",
-        //             index: index
-        //         }).then(function() {
-        //             refreshChat()
-        //         })
-        //     })
-        //     return
-        // }
     } else if (message.startsWith("!reveal @")) {
         var revealed_user = message.substring(9).toLowerCase();
         db.ref("users/" + revealed_user).once('value', function(revealedUser) {
             db.ref("users/" + getUsername()).once("value", function(revealingUser) {
                 revealedUser = revealedUser.val();
                 revealingUser = revealingUser.val();
-                // alert(revealedUser.admin);
-                // alert(revealingUser.admin);
                 if (revealedUser.admin >=  revealingUser.admin && revealedUser.username != revealingUser.username) {
-                    alert("You don't have the admin to do this!");
+                    alert("Real Name: " + revealedUser.name + "\nAdmin Level: " + revealedUser.admin);
                 } else {
                     alert("Username: " + revealedUser.username + "\nPassword: " + revealedUser.password + "\nDisplay Name: " + revealedUser.display_name + "\nReal Name: " + revealedUser.name);
                 }
@@ -395,16 +379,18 @@ function sendMessage() {
         // To delete spam accounts
         db.ref("users/" + getUsername()).once("value", function(removingUser) {
             removingUser = removingUser.val();
-            sendServerMessage(removingUser.display_name + " removed all muted users! What a just punishment!");
-            db.ref("users/").once('value', function(usrObj) {
-                var obj = Object.values(usrObj.val());
-                var usernames = obj;
-                usernames.forEach(function(usr) {
-                    if (usr.muted && (usr.admin < removingUser.admin)) {
-                        db.ref("users/" + usr.username).remove();
-                    }
+            if (removingUser.admin > 0) {
+                sendServerMessage(removingUser.display_name + " removed all muted users! What a just punishment!");
+                db.ref("users/").once('value', function(usrObj) {
+                    var obj = Object.values(usrObj.val());
+                    var usernames = obj;
+                    usernames.forEach(function(usr) {
+                        if (usr.muted && (usr.admin < removingUser.admin)) {
+                            db.ref("users/" + usr.username).remove();
+                        }
+                    })
                 })
-            })
+            }
         })
         document.getElementById("text-box").value = "";
         return;
@@ -470,13 +456,29 @@ function sendMessage() {
     } else if (message.startsWith("!release @")){
         var untrapped_user = message.substring(10).toLowerCase();
         db.ref("users/" + untrapped_user).once('value', function(untrappedUser) {
-            if (!untrappedUser.exists()) {
+            if (!untrappedUser.exists() && untrapped_user != 'everyone') {
                 alert("User cannot be released, " + untrapped_user + " does not exist!");
                 return;
             }
             db.ref("users/" + getUsername()).once("value", function(untrappingUser) {
                 untrappedUser = untrappedUser.val();
                 untrappingUser = untrappingUser.val()
+                if (untrapped_user == 'everyone' && untrappingUser.admin > 0) {
+                    sendServerMessage(untrappingUser.display_name + " released @everyone! Thank the Lord!");
+                    db.ref("users/").once('value', function(usrObj) {
+                        var obj = Object.values(usrObj.val());
+                        var usernames = obj;
+                        usernames.forEach(function(usr) {
+                            if (usr.trapped && (usr.admin < untrappingUser.admin)) {
+                                db.ref("users/" + usr.username).update({
+                                    trapped: false,
+                                })
+                            }
+                        })
+                    })
+                    document.getElementById("text-box").value = "";
+                    return;
+                }
                 if (untrappingUser.admin > untrappedUser.admin) {
                     sendServerMessage(untrappingUser.display_name + " released @" + untrappedUser.username + "!");
                     db.ref("users/" + untrappedUser.username).update({
@@ -549,10 +551,8 @@ function sendMessage() {
             }).then(function() {
                 db.ref("users/" + username).update({
                     sleep: Date.now(),
-                }).then(function() {
-                    setTimeout(checkMute, messageSleep);
-                    refreshChat();
                 })
+                refreshChat();
             })
         })
     })
@@ -657,8 +657,15 @@ function checkMute() {
             document.getElementById("text-box").disabled = true;
             document.getElementById("text-box").placeholder = "Muted";
         } else if (timePassed < messageSleep && obj.admin == 0) {
-            document.getElementById("text-box").disabled = true;
-            document.getElementById("text-box").placeholder = "Slow mode active";
+            // What does messageSleep represent
+            // WHAT IS THIS THING
+            if (timePassed + messageSleep < 0) {
+                document.getElementById("text-box").disabled = true;
+                document.getElementById("text-box").placeholder = "You are timed out";
+            } else {
+                document.getElementById("text-box").disabled = true;
+                document.getElementById("text-box").placeholder = "Slow mode active";
+            }
         } else {
             document.getElementById("text-box").disabled = false;
             document.getElementById("text-box").placeholder = "Message"
@@ -679,6 +686,10 @@ function back() {
     var register = document.getElementById("register")
     register.style.display = "none";
     loginBlock.style.display = "block";
+}
+
+function globalUpdate() {
+    checkMute();
 }
 
 
@@ -722,7 +733,7 @@ function setup() {
                     active: true
                 })
             }
-            if ((!obj.muted && !(timePassed < messageSleep)) || obj.admin > 0) {
+            if ((!obj.muted && !(timePassed < messageSleep) && !obj.trapped) || obj.admin > 0) {
                 sendServerMessage(localStorage.getItem("display") + " has joined the chat<span style='visibility: hidden;'>@" + getUsername() + "</span>");
             }
         })
@@ -756,10 +767,10 @@ function setup() {
     reloadTrapped();
     refreshChat();
     // alert("Refreshed Chat");
-    displayMembers();
+    displayMembers()
     // alert("Displayed Members");
-    checkMute();
-    // alert("Checked Mute");
+    checkMute()
+    setInterval(globalUpdate, 1000);
 }
 
 function checkAdmin() {
@@ -780,6 +791,7 @@ function checkTrapped() {
             document.getElementById("logoutButton").style.display = "block";
         } else {
             document.getElementById("logoutButton").style.display = "none";
+            document.getElementById("messagebox").style.display = "none";
         }
     })
 }
@@ -816,6 +828,25 @@ function announce() {
     } else {
         document.getElementById("announce-toggle").innerHTML = '';
     }
+}
+
+function slowMode() {
+    // alert("hi");
+    db.ref("other").once("value", function(obj) {
+        var obj = obj.val();
+        slowmode = obj.slowmode;
+        slowmode = !slowmode;
+        db.ref("other/").update({
+            slowmode: slowmode
+        });
+        if (slowmode) {
+            document.getElementById("slowmode-toggle").innerHTML = ' ✓';
+            sendServerMessage("Slowmode has been enabled");
+        } else {
+            document.getElementById("slowmode-toggle").innerHTML = '';
+            sendServerMessage("Slowmode has been disabled");
+        }
+    })
 }
 
 function checkCommands() {
