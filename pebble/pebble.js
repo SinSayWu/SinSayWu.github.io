@@ -882,13 +882,13 @@ function slowmodeToggle() {
         db.ref("other/").update({
             slowmode: slowmode
         });
-        // if (slowmode) {
-        //     document.getElementById("slowmode-toggle").innerHTML = ' ✓';
-        //     sendServerMessage("Slowmode has been enabled");
-        // } else {
-        //     document.getElementById("slowmode-toggle").innerHTML = '';
-        //     sendServerMessage("Slowmode has been disabled");
-        // }
+        if (slowmode) {
+            // document.getElementById("slowmode-toggle").innerHTML = ' ✓';
+            sendServerMessage("Slowmode has been enabled");
+        } else {
+            // document.getElementById("slowmode-toggle").innerHTML = '';
+            sendServerMessage("Slowmode has been disabled");
+        }
     })
 }
 
