@@ -464,7 +464,7 @@ textarea:focus {
     height: auto;
     color: gray;
     font-size: 12px;
-    margin-top: 2.5px;
+    margin-top: 0px;
     float: right;
     padding: 0;
     position: relative;
