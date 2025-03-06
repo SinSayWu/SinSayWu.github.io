@@ -39,5 +39,9 @@ const commands = `!mute @[username] -- mutes the specified user (@everyone compa
 
 !timeout @[username] [seconds] -- times out the specified user for a specified number of seconds
 
-!removetimeout @[username] -- removes the timeout for the specified user`;
+!removetimeout @[username] -- removes the timeout for the specified user
+
+!lockdown -- locks down the site (users can no longer register accounts)
+
+!removelockdown -- removed the lockdown on the site`;
 

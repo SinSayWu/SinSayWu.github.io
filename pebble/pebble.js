@@ -62,9 +62,11 @@ function refreshChat() {
         }
         
         // Now we're done. Simply display the ordered messages
-        ordered.forEach(function(data) {
+        ordered.forEach(function(data, index) {
             var username = data.display_name;
             var message = data.message;
+            let prevIndex = index - 1;
+            let prevItem = prevIndex >= 0 ? ordered[prevIndex] : null;
             
             var messageElement = document.createElement("div");
             messageElement.setAttribute("class", "message");
@@ -77,23 +79,34 @@ function refreshChat() {
                 messageImg.setAttribute("class", "profile-img");
                 messageElement.appendChild(messageImg);
             }
-            
-            var userElement = document.createElement("div");
-            userElement.setAttribute("class", "username");
-            userElement.addEventListener("click", function(e) {
-                userElement.innerHTML = username + " @(" + data.name + ")" ;
-            })
-            userElement.innerHTML = username;
-            userElement.style.fontWeight = "bold";
-            if (data.name == "[SERVER]") {
-                userElement.style.color = "Yellow";
-            }
-            messageElement.appendChild(userElement);
 
             var timeElement = document.createElement("div");
             timeElement.setAttribute("class", "time");
             timeElement.innerHTML = data.time;
             messageElement.appendChild(timeElement);
+
+            if (data.name == "[SERVER]") {
+                var userElement = document.createElement("div");
+                userElement.setAttribute("class", "username");
+                userElement.addEventListener("click", function(e) {
+                    userElement.innerHTML = username + " @(" + data.name + ")" ;
+                })
+                userElement.innerHTML = username;
+                userElement.style.fontWeight = "bold";
+                userElement.style.color = "Yellow";
+                messageElement.appendChild(userElement);
+            } else if (prevItem == null || prevItem.name != data.name) {
+                var userElement = document.createElement("div");
+                userElement.setAttribute("class", "username");
+                userElement.addEventListener("click", function(e) {
+                    userElement.innerHTML = username + " @(" + data.name + ")" ;
+                })
+                userElement.innerHTML = username;
+                userElement.style.fontWeight = "bold";
+                timeElement.style.marginTop = "25px";
+                messageElement.appendChild(userElement);
+            }
+
             
 
             var messageContent = document.createElement("div");
@@ -534,6 +547,32 @@ function sendMessage() {
         })
         document.getElementById("text-box").value = "";
         return;
+    } else if (message.startsWith("!lockdown")) {
+        db.ref("users/" + getUsername()).once("value", function(lockdownUser) {
+            lockdownUser = lockdownUser.val()
+            if (lockdownUser.admin > 0) {
+                sendServerMessage(lockdownUser.display_name + " has locked down the server!");
+                db.ref("other/").update({
+                    lockdown: true,
+                })
+            }
+            return;
+        })
+        document.getElementById("text-box").value = "";
+        return;
+    } else if (message.startsWith("!removelockdown")) {
+        db.ref("users/" + getUsername()).once("value", function(lockdownUser) {
+            lockdownUser = lockdownUser.val()
+            if (lockdownUser.admin > 0) {
+                sendServerMessage(lockdownUser.display_name + " has removed the lock down for the server!");
+                db.ref("other/").update({
+                    lockdown: false,
+                })
+            }
+            return;
+        })
+        document.getElementById("text-box").value = "";
+        return;
     }
     db.ref("users/" + username).once('value', function(user_object) {
         var obj = user_object.val();
@@ -677,8 +716,13 @@ function checkMute() {
 function regMenu() {
     var register = document.getElementById("register");
     var loginBlock = document.getElementById("login");
-    register.style.display = "block";
-    loginBlock.style.display = "none";
+    db.ref("other/").once("value", function(obj) {
+        var obj = obj.val();
+        if (!obj.lockdown) {
+            loginBlock.style.display = "none";
+            register.style.display = "block";
+        }
+    })
 }
 
 function back() {
@@ -715,7 +759,7 @@ function setup() {
     //         }
     //     });
     // }
-
+    slowMode();
     checkCreds();
     update_name();
     // Login and Register Screens
@@ -830,21 +874,31 @@ function announce() {
     }
 }
 
-function slowMode() {
-    // alert("hi");
-    db.ref("other").once("value", function(obj) {
+function slowmodeToggle() {
+    db.ref("other/").once("value", function(obj) {
         var obj = obj.val();
-        slowmode = obj.slowmode;
+        var slowmode = obj.slowmode;
         slowmode = !slowmode;
         db.ref("other/").update({
             slowmode: slowmode
         });
-        if (slowmode) {
-            document.getElementById("slowmode-toggle").innerHTML = ' ✓';
-            sendServerMessage("Slowmode has been enabled");
+        // if (slowmode) {
+        //     document.getElementById("slowmode-toggle").innerHTML = ' ✓';
+        //     sendServerMessage("Slowmode has been enabled");
+        // } else {
+        //     document.getElementById("slowmode-toggle").innerHTML = '';
+        //     sendServerMessage("Slowmode has been disabled");
+        // }
+    })
+}
+
+function slowMode() {
+    db.ref("other/").on("value", function(obj) {
+        var obj = obj.val();
+        if (obj.slowmode) {
+            messageSleep = 5000; // 5 seconds
         } else {
-            document.getElementById("slowmode-toggle").innerHTML = '';
-            sendServerMessage("Slowmode has been disabled");
+            messageSleep = 0; // 0 seconds
         }
     })
 }
