@@ -33,3 +33,26 @@ function checkInput(input) {
     }
     return true;
 }
+
+fetch("https://us-central1-pebble-rocks.cloudfunctions.net/testCommand", {
+    // IDRK WHAT THIS IS, BUT IT WORKS
+    method: "POST",
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+        // THESE ARE THE PARAMETERS YOU PASS INTO THE BACKEND FUNCTION
+        param1: "value1",
+        param2: "value2",
+        param3: "value3",
+    }),
+}).then(
+    response => response.json()
+).then(
+    data => {
+        // THIS IS WHAT U DO WITH THE RETURNED DATA
+        alert(data.message);
+    }
+).catch(
+    error => alert('Error: ', error)
+);
