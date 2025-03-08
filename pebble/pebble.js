@@ -1,4 +1,5 @@
 var announceToggle = false;
+var notificationNumber = 0;
 
 function getUsername() {
     if (localStorage.getItem("username") != null) {
@@ -56,9 +57,9 @@ function refreshChat() {
             })
         })
 
-        // Max 50 messages
+        // Max 500 messages
         if (ordered.length > 50) {
-            ordered.splice(0,ordered.length-50)
+            ordered.splice(0,ordered.length-500)
         }
         
         // Now we're done. Simply display the ordered messages
@@ -118,7 +119,29 @@ function refreshChat() {
             messageElement.appendChild(messageContent);
         });
         textarea.scrollTop = textarea.scrollHeight;
-    })
+
+        // Notifications
+        if (document.visibilityState === "hidden") {
+            var prevMessage = ordered.at(-1)
+            var announceNotification = localStorage.getItem("announceNotification") || true;
+            var mentionNotification = localStorage.getItem("mentionNotification") || true;
+            var messageNotification = localStorage.getItem("messageNotification") || false;
+            try {
+            if (prevMessage.display_name == "[SERVER]" && JSON.parse(announceNotification)) {
+                notificationNumber += 1
+            } else if ((prevMessage.message.includes("@" + getUsername()) || prevMessage.message.includes("@everyone")) && JSON.parse(mentionNotification)) {
+                notificationNumber += 1
+            } else if (JSON.parse(messageNotification)) {
+                notificationNumber += 1
+            }
+            if (notificationNumber != 0) {
+                document.title = "Pebble (" + notificationNumber + ")";
+            }
+        } catch(err) {
+            alert(err)
+        }
+        };
+    });
     db.ref("users/null").remove();
 }
 
@@ -207,7 +230,7 @@ function sendServerMessage(message) {
             display_name: "[SERVER]",
             index: index,
             time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
-        }).then(refreshChat())
+        })
     })
 }
 
@@ -591,7 +614,6 @@ function sendMessage() {
                 db.ref("users/" + username).update({
                     sleep: Date.now(),
                 })
-                refreshChat();
             })
         })
     })
@@ -738,27 +760,13 @@ function globalUpdate() {
 
 
 function setup() {
-    // TODO: MAKE NOTIFICATIONS WORK
-
-    // if (!("Notification" in window)) {
-    //     // Check if the browser supports notifications
-    //     alert("This browser does not support desktop notification");
-    // } else if (Notification.permission === "granted") {
-    //     // Check whether notification permissions have already been granted;
-    //     // if so, create a notification
-    //     var notification = new Notification("Hi there!", {body: "test"});
-    // } else if (Notification.permission !== "denied") {
-    //     // We need to ask the user for permission
-    //     Notification.requestPermission().then((permission) => {
-    //         console.log(permission);
-    //         // If the user accepts, let's create a notification
-    //         if (permission === "granted") {
-    //             var notification = new Notification("Hi there!", {
-    //                 body: "Test"
-    //             });
-    //         }
-    //     });
-    // }
+    // Notification check
+    document.addEventListener("visibilitychange", function() {
+        if (document.visibilityState === "visible") {
+            notificationNumber = 0
+            document.title = "Pebble";
+        }
+    });
     slowMode();
     checkCreds();
     update_name();
@@ -818,7 +826,7 @@ function setup() {
 }
 
 function checkAdmin() {
-    db.ref("users/" + getUsername()).on('value', function(user_object) {
+    db.ref("users/" + getUsername()).once('value', function(user_object) {
         var obj = user_object.val();
         if (obj.admin > 0) {
             document.getElementById("adminControls").style.display = "block";
@@ -852,7 +860,14 @@ function reloadTrapped() {
 }
 
 function toggleMenu() {
-    document.getElementById("menu").classList.toggle("show");
+    db.ref("users/" + getUsername()).once('value', function(user_object) {
+        var obj = user_object.val();
+        if (obj.admin > 0) {
+            document.getElementById("adminMenu").classList.toggle("show");
+        } else {
+            document.getElementById("userMenu").classList.toggle("show");
+        }
+    })
 }
 
 function wipeChat() {
