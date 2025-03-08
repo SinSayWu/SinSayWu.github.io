@@ -413,11 +413,10 @@ textarea:focus {
 }
 
 /* Positioning for the container */
-.admin-controls {
+.menu-controls {
     position: relative;
     float: right;
     margin-right: 3%;
-    display: none;
 }
 
 /* Style the 3-dot button */
