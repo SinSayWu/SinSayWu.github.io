@@ -58,7 +58,7 @@ function refreshChat() {
         })
 
         // Max 500 messages
-        if (ordered.length > 50) {
+        if (ordered.length > 500) {
             ordered.splice(0,ordered.length-500)
         }
         
