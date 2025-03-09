@@ -54,5 +54,34 @@ input:checked + .slider:before {
 }
 
 button {
-    float: left;
+    position: absolute;
+    bottom: 5%;
+
+}
+
+#menu {
+    padding: 10px;
+    background-color: #35393f;
+    width: 500px;
+    height: 250px;
+    position: absolute;
+}
+
+.text {
+    font-size: 21px;
+}
+
+label {
+    margin-left: auto;
+}
+
+.container {
+    display: flex;
+    margin-bottom: 5%;
+}
+
+#notif-title {
+    font-size: 40px;
+    margin-top: 1.5%;
+    margin-bottom: 1%;
 }

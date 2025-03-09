@@ -135,7 +135,7 @@ function refreshChat() {
                 notificationNumber += 1
             }
             if (notificationNumber != 0) {
-                document.title = "Pebble (" + notificationNumber + ")";
+                document.title = "(" + notificationNumber + ") Pebble";
             }
         } catch(err) {
             alert(err)
