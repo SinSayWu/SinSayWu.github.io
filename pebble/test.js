@@ -9,6 +9,10 @@ function getPassword() {
     return localStorage.getItem("password");
 }
 
+function getDisplayName() {
+    return localStorage.getItem("display")
+}
+
 function refreshChat() {
     // alert("Refresh Chat");
     var textarea = document.getElementById('textarea');
@@ -589,26 +593,50 @@ function sendMessage() {
         document.getElementById("text-box").value = "";
         return;
     }
-    db.ref("users/" + username).once('value', function(user_object) {
-        var obj = user_object.val();
-        var display_name = obj.display_name;
-        document.getElementById("text-box").value = "";
-        db.ref('chats/').once('value', function(message_object) {
-            var index = parseFloat(message_object.numChildren()) + 1;
-            var curr = new Date();
-            db.ref('chats/' + `${index.toString().padStart(4, '0')}_message`).set({
-                name: username,
-                message: message,
-                display_name: display_name,
-                index: index,
-                time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
-            }).then(function() {
-                db.ref("users/" + username).update({
-                    sleep: Date.now(),
-                })
-            })
-        })
-    })
+    fetch("https://us-central1-pebble-rocks.cloudfunctions.net/sendMessage", {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            chat: "public",
+            username: getUsername(),
+            displayName: getDisplayName(),
+            message: message,
+        }),
+    }).then(
+        response => response.json()
+    ).then(
+        data => {
+            if (data.success) {
+                document.getElementById("text-box").value = "";
+            } else {
+                alert("Message failed to send");
+            }
+        }
+    ).catch(
+        error => alert("Error: ", error)
+    )
+    // db.ref("users/" + username).once('value', function(user_object) {
+    //     var obj = user_object.val();
+    //     var display_name = obj.display_name;
+    //     document.getElementById("text-box").value = "";
+    //     db.ref('chats/').once('value', function(message_object) {
+    //         var index = parseFloat(message_object.numChildren()) + 1;
+    //         var curr = new Date();
+    //         db.ref('chats/' + `${index.toString().padStart(4, '0')}_message`).set({
+    //             name: username,
+    //             message: message,
+    //             display_name: display_name,
+    //             index: index,
+    //             time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
+    //         }).then(function() {
+    //             db.ref("users/" + username).update({
+    //                 sleep: Date.now(),
+    //             })
+    //         })
+    //     })
+    // })
 }
 function logout() {
     // alert(getUsername() + " logged out");
@@ -675,30 +703,61 @@ function register() {
         return;
     }
     
-    db.ref("users/" + username).once('value', function(user_object) {
-        if (user_object.exists() == true) {
-            alert("Username already exists!");
-            return;
-        }
-        db.ref("users/" + username).set({
-            display_name: displayName,
-            password: password,
+    fetch("https://us-central1-pebble-rocks.cloudfunctions.net/createUser", {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
             username: username,
-            name: realName,
-            muted: true,
-            active: true,
-            admin: 0,
-        }).then(function() {
-            localStorage.setItem('username', username);
-            localStorage.setItem('password', password);
-            localStorage.setItem("display", displayName);
-            localStorage.setItem("name", realName);
-            alert(credits);
-            alert(termsOfService);
-            window.location.reload();
-            sendServerMessage(localStorage.getItem("display") + " has joined the chat<span style='visibility: hidden;'>@" + getUsername() + "</span>");
-        })
-    })
+            displayName: displayName,
+            realName: realName,
+            password: password,
+        }),
+    }).then(
+        response => response.json()
+    ).then(
+        data => {
+            if (data.success) {
+                localStorage.setItem('username', username);
+                localStorage.setItem('password', password);
+                localStorage.setItem("display", displayName);
+                localStorage.setItem("name", realName);
+                alert(credits);
+                alert(termsOfService);
+                window.location.reload();
+            } else {
+                alert("Action Failed");
+            }
+        }
+    ).catch(
+        error => alert("Error: ", error)
+    )
+
+    // db.ref("users/" + username).once('value', function(user_object) {
+    //     if (user_object.exists() == true) {
+    //         alert("Username already exists!");
+    //         return;
+    //     }
+    //     db.ref("users/" + username).set({
+    //         display_name: displayName,
+    //         password: password,
+    //         username: username,
+    //         name: realName,
+    //         muted: true,
+    //         active: true,
+    //         admin: 0,
+    //     }).then(function() {
+    //         localStorage.setItem('username', username);
+    //         localStorage.setItem('password', password);
+    //         localStorage.setItem("display", displayName);
+    //         localStorage.setItem("name", realName);
+    //         alert(credits);
+    //         alert(termsOfService);
+    //         window.location.reload();
+    //         sendServerMessage(getDisplayName() + " has joined the chat<span style='visibility: hidden;'>@" + getUsername() + "</span>");
+    //     })
+    // })
 }
             
 function checkMute() {
@@ -778,7 +837,7 @@ function setup() {
                 })
             }
             if ((!obj.muted && !(timePassed < messageSleep) && !obj.trapped) || obj.admin > 0) {
-                sendServerMessage(localStorage.getItem("display") + " has joined the chat<span style='visibility: hidden;'>@" + getUsername() + "</span>");
+                sendServerMessage(getDisplayName() + " has joined the chat<span style='visibility: hidden;'>@" + getUsername() + "</span>");
             }
         })
     } else {
@@ -863,7 +922,7 @@ function toggleMenu() {
 }
 
 function wipeChat() {
-    var name = localStorage.getItem("display");
+    var name = getDisplayName();
     db.ref("wipeMessage").on("value", function(message) {
         var wipeMessage = message.val();
         db.ref("chats/").remove();
