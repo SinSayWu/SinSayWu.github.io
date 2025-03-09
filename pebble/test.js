@@ -16,6 +16,31 @@ function getDisplayName() {
 function refreshChat() {
     // alert("Refresh Chat");
     var textarea = document.getElementById('textarea');
+    // Get the cahts from firestore
+    fetch("https://us-central1-pebble-rocks.cloudfunctions.net/getMessages", {
+        method: "GET",
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            chat: "public",
+        }),
+    }).then(
+        data => {
+            alert("hi")
+            if (!data.success) {
+                alert("Failed to get chat messages");
+                return;
+            }
+            const messages = data.chats.map(doc => ({ messageNum: doc.id, ...doc.data() }));
+            alert(messages);
+        }
+    ).catch(
+        error => {
+            alert("error detected")
+            alert("Error: ", error)
+        }
+    )
 
     // Get the chats from firebase
     db.ref('chats/').on('value', function(messages_object) {
@@ -608,11 +633,11 @@ function sendMessage() {
         response => response.json()
     ).then(
         data => {
-            if (data.success) {
-                document.getElementById("text-box").value = "";
-            } else {
+            if (!data.success) {
                 alert("Message failed to send");
+                return;
             }
+            document.getElementById("text-box").value = "";
         }
     ).catch(
         error => alert("Error: ", error)
@@ -718,17 +743,17 @@ function register() {
         response => response.json()
     ).then(
         data => {
-            if (data.success) {
-                localStorage.setItem('username', username);
-                localStorage.setItem('password', password);
-                localStorage.setItem("display", displayName);
-                localStorage.setItem("name", realName);
-                alert(credits);
-                alert(termsOfService);
-                window.location.reload();
-            } else {
+            if (!data.success) {
                 alert("Action Failed");
+                return;
             }
+            localStorage.setItem('username', username);
+            localStorage.setItem('password', password);
+            localStorage.setItem("display", displayName);
+            localStorage.setItem("name", realName);
+            alert(credits);
+            alert(termsOfService);
+            window.location.reload();
         }
     ).catch(
         error => alert("Error: ", error)
