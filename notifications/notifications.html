@@ -11,21 +11,27 @@
     <body>
         <div class="text" id="notif-title">Notification Settings</div>
         <div id="menu">
-            <div class="text" id="announcements-text">Toggle Server Announcement Notifications</div>
-            <label class="switch">
-                <input type="checkbox" id="server-announcements">
-                <span class="slider round"></span>
-            </label>
-            <div class="text" id="mention-text">Toggle @Mention Notifications</div>
-            <label class="switch">
-                <input type="checkbox" id="mention">
-                <span class="slider round"></span>
-            </label>
-            <div class="text" id="message-text">Toggle Message Notifications</div>
-            <label class="switch">
-                <input type="checkbox" id="message">
-                <span class="slider round"></span>
-            </label><br>
+            <div class ="container" id="announcements-container">
+                <div class="text" id="announcements-text">Toggle Server Announcement Notifications</div>
+                <label class="switch">
+                    <input type="checkbox" id="server-announcements">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+            <div class ="container" id="mention-container">
+                <div class="text" id="mention-text">Toggle @Mention Notifications</div>
+                <label class="switch">
+                    <input type="checkbox" id="mention">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+            <div class ="container" id="message-container">
+                <div class="text" id="message-text">Toggle Message Notifications</div>
+                <label class="switch">
+                    <input type="checkbox" id="message">
+                    <span class="slider round"></span>
+                </label><br>
+            </div>
             <button type="button" onclick="window.location.replace('../pebble/pebble.html')">Back</button>
         </div>
     </body>
