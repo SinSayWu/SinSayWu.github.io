@@ -129,10 +129,16 @@ a {
 }
 
 .member {
-    background-color: #2f3135;
     color: white;
-    padding: 1%;
-    text-align: center;
+    padding-bottom: 3%;
+    padding-left: 5%;
+}
+
+.admin-level {
+    color: white;
+    float: right;
+    display: inline-block;
+    padding-right: 5%;
 }
 
 .member-channel {

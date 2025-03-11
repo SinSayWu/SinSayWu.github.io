@@ -3,19 +3,11 @@ var notificationNumber = 0;
 everyoneRevealed = false;
 
 function getUsername() {
-    if (localStorage.getItem("username") != null) {
-        return localStorage.getItem("username");
-    } else {
-        return null
-    }
+    return localStorage.getItem("username");
 }
 
 function getPassword() {
-    if (localStorage.getItem("password") != null) {
-        return localStorage.getItem("password");
-    } else {
-        return null
-    }
+    return localStorage.getItem("password");
 }
 
 function refreshChat() {
@@ -174,13 +166,16 @@ function displayMembers() {
         ordered.sort((a, b) => b[4]-a[4]);
         ordered.sort((a, b) => b[3]-a[3]);
         ordered.forEach(function(properties) {
+            var mainElement = document.createElement("div");
             var memberElement = document.createElement("div");
             memberElement.setAttribute("class", "member");
+            var inner = "";
             if (everyoneRevealed) {
-                memberElement.innerHTML = properties[7];
+                inner += properties[7];
             } else {
-                memberElement.innerHTML = properties[0];
+                inner += properties[0];
             }
+            memberElement.innerHTML = inner;
             var text = memberElement.innerHTML;
             if (properties[3]) {
                 if (properties[4] > 0) {
@@ -200,9 +195,9 @@ function displayMembers() {
                     memberElement.appendChild(mutedElement);
                 } else if (properties[5]) {
                     var mutedElement = document.createElement("span");
-                        mutedElement.style.color = "rgb(145, 83, 196)";
-                        mutedElement.innerHTML = " [Trapped]";
-                        memberElement.appendChild(mutedElement);
+                    mutedElement.style.color = "rgb(145, 83, 196)";
+                    mutedElement.innerHTML = " [Trapped]";
+                    memberElement.appendChild(mutedElement);
                 } else if ((Date.now() - (properties[6] || 0) + messageSleep + 200 < 0) && properties[4] == 0) {
                     var mutedElement = document.createElement("span");
                     mutedElement.style.color = "rgb(145, 83, 196)";
@@ -210,6 +205,14 @@ function displayMembers() {
                     memberElement.appendChild(mutedElement);
                 }
             })
+
+            mainElement.append(memberElement);
+
+            var adminLevel = document.createElement("div");
+            adminLevel.setAttribute("class", "admin-level");
+            adminLevel.innerHTML = ` (${properties[4]})`;
+
+
             if (properties[1]) {
                 var mutedElement = document.createElement("span");
                 mutedElement.style.color = "Red";
@@ -226,7 +229,8 @@ function displayMembers() {
                     mutedElement.innerHTML = " [Timed Out]";
                     memberElement.appendChild(mutedElement);
             }
-            members.appendChild(memberElement);
+            mainElement.append(adminLevel);
+            members.appendChild(mainElement);
         });
         // members.scrollTop = members.scrollHeight;
     })
