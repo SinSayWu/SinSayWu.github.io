@@ -45,3 +45,6 @@ const commands = `!mute @[username] -- mutes the specified user (@everyone compa
 
 !removelockdown -- removed the lockdown on the site`;
 
+const usrCommands = `!reveal @[username] -- shows the specified user's real name and admin level (compatible with @everyone)
+
+!whisper @[username] -- whispers to the specified user (no other user can see your message)`
