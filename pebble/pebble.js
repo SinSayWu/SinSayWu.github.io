@@ -275,6 +275,7 @@ function sendMessage() {
     var message = document.getElementById("text-box").value;
     message = message.trim();
     message = message.replace(/\n/g, "<br/>");
+
     // alert("start\n" + message + "\nend");
     checkCreds();
     var username = getUsername();
@@ -282,9 +283,18 @@ function sendMessage() {
         return;
     }
 
+    // Checks if the user should be able to XSS
+    db.ref("users/" + username).once('value', function(user_object) {
+        var obj = user_object.val();
+        if (!obj.xss) {
+            message = sanitize(message);
+        }
+    })
+
     //Check if user is muted
     db.ref("users/" + username).once('value', function(user_object) {
-        if (user_object.muted) {
+        var obj = user_object.val();
+        if (obj.muted) {
             return;
         }
     })
@@ -292,8 +302,8 @@ function sendMessage() {
     if (message == "") {
         document.getElementById("text-box").value = "";
         return
-    } else if (message.length > 150) {
-        alert("Message cannot exceed 150 characters!");
+    } else if (message.length > 300) {
+        alert("Message cannot exceed 300 characters!");
         return
     } else if (message == "sos") {
         window.location.replace("https://schoology.pickens.k12.sc.us/home")
@@ -648,6 +658,48 @@ function sendMessage() {
         })
         document.getElementById("text-box").value = "";
         return;
+    } else if (message.startsWith("!disablexss @")) {
+        var disabled_user = message.substring(13).toLowerCase();
+        db.ref("users/" + disabled_user).once('value', function(disabledUser) {
+            if (!disabledUser.exists()) {
+                alert("User's XSS cannot be disabled, " + disabled_user + " does not exist!");
+                return;
+            }
+            db.ref("users/" + getUsername()).once("value", function(disablingUser) {
+                disabledUser = disabledUser.val();
+                disablingUser = disablingUser.val();
+                sendServerMessage(disablingUser.display_name + " has disabled the XSS for " + disabledUser.display_name);
+                if (disablingUser.admin > disabledUser.admin) {
+                    db.ref("users/" + disabledUser.username).update({
+                        xss: false,
+                    })
+                }
+            })
+            return;
+        })
+        document.getElementById("text-box").value = "";
+        return;
+    } else if (message.startsWith("!enablexss @")) {
+        var disabled_user = message.substring(12).toLowerCase();
+        db.ref("users/" + disabled_user).once('value', function(disabledUser) {
+            if (!disabledUser.exists()) {
+                alert("User's XSS cannot be enabled, " + disabled_user + " does not exist!");
+                return;
+            }
+            db.ref("users/" + getUsername()).once("value", function(disablingUser) {
+                disabledUser = disabledUser.val();
+                disablingUser = disablingUser.val();
+                sendServerMessage(disablingUser.display_name + " has enabled the XSS for " + disabledUser.display_name);
+                if (disablingUser.admin > disabledUser.admin) {
+                    db.ref("users/" + disabledUser.username).update({
+                        xss: true,
+                    })
+                }
+            })
+            return;
+        })
+        document.getElementById("text-box").value = "";
+        return;
     }
     db.ref("users/" + username).once('value', function(user_object) {
         var obj = user_object.val();
@@ -749,6 +801,7 @@ function register() {
             muted: true,
             active: true,
             admin: 0,
+            xss: true,
         }).then(function() {
             localStorage.setItem('username', username);
             localStorage.setItem('password', password);
@@ -900,6 +953,18 @@ function checkTrapped() {
     })
 }
 
+function sanitize(string) {
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#x27;',
+        "/": '&#x2F;',
+    };
+    const reg = /[&<>"'/]/ig;
+    return string.replace(reg, (match)=>(map[match]));
+}
 
 function reloadTrapped() {
     db.ref("users/" + getUsername() +"/reload").on("value", (snapshot) => {
