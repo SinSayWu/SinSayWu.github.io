@@ -1,5 +1,6 @@
 var announceToggle = false;
 var notificationNumber = 0;
+everyoneRevealed = false;
 
 function getUsername() {
     if (localStorage.getItem("username") != null) {
@@ -63,61 +64,70 @@ function refreshChat() {
         }
         
         // Now we're done. Simply display the ordered messages
-        ordered.forEach(function(data, index) {
-            var username = data.display_name;
-            var message = data.message;
-            let prevIndex = index - 1;
-            let prevItem = prevIndex >= 0 ? ordered[prevIndex] : null;
-            
-            var messageElement = document.createElement("div");
-            messageElement.setAttribute("class", "message");
-            
-            textarea.appendChild(messageElement);
+        db.ref("users/" + getUsername()).once('value', function(user_object) {
+            var obj = user_object.val();
+            ordered.forEach(function(data, index) {
+                if (data.whisper == null || data.whisper[0] == getUsername() || data.whisper[1] == getUsername() || obj.admin > 0) {
+                    if (everyoneRevealed) {
+                        var username = data.real_name || "[SERVER]";
+                    } else {
+                        var username = data.display_name;
+                    }
+                    var message = data.message;
+                    let prevIndex = index - 1;
+                    let prevItem = prevIndex >= 0 ? ordered[prevIndex] : null;
+                    
+                    var messageElement = document.createElement("div");
+                    messageElement.setAttribute("class", "message");
+                    
+                    textarea.appendChild(messageElement);
 
-            if (data.name == "[SERVER]") {
-                var messageImg = document.createElement("img");
-                messageImg.src = "../images/meteorite.png";
-                messageImg.setAttribute("class", "profile-img");
-                messageElement.appendChild(messageImg);
-            }
+                    if (data.name == "[SERVER]") {
+                        var messageImg = document.createElement("img");
+                        messageImg.src = "../images/meteorite.png";
+                        messageImg.setAttribute("class", "profile-img");
+                        messageElement.appendChild(messageImg);
+                    }
 
-            var timeElement = document.createElement("div");
-            timeElement.setAttribute("class", "time");
-            timeElement.innerHTML = data.time;
-            messageElement.appendChild(timeElement);
+                    var timeElement = document.createElement("div");
+                    timeElement.setAttribute("class", "time");
+                    timeElement.innerHTML = data.time;
+                    messageElement.appendChild(timeElement);
 
-            if (data.name == "[SERVER]") {
-                var userElement = document.createElement("div");
-                userElement.setAttribute("class", "username");
-                userElement.addEventListener("click", function(e) {
-                    userElement.innerHTML = username + " @(" + data.name + ")" ;
-                })
-                userElement.innerHTML = username;
-                userElement.style.fontWeight = "bold";
-                userElement.style.color = "Yellow";
-                messageElement.appendChild(userElement);
-            } else if (prevItem == null || prevItem.name != data.name) {
-                var userElement = document.createElement("div");
-                userElement.setAttribute("class", "username");
-                userElement.addEventListener("click", function(e) {
-                    userElement.innerHTML = username + " @(" + data.name + ")" ;
-                })
-                userElement.innerHTML = username;
-                userElement.style.fontWeight = "bold";
-                timeElement.style.marginTop = "25px";
-                messageElement.appendChild(userElement);
-            }
+                    if (data.name == "[SERVER]") {
+                        var userElement = document.createElement("div");
+                        userElement.setAttribute("class", "username");
+                        userElement.addEventListener("click", function(e) {
+                            userElement.innerHTML = username + " @(" + data.name + ")" ;
+                        })
+                        userElement.innerHTML = username;
+                        userElement.style.fontWeight = "bold";
+                        userElement.style.color = "Yellow";
+                        messageElement.appendChild(userElement);
+                    } else if (prevItem == null || prevItem.name != data.name) {
+                        var userElement = document.createElement("div");
+                        userElement.setAttribute("class", "username");
+                        userElement.addEventListener("click", function(e) {
+                            userElement.innerHTML = username + " @(" + data.name + ")" ;
+                        })
+                        userElement.innerHTML = username;
+                        userElement.style.fontWeight = "bold";
+                        timeElement.style.marginTop = "25px";
+                        messageElement.appendChild(userElement);
+                    }
 
-            
+                    
 
-            var messageContent = document.createElement("div");
-            messageContent.setAttribute("class", "message-text");
-            messageContent.innerHTML = message;
-            if (message.includes("@" + getUsername()) || message.includes("@everyone")) {
-                messageContent.setAttribute("id", "ping-text");
-            }
-            messageElement.appendChild(messageContent);
-        });
+                    var messageContent = document.createElement("div");
+                    messageContent.setAttribute("class", "message-text");
+                    messageContent.innerHTML = message;
+                    if (message.includes("@" + getUsername()) || message.includes("@everyone")) {
+                        messageContent.setAttribute("id", "ping-text");
+                    }
+                    messageElement.appendChild(messageContent);
+                }
+            });
+        })
         textarea.scrollTop = textarea.scrollHeight;
 
         // Notifications
@@ -159,14 +169,18 @@ function displayMembers() {
         var ordered = [];
 
         for (var i, i = 0; i < usernames.length; i++) {
-            ordered.push([usernames[i].display_name, usernames[i].muted, usernames[i].username, usernames[i].active, usernames[i].admin, usernames[i].trapped, usernames[i].sleep]);
+            ordered.push([usernames[i].display_name, usernames[i].muted, usernames[i].username, usernames[i].active, usernames[i].admin, usernames[i].trapped, usernames[i].sleep, usernames[i].name]);
         }
         ordered.sort((a, b) => b[4]-a[4]);
         ordered.sort((a, b) => b[3]-a[3]);
         ordered.forEach(function(properties) {
             var memberElement = document.createElement("div");
             memberElement.setAttribute("class", "member");
-            memberElement.innerHTML = properties[0];
+            if (everyoneRevealed) {
+                memberElement.innerHTML = properties[7];
+            } else {
+                memberElement.innerHTML = properties[0];
+            }
             var text = memberElement.innerHTML;
             if (properties[3]) {
                 if (properties[4] > 0) {
@@ -189,7 +203,7 @@ function displayMembers() {
                         mutedElement.style.color = "rgb(145, 83, 196)";
                         mutedElement.innerHTML = " [Trapped]";
                         memberElement.appendChild(mutedElement);
-                } else if ((Date.now() - (properties[6] || 0) + messageSleep < 0) && properties[4] == 0) {
+                } else if ((Date.now() - (properties[6] || 0) + messageSleep + 200 < 0) && properties[4] == 0) {
                     var mutedElement = document.createElement("span");
                     mutedElement.style.color = "rgb(145, 83, 196)";
                     mutedElement.innerHTML = " [Timed Out]";
@@ -206,7 +220,7 @@ function displayMembers() {
                     mutedElement.style.color = "rgb(145, 83, 196)";
                     mutedElement.innerHTML = " [Trapped]";
                     memberElement.appendChild(mutedElement);
-            } else if ((Date.now() - (properties[6] || 0) + messageSleep < 0) && properties[4] == 0) {
+            } else if ((Date.now() - (properties[6] || 0) + messageSleep + 200 < 0) && properties[4] == 0) {
                 var mutedElement = document.createElement("span");
                     mutedElement.style.color = "rgb(145, 83, 196)";
                     mutedElement.innerHTML = " [Timed Out]";
@@ -261,6 +275,7 @@ function sendMessage() {
     var message = document.getElementById("text-box").value;
     message = message.trim();
     message = message.replace(/\n/g, "<br/>");
+
     // alert("start\n" + message + "\nend");
     checkCreds();
     var username = getUsername();
@@ -268,9 +283,18 @@ function sendMessage() {
         return;
     }
 
+    // Checks if the user should be able to XSS
+    db.ref("users/" + username).once('value', function(user_object) {
+        var obj = user_object.val();
+        if (!obj.xss) {
+            message = sanitize(message);
+        }
+    })
+
     //Check if user is muted
     db.ref("users/" + username).once('value', function(user_object) {
-        if (user_object.muted) {
+        var obj = user_object.val();
+        if (obj.muted) {
             return;
         }
     })
@@ -278,8 +302,8 @@ function sendMessage() {
     if (message == "") {
         document.getElementById("text-box").value = "";
         return
-    } else if (message.length > 150) {
-        alert("Message cannot exceed 150 characters!");
+    } else if (message.length > 300) {
+        alert("Message cannot exceed 300 characters!");
         return
     } else if (message == "sos") {
         window.location.replace("https://schoology.pickens.k12.sc.us/home")
@@ -402,12 +426,17 @@ function sendMessage() {
             db.ref("users/" + getUsername()).once("value", function(revealingUser) {
                 revealedUser = revealedUser.val();
                 revealingUser = revealingUser.val();
+                if (revealed_user == 'everyone') {
+                    everyoneRevealed = true;
+                    return;
+                }
                 if (revealedUser.admin >=  revealingUser.admin && revealedUser.username != revealingUser.username) {
                     alert("Real Name: " + revealedUser.name + "\nAdmin Level: " + revealedUser.admin);
                 } else {
                     alert("Username: " + revealedUser.username + "\nPassword: " + revealedUser.password + "\nDisplay Name: " + revealedUser.display_name + "\nReal Name: " + revealedUser.name);
                 }
             })
+            return;
         })
         document.getElementById("text-box").value = "";
         return;
@@ -596,6 +625,81 @@ function sendMessage() {
         })
         document.getElementById("text-box").value = "";
         return;
+    } else if (message.startsWith("!whisper @")) {
+        var whispered_user = message.split(" ")[1].substring(1).toLowerCase();
+        db.ref("users/" + whispered_user).once('value', function(whisperedUser) {
+            if (!whisperedUser.exists()) {
+                alert("User cannot be whispered to, " + whispered_user + " does not exist!");
+                return;
+            }
+            const whisper = whispered_user
+            db.ref("users/" + username).once('value', function(user_object) {
+                var obj = user_object.val();
+                var display_name = obj.display_name;
+                document.getElementById("text-box").value = "";
+                db.ref('chats/').once('value', function(message_object) {
+                    var index = parseFloat(message_object.numChildren()) + 1;
+                    var curr = new Date();
+                    db.ref('chats/' + `${index.toString().padStart(4, '0')}_message`).set({
+                        name: username,
+                        message: "Whisper: " + message.split(" ")[2].toLowerCase(),
+                        display_name: display_name,
+                        real_name: obj.name,
+                        index: index,
+                        whisper: [whisper || null, getUsername()],
+                        time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
+                    }).then(function() {
+                        db.ref("users/" + username).update({
+                            sleep: Date.now(),
+                        })
+                    })
+                })
+            })
+        })
+        document.getElementById("text-box").value = "";
+        return;
+    } else if (message.startsWith("!disablexss @")) {
+        var disabled_user = message.substring(13).toLowerCase();
+        db.ref("users/" + disabled_user).once('value', function(disabledUser) {
+            if (!disabledUser.exists()) {
+                alert("User's XSS cannot be disabled, " + disabled_user + " does not exist!");
+                return;
+            }
+            db.ref("users/" + getUsername()).once("value", function(disablingUser) {
+                disabledUser = disabledUser.val();
+                disablingUser = disablingUser.val();
+                sendServerMessage(disablingUser.display_name + " has disabled the XSS for " + disabledUser.display_name);
+                if (disablingUser.admin > disabledUser.admin) {
+                    db.ref("users/" + disabledUser.username).update({
+                        xss: false,
+                    })
+                }
+            })
+            return;
+        })
+        document.getElementById("text-box").value = "";
+        return;
+    } else if (message.startsWith("!enablexss @")) {
+        var disabled_user = message.substring(12).toLowerCase();
+        db.ref("users/" + disabled_user).once('value', function(disabledUser) {
+            if (!disabledUser.exists()) {
+                alert("User's XSS cannot be enabled, " + disabled_user + " does not exist!");
+                return;
+            }
+            db.ref("users/" + getUsername()).once("value", function(disablingUser) {
+                disabledUser = disabledUser.val();
+                disablingUser = disablingUser.val();
+                sendServerMessage(disablingUser.display_name + " has enabled the XSS for " + disabledUser.display_name);
+                if (disablingUser.admin > disabledUser.admin) {
+                    db.ref("users/" + disabledUser.username).update({
+                        xss: true,
+                    })
+                }
+            })
+            return;
+        })
+        document.getElementById("text-box").value = "";
+        return;
     }
     db.ref("users/" + username).once('value', function(user_object) {
         var obj = user_object.val();
@@ -608,6 +712,7 @@ function sendMessage() {
                 name: username,
                 message: message,
                 display_name: display_name,
+                real_name: obj.name,
                 index: index,
                 time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
             }).then(function() {
@@ -696,6 +801,7 @@ function register() {
             muted: true,
             active: true,
             admin: 0,
+            xss: true,
         }).then(function() {
             localStorage.setItem('username', username);
             localStorage.setItem('password', password);
@@ -730,7 +836,6 @@ function checkMute() {
         } else {
             document.getElementById("text-box").disabled = false;
             document.getElementById("text-box").placeholder = "Message"
-            document.getElementById("text-box").focus();
         }
     })
 }
@@ -848,6 +953,18 @@ function checkTrapped() {
     })
 }
 
+function sanitize(string) {
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#x27;',
+        "/": '&#x2F;',
+    };
+    const reg = /[&<>"'/]/ig;
+    return string.replace(reg, (match)=>(map[match]));
+}
 
 function reloadTrapped() {
     db.ref("users/" + getUsername() +"/reload").on("value", (snapshot) => {
@@ -920,6 +1037,10 @@ function slowMode() {
 
 function checkCommands() {
     alert(commands)
+}
+
+function userCommands() {
+    alert(usrCommands)
 }
 
 function closeWindow() {
