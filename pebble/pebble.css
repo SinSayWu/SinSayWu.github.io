@@ -132,12 +132,13 @@ a {
     color: white;
     padding-bottom: 3%;
     padding-left: 5%;
+    display: inline-flex;
+    word-break: break-all;
 }
 
-.admin-level {
+#admin-level {
     color: white;
     float: right;
-    display: inline-block;
     padding-right: 5%;
 }
 

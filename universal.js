@@ -10,9 +10,6 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-messageSleep = 5000;
-
-const profilesleep = 86400000; // 1 day
 
 function checkInput(input) {
     if (input == "") {

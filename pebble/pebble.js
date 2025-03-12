@@ -59,7 +59,7 @@ function refreshChat() {
         db.ref("users/" + getUsername()).once('value', function(user_object) {
             var obj = user_object.val();
             ordered.forEach(function(data, index) {
-                if (data.whisper == null || data.whisper[0] == getUsername() || data.whisper[1] == getUsername() || obj.admin > 0) {
+                if (data.whisper == null || data.whisper == getUsername() || data.name == getUsername() || obj.admin > 0) {
                     if (everyoneRevealed) {
                         var username = data.real_name || "[SERVER]";
                     } else {
@@ -209,7 +209,8 @@ function displayMembers() {
             mainElement.append(memberElement);
 
             var adminLevel = document.createElement("div");
-            adminLevel.setAttribute("class", "admin-level");
+            adminLevel.setAttribute("id", "admin-level");
+            adminLevel.setAttribute("class", "member");
             adminLevel.innerHTML = ` (${properties[4]})`;
 
 
@@ -306,12 +307,12 @@ function sendMessage() {
     if (message == "") {
         document.getElementById("text-box").value = "";
         return
-    } else if (message.length > 300) {
-        alert("Message cannot exceed 300 characters!");
-        return
+    } else if (message.length > 500) {
+        alert("Message cannot exceed 500 characters!");
+        return;
     } else if (message == "sos") {
-        window.location.replace("https://schoology.pickens.k12.sc.us/home")
-        return
+        window.location.replace("https://schoology.pickens.k12.sc.us/home");
+        return;
     } else if (announceToggle) {
         sendServerMessage(message);
         document.getElementById("text-box").value = "";
@@ -563,6 +564,11 @@ function sendMessage() {
     } else if (message.startsWith("!timeout @")){
         var timed_user = message.split(" ")[1].substring(1).toLowerCase();
         var timeout_time = message.split(" ")[2];
+        if (!/^[0-9]+$/.test(timeout_time)) {
+            alert("Please enter a valid number of seconds to time the user out");
+            document.getElementById("text-box").value = "";
+            return;
+        }
         db.ref("users/" + timed_user).once('value', function(timedUser) {
             if (!timedUser.exists()) {
                 alert("User cannot be timed out, " + timed_user + " does not exist!");
@@ -636,7 +642,6 @@ function sendMessage() {
                 alert("User cannot be whispered to, " + whispered_user + " does not exist!");
                 return;
             }
-            const whisper = whispered_user
             db.ref("users/" + username).once('value', function(user_object) {
                 var obj = user_object.val();
                 var display_name = obj.display_name;
@@ -646,11 +651,11 @@ function sendMessage() {
                     var curr = new Date();
                     db.ref('chats/' + `${index.toString().padStart(4, '0')}_message`).set({
                         name: username,
-                        message: "Whisper: " + message.split(" ")[2].toLowerCase(),
+                        message: "Whisper to @" + whispered_user + ": " + message.substring(10 + whispered_user.length),
                         display_name: display_name,
                         real_name: obj.name,
                         index: index,
-                        whisper: [whisper || null, getUsername()],
+                        whisper: whispered_user,
                         time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
                     }).then(function() {
                         db.ref("users/" + username).update({
@@ -700,6 +705,44 @@ function sendMessage() {
                     })
                 }
             })
+            return;
+        })
+        document.getElementById("text-box").value = "";
+        return;
+    } else if (message.startsWith("!setslowmode ")) {
+        var slowmodetime = message.substring(13).toLowerCase();
+        if (!/^[0-9]+$/.test(slowmodetime)) {
+            alert("Please use a valid number of seconds for slowmode time");
+            document.getElementById("text-box").value = "";
+            return;
+        }
+        db.ref("users/" + getUsername()).once("value", function(slowmodeUser) {
+            slowmodeUser = slowmodeUser.val()
+            if (slowmodeUser.admin > 0) {
+                sendServerMessage(slowmodeUser.display_name + " has changed the slowmode time to " + slowmodetime);
+                db.ref("other/").update({
+                    slowmodetime: slowmodetime,
+                })
+            }
+            return;
+        })
+        document.getElementById("text-box").value = "";
+        return;
+    } else if (message.startsWith("!setprofilesleep ")) {
+        var profilesleeptime = message.substring(17).toLowerCase();
+        if (!/^[0-9]+$/.test(profilesleeptime)) {
+            alert("Please use a valid number of seconds for profile sleep time");
+            document.getElementById("text-box").value = "";
+            return;
+        }
+        db.ref("users/" + getUsername()).once("value", function(profileUser) {
+            profileUser = profileUser.val()
+            if (profileUser.admin > 0) {
+                sendServerMessage(profileUser.display_name + " has changed the profile sleep time to " + profilesleeptime);
+                db.ref("other/").update({
+                    profilesleeptime: profilesleeptime,
+                })
+            }
             return;
         })
         document.getElementById("text-box").value = "";
@@ -828,8 +871,6 @@ function checkMute() {
             document.getElementById("text-box").disabled = true;
             document.getElementById("text-box").placeholder = "Muted";
         } else if (timePassed < messageSleep && obj.admin == 0) {
-            // What does messageSleep represent
-            // WHAT IS THIS THING
             if (timePassed + messageSleep < 0) {
                 document.getElementById("text-box").disabled = true;
                 document.getElementById("text-box").placeholder = "You are timed out";
@@ -1032,9 +1073,9 @@ function slowMode() {
     db.ref("other/").on("value", function(obj) {
         var obj = obj.val();
         if (obj.slowmode) {
-            messageSleep = 5000; // 5 seconds
+            messageSleep = parseInt(obj.slowmodetime) * 1000;
         } else {
-            messageSleep = 0; // 0 seconds
+            messageSleep = 0;
         }
     })
 }

@@ -27,9 +27,11 @@ const commands = `!mute @[username] -- mutes the specified user (@everyone compa
 
 !unmute @[username] -- unmutes the specified user (@everyone compatible)
 
-!remove @[username] -- removes the specified user (uncompatible with @everyone)
+!remove @[username] -- removes the specified user (@everyone compatible look on next line)
 
-!reveal @[username] -- shows the specified user's username, password, display name, and real name (uncompatible with @everyone)
+!removeallmuted -- removes all the users that are muted
+
+!reveal @[username] -- shows the specified user's username, password, display name, and real name (compatible with @everyone)
 
 !removeallmuted -- removes all accounts that are muted
 
@@ -43,8 +45,16 @@ const commands = `!mute @[username] -- mutes the specified user (@everyone compa
 
 !lockdown -- locks down the site (users can no longer register accounts)
 
-!removelockdown -- removed the lockdown on the site`;
+!removelockdown -- removes the lockdown on the site
+
+!enablexss @[username] -- allows the specified user to do XSS exploits (images, html tags, etc)
+
+!disablexss @[username] -- removes the ability for the specified user to do XSS exploits
+
+!setslowmode [seconds] -- sets the slowmode for a specified number of seconds
+
+!setprofilesleep [seconds] -- sets the duration between when a user can change their profile for a specified number of seconds`;
 
 const usrCommands = `!reveal @[username] -- shows the specified user's real name and admin level (compatible with @everyone)
 
-!whisper @[username] -- whispers to the specified user (no other user can see your message)`
+!whisper @[username] [message] -- whispers to the specified user (no other user can see your message)`
