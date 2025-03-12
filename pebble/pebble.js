@@ -834,6 +834,11 @@ function register() {
     if (!(checkInput(username) && checkInput(password) && checkInput(realName) && checkInput(displayName))) {
         return;
     }
+
+    if (username.length > 20 || displayName.length > 20) {
+        alert("Username or display name cannot be longer than 20 characters");
+        return;
+    }
     
     db.ref("users/" + username).once('value', function(user_object) {
         if (user_object.exists() == true) {

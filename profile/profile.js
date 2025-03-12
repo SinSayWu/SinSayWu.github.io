@@ -31,6 +31,9 @@ function submit() {
                 } else if (!(checkInput(newDisplay) && checkInput(newName) && checkInput(newPassword))) {
                     alert("Something went wrong...");
                     return;
+                } else if (newDisplay.length > 20) {
+                    alert("New display name cannot be longer than 20 characters");
+                    return;
                 }
                 var username = getUsername();
                 db.ref("users/" + username).update({
