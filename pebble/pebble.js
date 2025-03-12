@@ -279,7 +279,6 @@ function sendMessage() {
     // var textarea = document.getElementById("textarea")
     var message = document.getElementById("text-box").value;
     message = message.trim();
-    message = message.replace(/\n/g, "<br/>");
 
     // alert("start\n" + message + "\nend");
     checkCreds();
@@ -295,6 +294,8 @@ function sendMessage() {
             message = sanitize(message);
         }
     })
+
+    message = message.replace(/\n/g, "<br/>");
 
     //Check if user is muted
     db.ref("users/" + username).once('value', function(user_object) {
