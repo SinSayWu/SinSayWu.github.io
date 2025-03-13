@@ -1090,6 +1090,7 @@ function checkCommands() {
     const commandsArray = commands.split("/");
     const commandsList = document.getElementById("commands-list");
 
+    document.getElementById("commands-list").innerHTML = "";
     document.getElementById("commands-menu").style.display = "block";
 
     commandsArray.forEach(command => {
@@ -1103,6 +1104,7 @@ function userCommands() {
     const commandsArray = usrCommands.split("/");
     const commandsList = document.getElementById("commands-list");
 
+    document.getElementById("commands-list").innerHTML = "";
     document.getElementById("commands-menu").style.display = "block";
 
     commandsArray.forEach(command => {
@@ -1114,7 +1116,6 @@ function userCommands() {
 
 function closeCommands() {
     document.getElementById("commands-menu").style.display = "none"
-    document.getElementById("commands-list").innerHTML = "";
 }
 
 function closeWindow() {
