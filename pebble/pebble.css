@@ -419,6 +419,39 @@ textarea:focus {
     background: #888;
 }
 
+#commands-menu {
+    z-index: 1;
+    width: 30%;
+    height: auto;
+    max-height: 60%;
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%);
+    top: 5%;
+    text-align: center;
+    border-radius: 10px;
+    border: solid;
+    border-color: #1f2124;
+    color: white;
+    background-color: #35393f;
+    overflow: auto;
+    padding: 1%;
+    display: none;
+}
+
+#commands-menu li {
+    margin-bottom: 5%;
+}
+
+#commands-list {
+    text-align: left;
+}
+
+#command-close {
+    margin-bottom: 2%;
+    padding: 1.5%;
+}
+
 /* Positioning for the container */
 .menu-controls {
     position: relative;

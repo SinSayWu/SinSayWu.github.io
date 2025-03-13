@@ -456,7 +456,7 @@ function sendMessage() {
                     var obj = Object.values(usrObj.val());
                     var usernames = obj;
                     usernames.forEach(function(usr) {
-                        if (usr.muted && (usr.admin < removingUser.admin)) {
+                        if (usr.muted && (usr.admin + 2 <= removingUser.admin)) {
                             db.ref("users/" + usr.username).remove();
                         }
                     })
@@ -476,7 +476,7 @@ function sendMessage() {
                 removedUser = removedUser.val();
                 removingUser = removingUser.val()
                 // If the removed user has a higher admin than the removing user, then it rebounds.
-                if (removingUser.admin < removedUser.admin) {
+                if (removingUser.admin < removedUser.admin + 2) {
                     alert(removedUser.display_name + " has a higher admin level than you! Rebound!");
                     sendServerMessage(removedUser.display_name + " rebounded their remove against @" + removingUser.username);
                     db.ref("users/" + removingUser.username).update({
@@ -512,7 +512,7 @@ function sendMessage() {
             db.ref("users/" + getUsername()).once("value", function(trappingUser) {
                 trappedUser = trappedUser.val();
                 trappingUser = trappingUser.val()
-                if (trappingUser.admin > trappedUser.admin) {
+                if (trappingUser.admin >= trappedUser.admin + 3) {
                     sendServerMessage(trappingUser.display_name + " trapped @" + trappedUser.username + "!");
                     db.ref("users/" + trappedUser.username).update({
                         trapped: true,
@@ -540,7 +540,7 @@ function sendMessage() {
                         var obj = Object.values(usrObj.val());
                         var usernames = obj;
                         usernames.forEach(function(usr) {
-                            if (usr.trapped && (usr.admin < untrappingUser.admin)) {
+                            if (usr.trapped && (usr.admin + 3 <= untrappingUser.admin)) {
                                 db.ref("users/" + usr.username).update({
                                     trapped: false,
                                 })
@@ -550,7 +550,7 @@ function sendMessage() {
                     document.getElementById("text-box").value = "";
                     return;
                 }
-                if (untrappingUser.admin > untrappedUser.admin) {
+                if (untrappingUser.admin >= untrappedUser.admin + 3) {
                     sendServerMessage(untrappingUser.display_name + " released @" + untrappedUser.username + "!");
                     db.ref("users/" + untrappedUser.username).update({
                         trapped: false,
@@ -1087,11 +1087,34 @@ function slowMode() {
 }
 
 function checkCommands() {
-    alert(commands)
+    const commandsArray = commands.split("/");
+    const commandsList = document.getElementById("commands-list");
+
+    document.getElementById("commands-menu").style.display = "block";
+
+    commandsArray.forEach(command => {
+        const li = document.createElement("li"); // Create a <li> element
+        li.textContent = command.trim(); // Set its text
+        commandsList.appendChild(li); // Add it to the <ul>
+    });
 }
 
 function userCommands() {
-    alert(usrCommands)
+    const commandsArray = usrCommands.split("/");
+    const commandsList = document.getElementById("commands-list");
+
+    document.getElementById("commands-menu").style.display = "block";
+
+    commandsArray.forEach(command => {
+        const li = document.createElement("li"); // Create a <li> element
+        li.textContent = command.trim(); // Set its text
+        commandsList.appendChild(li); // Add it to the <ul>
+    });
+}
+
+function closeCommands() {
+    document.getElementById("commands-menu").style.display = "none"
+    document.getElementById("commands-list").innerHTML = "";
 }
 
 function closeWindow() {

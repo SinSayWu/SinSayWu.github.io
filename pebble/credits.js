@@ -23,38 +23,38 @@ P.S. These terms apply to all of the webpages I own`;
 
 
 
-const commands = `!mute @[username] -- mutes the specified user (@everyone compatible)
+const commands = `!mute @[username] -- mutes the specified user (@everyone compatible)/
 
-!unmute @[username] -- unmutes the specified user (@everyone compatible)
+!unmute @[username] -- unmutes the specified user (@everyone compatible)/
 
-!remove @[username] -- removes the specified user (@everyone compatible look on next line)
+!remove @[username] -- removes the specified user (@everyone compatible look on next line)/
 
-!removeallmuted -- removes all the users that are muted
+!removeallmuted -- removes all the users that are muted/
 
-!reveal @[username] -- shows the specified user's username, password, display name, and real name (compatible with @everyone)
+!reveal @[username] -- shows the specified user's username, password, display name, and real name (compatible with @everyone)/
 
-!removeallmuted -- removes all accounts that are muted
+!removeallmuted -- removes all accounts that are muted/
 
-!trap @[username] -- removes the specified user's logout button
+!trap @[username] -- removes the specified user's logout button/
 
-!release @[username] -- returns the specified user's logout button
+!release @[username] -- returns the specified user's logout button/
 
-!timeout @[username] [seconds] -- times out the specified user for a specified number of seconds
+!timeout @[username] [seconds] -- times out the specified user for a specified number of seconds/
 
-!removetimeout @[username] -- removes the timeout for the specified user
+!removetimeout @[username] -- removes the timeout for the specified user/
 
-!lockdown -- locks down the site (users can no longer register accounts)
+!lockdown -- locks down the site (users can no longer register accounts)/
 
-!removelockdown -- removes the lockdown on the site
+!removelockdown -- removes the lockdown on the site/
 
-!enablexss @[username] -- allows the specified user to do XSS exploits (images, html tags, etc)
+!enablexss @[username] -- allows the specified user to do XSS exploits (images, html tags, etc)/
 
-!disablexss @[username] -- removes the ability for the specified user to do XSS exploits
+!disablexss @[username] -- removes the ability for the specified user to do XSS exploits/
 
-!setslowmode [seconds] -- sets the slowmode for a specified number of seconds
+!setslowmode [seconds] -- sets the slowmode for a specified number of seconds/
 
 !setprofilesleep [seconds] -- sets the duration between when a user can change their profile for a specified number of seconds`;
 
-const usrCommands = `!reveal @[username] -- shows the specified user's real name and admin level (compatible with @everyone)
+const usrCommands = `!reveal @[username] -- shows the specified user's real name and admin level (compatible with @everyone)/
 
 !whisper @[username] [message] -- whispers to the specified user (no other user can see your message)`
