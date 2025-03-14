@@ -1,4 +1,5 @@
 var announceToggle = false;
+var brainRot = false;
 var notificationNumber = 0;
 everyoneRevealed = false;
 
@@ -1054,6 +1055,18 @@ function announce() {
         document.getElementById("announce-toggle").innerHTML = ' ✓';
     } else {
         document.getElementById("announce-toggle").innerHTML = '';
+    }
+}
+
+function brainRotToggle() {
+    brainRot = !brainRot;
+    if (brainRot) {
+        document.getElementById("brainrot-toggle").innerHTML = ' ✓';
+        document.getElementById("brainrot").display = "block";
+        alert("BRAINROT")
+    } else {
+        document.getElementById("brainrot-toggle").innerHTML = '';
+        document.getElementById("brainrot").display = "none";
     }
 }
 
