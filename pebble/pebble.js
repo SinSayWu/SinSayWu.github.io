@@ -11,6 +11,10 @@ function getPassword() {
     return localStorage.getItem("password");
 }
 
+function getDisplayName() {
+    return localStorage.getItem("name");
+}
+
 function refreshChat() {
     // alert("Refresh Chat");
     var textarea = document.getElementById('textarea');
@@ -66,14 +70,19 @@ function refreshChat() {
                     } else {
                         var username = data.display_name;
                     }
-                    var message = data.message;
+
+                    // TODO: FIX THIS TO DO SOMETHING IDK WHAT
+                    if (data.removed) {
+                        var message = data.message;
+                    } else {
+                        var message = data.message;
+                    }
+                    
                     let prevIndex = index - 1;
                     let prevItem = prevIndex >= 0 ? ordered[prevIndex] : null;
                     
                     var messageElement = document.createElement("div");
                     messageElement.setAttribute("class", "message");
-                    
-                    textarea.appendChild(messageElement);
 
                     if (data.name == "[SERVER]") {
                         var messageImg = document.createElement("img");
@@ -97,13 +106,16 @@ function refreshChat() {
                         userElement.style.fontWeight = "bold";
                         userElement.style.color = "Yellow";
                         messageElement.appendChild(userElement);
-                    } else if (prevItem == null || prevItem.name != data.name) {
+                    } else if (prevItem == null || prevItem.name != data.name || data.edited) {
                         var userElement = document.createElement("div");
                         userElement.setAttribute("class", "username");
                         userElement.addEventListener("click", function(e) {
                             userElement.innerHTML = username + " @(" + data.name + ")" ;
                         })
                         userElement.innerHTML = username;
+                        if (data.edited) {
+                            userElement.innerHTML += " <span style='color: gray; font-size: 60%'>(Edited)</span>";
+                        }
                         userElement.style.fontWeight = "bold";
                         timeElement.style.marginTop = "25px";
                         messageElement.appendChild(userElement);
@@ -118,6 +130,43 @@ function refreshChat() {
                         messageContent.setAttribute("id", "ping-text");
                     }
                     messageElement.appendChild(messageContent);
+
+                    messageElement.addEventListener("mouseover", function(e) {
+                        messageContent.style.backgroundColor = "gray";
+                        if (data.name == getUsername() || data.admin < obj.admin) {
+                            var trashButton = document.createElement("button");
+                            trashButton.innerHTML = "🗑️️";
+                            trashButton.setAttribute("class", "message-button");
+                            trashButton.onclick = () => {
+                                db.ref("chats/" + `${(index + 1).toString().padStart(4, '0')}_message`).update({
+                                    removed: true,
+                                    message: `<i><b>REMOVED BY ${getDisplayName()}</b></i><span style="display: none">@${getUsername()} @${data.name}</span>`,
+                                });
+                            }
+                            messageContent.appendChild(trashButton);
+                        }
+                        if (data.name == getUsername()) {
+                            var editButton = document.createElement("button");
+                            editButton.innerHTML = "✏️";
+                            editButton.setAttribute("class", "message-button");
+                            editButton.onclick = () => {
+                                db.ref("chats/" + `${(index + 1).toString().padStart(4, '0')}_message`).update({
+                                    edited: true,
+                                    message: `edited`,
+                                });
+                            }
+                            messageContent.appendChild(editButton);
+                        }
+                    })
+                    messageElement.addEventListener("mouseout", function(e) {
+                        messageContent.style.backgroundColor = "";
+                        var buttons = messageContent.querySelectorAll(".message-button");
+                        buttons.forEach(function(button) {
+                            button.remove();
+                        })
+                    })
+
+                    textarea.appendChild(messageElement);
                 }
             });
         })
@@ -166,6 +215,7 @@ function displayMembers() {
         }
         ordered.sort((a, b) => b[4]-a[4]);
         ordered.sort((a, b) => b[3]-a[3]);
+        var isActive = true;
         ordered.forEach(function(properties) {
             var mainElement = document.createElement("div");
             var memberElement = document.createElement("div");
@@ -186,6 +236,11 @@ function displayMembers() {
                 }
             } else {
                 memberElement.style.color = "Gray";
+                if (isActive) {
+                    var hr = document.createElement("hr");
+                    mainElement.appendChild(hr);
+                    isActive = false;
+                }
             }
             memberElement.addEventListener("click", function(e) {
                 memberElement.innerHTML = text + " @(" + properties[2] + ")";
@@ -249,6 +304,9 @@ function sendServerMessage(message) {
             message: message,
             display_name: "[SERVER]",
             index: index,
+            admin: 9998,
+            removed: false,
+            edited: false,
             time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
         })
     })
@@ -314,6 +372,9 @@ function sendMessage() {
         return;
     } else if (message == "sos") {
         window.location.replace("https://schoology.pickens.k12.sc.us/home");
+        return;
+    } else if (message.includes("https://youtube") || message.includes("www.youtu") || message.includes("youtu.be")) {
+        window.location.replace("https://ungabungaa.replit.app/embedcreator.html");
         return;
     } else if (announceToggle) {
         sendServerMessage(message);
@@ -440,7 +501,7 @@ function sendMessage() {
                 if (revealedUser.admin >=  revealingUser.admin && revealedUser.username != revealingUser.username) {
                     alert("Real Name: " + revealedUser.name + "\nAdmin Level: " + revealedUser.admin);
                 } else {
-                    alert("Username: " + revealedUser.username + "\nPassword: " + revealedUser.password + "\nDisplay Name: " + revealedUser.display_name + "\nReal Name: " + revealedUser.name);
+                    alert("Username: " + revealedUser.username + "\nPassword: " + revealedUser.password + "\nDisplay Name: " + revealedUser.display_name + "\nReal Name: " + revealedUser.name + "\nAdmin Level: " + revealedUser.admin);
                 }
             })
             return;
@@ -480,20 +541,14 @@ function sendMessage() {
                 if (removingUser.admin < removedUser.admin + 2) {
                     alert(removedUser.display_name + " has a higher admin level than you! Rebound!");
                     sendServerMessage(removedUser.display_name + " rebounded their remove against @" + removingUser.username);
-                    db.ref("users/" + removingUser.username).update({
-                        muted: true
-                    })
+                    db.ref("users/" + removingUser.username).remove();
                     return;
                 }
                 // If the removed user and the removing user have the same admin, then it kamikazes.
                 if (removingUser.admin == removedUser.admin) {
                     sendServerMessage("@" + removingUser.username + " initiated a kamikaze remove against @" + removedUser.username + "!");
-                    db.ref("users/" + removingUser.username).update({
-                        muted: true
-                    })
-                    db.ref("users/" + removedUser.username).update({
-                        muted: true
-                    })
+                    db.ref("users/" + removingUser.username).remove();
+                    db.ref("users/" + removedUser.username).remove();
                     return;
                 }
                 sendServerMessage(removingUser.display_name + " removed @" + removedUser.username + "!");
@@ -763,6 +818,9 @@ function sendMessage() {
                 display_name: display_name,
                 real_name: obj.name,
                 index: index,
+                admin: obj.admin,
+                removed: false,
+                edited: false,
                 time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
             }).then(function() {
                 db.ref("users/" + username).update({
@@ -772,6 +830,7 @@ function sendMessage() {
         })
     })
 }
+
 function logout() {
     // alert(getUsername() + " logged out");
     db.ref("users/" + getUsername()).update({
@@ -864,7 +923,7 @@ function register() {
             alert(credits);
             alert(termsOfService);
             window.location.reload();
-            sendServerMessage(localStorage.getItem("display") + " has joined the chat<span style='visibility: hidden;'>@" + getUsername() + "</span>");
+            sendServerMessage(localStorage.getItem("display") + " has joined the chat for the first time<span style='visibility: hidden;'>@" + getUsername() + "</span>");
         })
     })
 }
@@ -917,6 +976,7 @@ function globalUpdate() {
 
 
 function setup() {
+    alert(findMedianAdmin());
     // Notification check
     document.addEventListener("visibilitychange", function() {
         if (document.visibilityState === "visible") {
@@ -1005,19 +1065,6 @@ function checkTrapped() {
     })
 }
 
-function sanitize(string) {
-    const map = {
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#x27;',
-        "/": '&#x2F;',
-    };
-    const reg = /[&<>"'/]/ig;
-    return string.replace(reg, (match)=>(map[match]));
-}
-
 function reloadTrapped() {
     db.ref("users/" + getUsername() +"/reload").on("value", (snapshot) => {
         if (snapshot.val() === true) {
@@ -1044,7 +1091,7 @@ function wipeChat() {
     db.ref("wipeMessage").on("value", function(message) {
         var wipeMessage = message.val();
         db.ref("chats/").remove();
-        sendServerMessage(name + " wiped the chat<br/>" + wipeMessage);
+        sendServerMessage("<span style='display: none'>@everyone</span>" + name + " wiped the chat<br/>" + wipeMessage);
     })
     
 }
@@ -1062,11 +1109,17 @@ function brainRotToggle() {
     brainRot = !brainRot;
     if (brainRot) {
         document.getElementById("brainrot-toggle").innerHTML = ' ✓';
-        document.getElementById("brainrot").display = "block";
-        alert("BRAINROT")
+        document.getElementById("brainrot").style.display = "block";
+        document.getElementById("cover").style.display = "block";
+        document.getElementById("channels").style.visibility = "hidden";
+        document.getElementById("permaAnnouncements").style.visibility = "hidden";
+        // alert("BRAINROT")
     } else {
         document.getElementById("brainrot-toggle").innerHTML = '';
-        document.getElementById("brainrot").display = "none";
+        document.getElementById("brainrot").style.display = "none";
+        document.getElementById("cover").style.display = "none";
+        document.getElementById("channels").style.visibility = "visible";
+        document.getElementById("permaAnnouncements").style.visibility = "visible";
     }
 }
 
@@ -1079,10 +1132,10 @@ function slowmodeToggle() {
             slowmode: slowmode
         });
         if (slowmode) {
-            // document.getElementById("slowmode-toggle").innerHTML = ' ✓';
+            document.getElementById("slowmode-toggle").innerHTML = ' ✓';
             sendServerMessage("Slowmode has been enabled");
         } else {
-            // document.getElementById("slowmode-toggle").innerHTML = '';
+            document.getElementById("slowmode-toggle").innerHTML = '';
             sendServerMessage("Slowmode has been disabled");
         }
     })
@@ -1103,6 +1156,8 @@ function checkCommands() {
     const commandsArray = commands.split("/");
     const commandsList = document.getElementById("commands-list");
 
+    document.getElementById("commandments-menu").style.display = "none"
+
     document.getElementById("commands-list").innerHTML = "";
     document.getElementById("commands-menu").style.display = "block";
 
@@ -1116,6 +1171,8 @@ function checkCommands() {
 function userCommands() {
     const commandsArray = usrCommands.split("/");
     const commandsList = document.getElementById("commands-list");
+
+    document.getElementById("commandments-menu").style.display = "none"
 
     document.getElementById("commands-list").innerHTML = "";
     document.getElementById("commands-menu").style.display = "block";
@@ -1131,6 +1188,49 @@ function closeCommands() {
     document.getElementById("commands-menu").style.display = "none"
 }
 
+function commandments() {
+    const commandmentsArray = tenCommandments.split("/");
+    const commandmentsList = document.getElementById("commandments-list");
+
+    document.getElementById("commands-menu").style.display = "none"
+
+    document.getElementById("commandments-list").innerHTML = "";
+    document.getElementById("commandments-menu").style.display = "block";
+
+    commandmentsArray.forEach(commandment => {
+        const li = document.createElement("li"); // Create a <li> element
+        li.textContent = commandment.trim(); // Set its text
+        commandmentsList.appendChild(li); // Add it to the <ul>
+    });
+}
+
+function closeCommandments() {
+    document.getElementById("commandments-menu").style.display = "none"
+}
+
+function findMedianAdmin() {
+    // Get the chats from firebase
+    db.ref("users/").on("value", function(memberList) {
+        var admins = [];
+        if (memberList.numChildren() == 0) {
+            return 0;
+        }
+        var members = Object.values(memberList.val());
+        members.forEach((member) => {
+            admins.push(parseFloat(member.admin));
+        })
+        admins.sort((a, b) => a - b);
+        alert(admins);
+        var size = admins.length();
+        alert(size);
+        if (size % 2 == 1) {
+            alert(admins[size / 2]);
+        } else {
+            alert((admins[size / 2] + admins[size / 2 + 1]) / 2);
+        }
+    })
+}
+
 function closeWindow() {
     // alert(getUsername());
     db.ref("users/" + getUsername()).once('value').then(snapshot => {
@@ -1143,10 +1243,10 @@ function closeWindow() {
     displayMembers();
 }
 
-
 window.addEventListener('beforeunload', function(event) {
     closeWindow();
 });
+
 window.onload = function() {
     try {
         setup();

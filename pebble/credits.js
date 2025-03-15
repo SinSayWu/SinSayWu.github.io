@@ -22,6 +22,26 @@ Please note that these Terms of Service will hold until ... forever.
 P.S. These terms apply to all of the webpages I own`;
 
 
+const tenCommandments = `Thou shalt have no other gods before me./
+
+Thou shalt not make unto thee any graven image, or any likeness of any thing that is in heaven above, or that is in the earth beneath, or that is in the water under the earth: Thou shalt not bow down thyself to them, nor serve them: for I the Lord thy God am a jealous God, visiting the iniquity of the fathers upon the children unto the third and fourth generation of them that hate me; And shewing mercy unto thousands of them that love me, and keep my commandments./
+
+Thou shalt not take the name of the Lord thy God in vain; for the Lord will not hold him guiltless that taketh his name in vain./
+
+Remember the sabbath day, to keep it holy. Six days shalt thou labour, and do all thy work: But the seventh day is the sabbath of the Lord thy God: in it thou shalt not do any work, thou, nor thy son, nor thy daughter, thy manservant, nor thy maidservant, nor thy cattle, nor thy stranger that is within thy gates: For in six days the Lord made heaven and earth, the sea, and all that in them is, and rested the seventh day: wherefore the Lord blessed the sabbath day, and hallowed it./
+
+Honour thy father and thy mother: that thy days may be long upon the land which the Lord thy God giveth thee./
+
+Thou shalt not kill./
+
+Thou shalt not commit adultery./
+
+Thou shalt not steal./
+
+Thou shalt not bear false witness against thy neighbour./
+
+Thou shalt not covet thy neighbour's house, thou shalt not covet thy neighbour's wife, nor his manservant, nor his maidservant, nor his ox, nor his ass, nor any thing that is thy neighbour's`;
+
 
 const commands = `!mute @[username] -- mutes the specified user (@everyone compatible)/
 
@@ -32,8 +52,6 @@ const commands = `!mute @[username] -- mutes the specified user (@everyone compa
 !removeallmuted -- removes all the users that are muted/
 
 !reveal @[username] -- shows the specified user's username, password, display name, and real name (compatible with @everyone)/
-
-!removeallmuted -- removes all accounts that are muted/
 
 !trap @[username] -- removes the specified user's logout button/
 
@@ -53,7 +71,8 @@ const commands = `!mute @[username] -- mutes the specified user (@everyone compa
 
 !setslowmode [seconds] -- sets the slowmode for a specified number of seconds/
 
-!setprofilesleep [seconds] -- sets the duration between when a user can change their profile for a specified number of seconds`;
+!setprofilesleep [seconds] -- sets the duration between when a user can change their profile for a specified number of seconds`;;
+
 
 const usrCommands = `!reveal @[username] -- shows the specified user's real name and admin level (compatible with @everyone)/
 
