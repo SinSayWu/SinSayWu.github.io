@@ -154,7 +154,7 @@ a {
 }
 
 .muted-element {
-    
+   margin-left: 1000%;
 }
 
 #medianAdmin {
@@ -227,6 +227,13 @@ a {
     border-width: 0px;
     color: white;
     float: left;
+    min-height: 40px;
+    max-height: 200px;
+    resize: none;
+    overflow-y: auto;
+    box-sizing: border-box;
+    bottom: 0;
+    transform: translateY(0); /* No shift initially */
 }
 
 .send-message {

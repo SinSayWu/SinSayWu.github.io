@@ -23,3 +23,23 @@ button:active {
     box-shadow: 0px 0px 0px 0px rgb(0,0,0);
     transition: 0.2s;
 }
+
+table {
+  width: 50%; /* Table width */
+  margin: auto; /* Center horizontally */
+  border-collapse: collapse; /* Remove gaps between cells */
+}
+
+th, td {
+  padding: 10px; /* Spacing */
+  border: 1px solid gray; /* Add border */
+}
+
+thead {
+  background-color: rgb(50, 50, 50);
+  color: white;
+}
+
+tbody tr:nth-child(even) {
+  background-color: rgb(25, 28, 39);
+}

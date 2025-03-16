@@ -1,3 +1,9 @@
 li {
     margin: 1%;
 }
+
+.hint {
+    color: gray;
+    font-size: 70%;
+    float: right;
+}

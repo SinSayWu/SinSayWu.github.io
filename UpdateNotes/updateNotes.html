@@ -15,9 +15,63 @@
                 <li>Delete your own messages</li>
                 <li>Perma-Announcements in the sidebar</li>
                 <li>Pay to win Admin Levels - Donating 1 dollar will get you 1 added admin level (we add new admin commands almost every day)</li>
+                <li>RESTRUCTURED ADMIN COMMS - People above the median admin have access to some admin commands, but other commands are available to everyone</li>
             </ul>
         </div>
-
+        <table>
+            <thead>
+                <tr>
+                    <th>Everyone</th>
+                    <th>> Median Admin</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>!mute @someone <span class="hint">(someone's admin is less than yours)</span></td>
+                    <td>!removeallmuted</td>
+                </tr>
+                <tr>
+                    <td>!unmute @someone <span class="hint">(someone's admin is less than yours)</span></td>
+                    <td>!enablexss @someone<span class="hint">(someone's admin is less than yours)</span</td>
+                </tr>
+                <tr>
+                    <td>!remove @someone <span class="hint">(someone's admin is 2 less than yours)</span></td>
+                    <td>!disablexss @someone<span class="hint">(someone's admin is less than yours)</span</td>
+                </tr>
+                <tr>
+                    <td>!trap @someone <span class="hint">(someone's admin is 3 less than yours)</span></td>
+                    <td>!lockdown</td>
+                </tr>
+                <tr>
+                    <td>!reveal @someone <span class="hint">(Will display EVERYTHING if their admin is less than yours)</span></td>
+                    <td>!removelockdown</td>
+                </tr>
+                <tr>
+                    <td>!timeout @someone #secs<span class="hint">(someone's admin is less than yours)</span></td>
+                    <td>!setslowmode #secs</td>
+                </tr>
+                <tr>
+                    <td>!removetimeout @someone<span class="hint">(someone's admin is less than yours)</span></td>
+                    <td>!setprofilesleep #secs</td>
+                </tr>
+                <tr>
+                    <td>!whisper @someone</td>
+                    <td>See whispers</td>
+                </tr>
+                <tr>
+                    <td>Brainrot Mode</td>
+                    <td>Announce</td>
+                </tr>
+                <tr>
+                    <td>Notification Settings</td>
+                    <td>Enable/Disable Slowmode</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>Wipe Chat</td>
+                </tr>
+            </tbody>
+        </table>
         <button type="button" onclick="window.location.replace('../pebble/pebble.html')">Back</button>
     </body>
 </html>
