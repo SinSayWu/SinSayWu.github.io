@@ -235,9 +235,10 @@ function displayMembers() {
                     memberElement.style.color = "White";
                 }
             } else {
-                memberElement.style.color = "Gray";
+                memberElement.style.color = "gray";
                 if (isActive) {
                     var hr = document.createElement("hr");
+                    hr.style.borderColor = "rgb(0, 0, 0)";
                     mainElement.appendChild(hr);
                     isActive = false;
                 }
@@ -246,16 +247,19 @@ function displayMembers() {
                 memberElement.innerHTML = text + " @(" + properties[2] + ")";
                 if (properties[1]) {
                     var mutedElement = document.createElement("span");
+                    mutedElement.setAttribute("class", "muted-element");
                     mutedElement.style.color = "Red";
                     mutedElement.innerHTML = " [Muted]";
                     memberElement.appendChild(mutedElement);
                 } else if (properties[5]) {
                     var mutedElement = document.createElement("span");
+                    mutedElement.setAttribute("class", "muted-element");
                     mutedElement.style.color = "rgb(145, 83, 196)";
                     mutedElement.innerHTML = " [Trapped]";
                     memberElement.appendChild(mutedElement);
                 } else if ((Date.now() - (properties[6] || 0) + messageSleep + 200 < 0) && properties[4] == 0) {
                     var mutedElement = document.createElement("span");
+                    mutedElement.setAttribute("class", "muted-element");
                     mutedElement.style.color = "rgb(145, 83, 196)";
                     mutedElement.innerHTML = " [Timed Out]";
                     memberElement.appendChild(mutedElement);
@@ -916,6 +920,7 @@ function register() {
             admin: 0,
             xss: true,
         }).then(function() {
+            updateMedianAdmin();
             localStorage.setItem('username', username);
             localStorage.setItem('password', password);
             localStorage.setItem("display", displayName);
@@ -974,9 +979,7 @@ function globalUpdate() {
     checkMute();
 }
 
-
 function setup() {
-    alert(findMedianAdmin());
     // Notification check
     document.addEventListener("visibilitychange", function() {
         if (document.visibilityState === "visible") {
@@ -1208,26 +1211,30 @@ function closeCommandments() {
     document.getElementById("commandments-menu").style.display = "none"
 }
 
-function findMedianAdmin() {
+function updateMedianAdmin() {
     // Get the chats from firebase
-    db.ref("users/").on("value", function(memberList) {
+    db.ref("users/").once("value", function(memberList) {
         var admins = [];
+        var median = 0;
         if (memberList.numChildren() == 0) {
-            return 0;
+            median = 0;
         }
         var members = Object.values(memberList.val());
         members.forEach((member) => {
             admins.push(parseFloat(member.admin));
         })
         admins.sort((a, b) => a - b);
-        alert(admins);
-        var size = admins.length();
-        alert(size);
+        // alert(admins);
+        var size = admins.length;
+        // alert(size);
         if (size % 2 == 1) {
-            alert(admins[size / 2]);
+            median = admins[Math.floor(size / 2)];
         } else {
-            alert((admins[size / 2] + admins[size / 2 + 1]) / 2);
+            median = (admins[size / 2] + admins[size / 2 + 1]) / 2;
         }
+        db.ref("other/").update({
+            medianAdmin: median,
+        })
     })
 }
 
@@ -1254,3 +1261,8 @@ window.onload = function() {
         alert(err);
     }
 };
+
+db.ref("other/").on('value', (obj) => {
+    obj = obj.val();
+    document.getElementById("medianAdmin").innerHTML = obj.medianAdmin;
+})

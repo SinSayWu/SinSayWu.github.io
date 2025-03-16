@@ -153,6 +153,15 @@ a {
     word-break: break-all;
 }
 
+.muted-element {
+    
+}
+
+#medianAdmin {
+    float: right;
+    color: rgb(0, 195, 255);
+}
+
 #admin-level {
     color: white;
     float: right;
@@ -160,10 +169,9 @@ a {
 }
 
 .member-channel {
-    margin-top: 10px;
-    margin-bottom: 10px;
-    margin-left: 10px;
+    margin: 5%;
     font-size: 25px;
+    width: 90%;
     color: white;
 }
 
