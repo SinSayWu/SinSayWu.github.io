@@ -92,7 +92,7 @@ function refreshChat() {
                     }
 
                     var timeElement = document.createElement("div");
-                    timeElement.setAttribute("class", "time");
+                    timeElement.setAttribute("id", "time");
                     timeElement.innerHTML = data.time;
                     messageElement.appendChild(timeElement);
 
@@ -121,6 +121,45 @@ function refreshChat() {
                         messageElement.appendChild(userElement);
                     }
 
+
+
+                    messageElement.addEventListener("mouseover", function(e) {
+                        messageContent.style.backgroundColor = "gray";
+                        if (data.name == getUsername() || data.admin < obj.admin) {
+                            var trashButton = document.createElement("button");
+                            timeElement.style.visibility = "hidden";
+                            trashButton.innerHTML = "🗑️️";
+                            trashButton.setAttribute("class", "message-button");
+                            trashButton.onclick = () => {
+                                db.ref("chats/" + `${(index + 1).toString().padStart(4, '0')}_message`).update({
+                                    removed: true,
+                                    message: `<i><b>REMOVED BY ${getDisplayName()}</b></i><span style="display: none">@${getUsername()} @${data.name}</span>`,
+                                });
+                            }
+                            messageElement.appendChild(trashButton);
+                        }
+                        if (data.name == getUsername()) {
+                            var editButton = document.createElement("button");
+                            timeElement.style.visibility = "hidden";
+                            editButton.innerHTML = "✏️";
+                            editButton.setAttribute("class", "message-button");
+                            editButton.onclick = () => {
+                                db.ref("chats/" + `${(index + 1).toString().padStart(4, '0')}_message`).update({
+                                    edited: true,
+                                    message: `edited`,
+                                });
+                            }
+                            messageElement.appendChild(editButton);
+                        }
+                    })
+                    messageElement.addEventListener("mouseout", function(e) {
+                        messageContent.style.backgroundColor = "";
+                        timeElement.style.visibility = "visible";
+                        var buttons = messageElement.querySelectorAll(".message-button");
+                        buttons.forEach(function(button) {
+                            button.remove();
+                        })
+                    })
                     
 
                     var messageContent = document.createElement("div");
@@ -130,41 +169,6 @@ function refreshChat() {
                         messageContent.setAttribute("id", "ping-text");
                     }
                     messageElement.appendChild(messageContent);
-
-                    messageElement.addEventListener("mouseover", function(e) {
-                        messageContent.style.backgroundColor = "gray";
-                        if (data.name == getUsername() || data.admin < obj.admin) {
-                            var trashButton = document.createElement("button");
-                            trashButton.innerHTML = "🗑️️";
-                            trashButton.setAttribute("class", "message-button");
-                            trashButton.onclick = () => {
-                                db.ref("chats/" + `${(index + 1).toString().padStart(4, '0')}_message`).update({
-                                    removed: true,
-                                    message: `<i><b>REMOVED BY ${getDisplayName()}</b></i><span style="display: none">@${getUsername()} @${data.name}</span>`,
-                                });
-                            }
-                            messageContent.appendChild(trashButton);
-                        }
-                        if (data.name == getUsername()) {
-                            var editButton = document.createElement("button");
-                            editButton.innerHTML = "✏️";
-                            editButton.setAttribute("class", "message-button");
-                            editButton.onclick = () => {
-                                db.ref("chats/" + `${(index + 1).toString().padStart(4, '0')}_message`).update({
-                                    edited: true,
-                                    message: `edited`,
-                                });
-                            }
-                            messageContent.appendChild(editButton);
-                        }
-                    })
-                    messageElement.addEventListener("mouseout", function(e) {
-                        messageContent.style.backgroundColor = "";
-                        var buttons = messageContent.querySelectorAll(".message-button");
-                        buttons.forEach(function(button) {
-                            button.remove();
-                        })
-                    })
 
                     textarea.appendChild(messageElement);
                 }
@@ -249,19 +253,19 @@ function displayMembers() {
                     var mutedElement = document.createElement("span");
                     mutedElement.setAttribute("class", "muted-element");
                     mutedElement.style.color = "Red";
-                    mutedElement.innerHTML = " [Muted]";
+                    mutedElement.innerHTML = "&nbsp;[Muted]";
                     memberElement.appendChild(mutedElement);
                 } else if (properties[5]) {
                     var mutedElement = document.createElement("span");
                     mutedElement.setAttribute("class", "muted-element");
                     mutedElement.style.color = "rgb(145, 83, 196)";
-                    mutedElement.innerHTML = " [Trapped]";
+                    mutedElement.innerHTML = "&nbsp;[Trapped]";
                     memberElement.appendChild(mutedElement);
                 } else if ((Date.now() - (properties[6] || 0) + messageSleep + 200 < 0) && properties[4] == 0) {
                     var mutedElement = document.createElement("span");
                     mutedElement.setAttribute("class", "muted-element");
                     mutedElement.style.color = "rgb(145, 83, 196)";
-                    mutedElement.innerHTML = " [Timed Out]";
+                    mutedElement.innerHTML = "&nbsp;[Timed Out]";
                     memberElement.appendChild(mutedElement);
                 }
             })
@@ -277,17 +281,17 @@ function displayMembers() {
             if (properties[1]) {
                 var mutedElement = document.createElement("span");
                 mutedElement.style.color = "Red";
-                mutedElement.innerHTML = " [Muted]";
+                mutedElement.innerHTML = "&nbsp;[Muted]";
                 memberElement.appendChild(mutedElement);
             } else if (properties[5]) {
                 var mutedElement = document.createElement("span");
                     mutedElement.style.color = "rgb(145, 83, 196)";
-                    mutedElement.innerHTML = " [Trapped]";
+                    mutedElement.innerHTML = "&nbsp;[Trapped]";
                     memberElement.appendChild(mutedElement);
             } else if ((Date.now() - (properties[6] || 0) + messageSleep + 200 < 0) && properties[4] == 0) {
                 var mutedElement = document.createElement("span");
                     mutedElement.style.color = "rgb(145, 83, 196)";
-                    mutedElement.innerHTML = " [Timed Out]";
+                    mutedElement.innerHTML = "&nbsp;[Timed Out]";
                     memberElement.appendChild(mutedElement);
             }
             mainElement.append(adminLevel);

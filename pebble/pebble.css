@@ -150,11 +150,6 @@ a {
     padding-bottom: 3%;
     padding-left: 5%;
     display: inline-flex;
-    word-break: break-all;
-}
-
-.muted-element {
-   margin-left: 1000%;
 }
 
 #medianAdmin {
@@ -253,10 +248,13 @@ a {
     margin-left: 2.5%;
     margin-top: 10px;
     margin-bottom: 10px;
+    position: relative;
 }
 
 .message-button {
-    float: right;
+    position: absolute;
+    top: 0;
+    right: 0;
 }
 
 .username {
@@ -566,7 +564,7 @@ textarea:focus {
     display: block;
 }
 
-.time {
+#time {
     vertical-align: middle;
     width: auto;
     word-wrap: break-word;
