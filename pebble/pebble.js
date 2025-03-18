@@ -20,7 +20,7 @@ function refreshChat() {
     var textarea = document.getElementById('textarea');
 
     // Get the chats from firebase
-    db.ref('chats/').on('value', function(messages_object) {
+    db.ref('chats/').orderByChild("index").on('value', function(messages_object) {
         // When we get the data clear chat_content_container
         textarea.innerHTML = '';
         // if there are no messages in the chat. Return . Don't load anything
@@ -28,42 +28,18 @@ function refreshChat() {
             return
         }
 
-        // convert the message object values to an array.
-        var messages = Object.values(messages_object.val());
-        var guide = []; // this will be our guide to organizing the messages
-        var unordered = []; // unordered messages
-        var ordered = []; // we're going to order these messages
+        var messages = [];
+        var nodename = []; // there's probably a better way to do this
 
-        for (var i, i = 0; i < messages.length; i++) {
-            // The guide is simply an array from 0 to the messages.length
-            guide.push(i+1);
-            // unordered is the [message, index_of_the_message]
-            unordered.push([messages[i], messages[i].index]);
-        }
+        messages_object.forEach((messages_child) => {
+            messages.push(messages_child.val())
+            nodename.push(messages_child.key)
+        });
 
-        // Sort the unordered messages by the guide
-        guide.forEach(function(key) {
-            var found = false;
-            unordered = unordered.filter(function(item) {
-                if(!found && item[1] == key) {
-                    ordered.push(item[0]);
-                    found = true;
-                    return false;
-                } else {
-                    return true;
-                }
-            })
-        })
-
-        // Max 500 messages
-        if (ordered.length > 500) {
-            ordered.splice(0,ordered.length-500)
-        }
-        
         // Now we're done. Simply display the ordered messages
         db.ref("users/" + getUsername()).once('value', function(user_object) {
             var obj = user_object.val();
-            ordered.forEach(function(data, index) {
+            messages.forEach(function(data, index) {
                 if (data.whisper == null || data.whisper == getUsername() || data.name == getUsername() || obj.admin > 0) {
                     if (everyoneRevealed) {
                         var username = data.real_name || "[SERVER]";
@@ -79,7 +55,7 @@ function refreshChat() {
                     }
                     
                     let prevIndex = index - 1;
-                    let prevItem = prevIndex >= 0 ? ordered[prevIndex] : null;
+                    let prevItem = prevIndex >= 0 ? messages[prevIndex] : null;
                     
                     var messageElement = document.createElement("div");
                     messageElement.setAttribute("class", "message");
@@ -131,7 +107,7 @@ function refreshChat() {
                             trashButton.innerHTML = "🗑️️";
                             trashButton.setAttribute("class", "message-button");
                             trashButton.onclick = () => {
-                                db.ref("chats/" + `${(index + 1).toString().padStart(4, '0')}_message`).update({
+                                db.ref("chats/" + nodename[index]).update({
                                     removed: true,
                                     message: `<i><b>REMOVED BY ${getDisplayName()}</b></i><span style="display: none">@${getUsername()} @${data.name}</span>`,
                                 });
@@ -144,7 +120,7 @@ function refreshChat() {
                             editButton.innerHTML = "✏️";
                             editButton.setAttribute("class", "message-button");
                             editButton.onclick = () => {
-                                db.ref("chats/" + `${(index + 1).toString().padStart(4, '0')}_message`).update({
+                                db.ref("chats/" + nodename[index]).update({
                                     edited: true,
                                     message: `edited`,
                                 });
@@ -178,7 +154,7 @@ function refreshChat() {
 
         // Notifications
         if (document.visibilityState === "hidden") {
-            var prevMessage = ordered.at(-1)
+            var prevMessage = messages.at(-1)
             var announceNotification = localStorage.getItem("announceNotification") || true;
             var mentionNotification = localStorage.getItem("mentionNotification") || true;
             var messageNotification = localStorage.getItem("messageNotification") || false;
@@ -307,15 +283,25 @@ function sendServerMessage(message) {
     db.ref('chats/').once('value', function(message_object) {
         var index = parseFloat(message_object.numChildren()) + 1
         var curr = new Date();
-        db.ref('chats/' + `${index.toString().padStart(4, '0')}_message`).set({
+        // db.ref('chats/' + `${index.toString().padStart(4, '0')}_message`).set({
+        //     name: "[SERVER]",
+        //     message: message,
+        //     display_name: "[SERVER]",
+        //     index: index,
+        //     admin: 9998,
+        //     removed: false,
+        //     edited: false,
+        //     time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
+        // })
+        db.ref('chats/').push({
             name: "[SERVER]",
             message: message,
             display_name: "[SERVER]",
-            index: index,
             admin: 9998,
             removed: false,
             edited: false,
             time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
+            index: firebase.database.ServerValue.TIMESTAMP,
         })
     })
 }
@@ -691,17 +677,33 @@ function sendMessage() {
                     db.ref('chats/').once('value', function(message_object) {
                         var index = parseFloat(message_object.numChildren()) + 1;
                         var curr = new Date();
-                        db.ref('chats/' + `${index.toString().padStart(4, '0')}_message`).set({
+                        // db.ref('chats/' + `${index.toString().padStart(4, '0')}_message`).set({
+                        //     name: username,
+                        //     message: "Whisper to @" + whispered_user + ": " + message.substring(10 + whispered_user.length),
+                        //     display_name: display_name,
+                        //     real_name: obj.name,
+                        //     index: index,
+                        //     whisper: whispered_user,
+                        //     time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
+                        // }).then(function() {
+                        //     db.ref("users/" + username).update({
+                        //         sleep: Date.now(),
+                        //     })
+                        // })
+                        db.ref('chats/').push({
                             name: username,
-                            message: "Whisper to @" + whispered_user + ": " + message.substring(10 + whispered_user.length),
+                            message: message,
                             display_name: display_name,
                             real_name: obj.name,
                             index: index,
-                            whisper: whispered_user,
+                            admin: obj.admin,
+                            removed: false,
+                            edited: false,
                             time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
+                            index: firebase.database.ServerValue.TIMESTAMP,
                         }).then(function() {
                             db.ref("users/" + username).update({
-                                sleep: Date.now(),
+                                sleep: firebase.database.ServerValue.TIMESTAMP,
                             })
                         })
                     })
@@ -787,7 +789,22 @@ function sendMessage() {
             db.ref('chats/').once('value', function(message_object) {
                 var index = parseFloat(message_object.numChildren()) + 1;
                 var curr = new Date();
-                db.ref('chats/' + `${index.toString().padStart(4, '0')}_message`).set({
+                // db.ref('chats/' + `${index.toString().padStart(4, '0')}_message`).set({
+                //     name: username,
+                //     message: message,
+                //     display_name: display_name,
+                //     real_name: obj.name,
+                //     index: index,
+                //     admin: obj.admin,
+                //     removed: false,
+                //     edited: false,
+                //     time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
+                // }).then(function() {
+                //     db.ref("users/" + username).update({
+                //         sleep: firebase.database.ServerValue.TIMESTAMP,
+                //     })
+                // })
+                db.ref('chats/').push({
                     name: username,
                     message: message,
                     display_name: display_name,
@@ -797,9 +814,10 @@ function sendMessage() {
                     removed: false,
                     edited: false,
                     time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
+                    index: firebase.database.ServerValue.TIMESTAMP,
                 }).then(function() {
                     db.ref("users/" + username).update({
-                        sleep: Date.now(),
+                        sleep: firebase.database.ServerValue.TIMESTAMP,
                     })
                 })
             })
