@@ -1202,14 +1202,14 @@ function closeWindow() {
 }
 
 function resizeTextBox() {
-    const textarea = document.getElementById("text-box");
-    const textwrapper = document.getElementById("downbar");
-    textarea.style.height = "auto"; // Reset height
-    textarea.style.height = Math.min(textarea.scrollHeight, 2000) + "px";
-    textarea.style.transform = `translateY(${-(newHeight - 40)}px)`;
-    textwrapper.style.height = "auto"; // Reset height
-    textwrapper.style.height = Math.min(textarea.scrollHeight, 2000) + "px";
-    textwrapper.style.transform = `translateY(${-(newHeight - 40)}px)`;
+    // const textarea = document.getElementById("box-message");
+    // const textwrapper = document.getElementById("downbar");
+    // textwrapper.style.height = "10%"; // Reset height
+    // textwrapper.style.height = Math.min(textarea.scrollHeight, 2000) + "px";
+    // textwrapper.style.transform = `translateY(${-(newHeight - 40)}px)`;
+    // textarea.style.height = "auto"; // Reset height
+    // textarea.style.height = Math.min(textarea.scrollHeight, 2000) + "px";
+    // textarea.style.transform = `translateY(${-(newHeight - 40)}px)`;
 }
 
 window.addEventListener('beforeunload', function(event) {

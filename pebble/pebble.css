@@ -222,13 +222,13 @@ a {
     border-width: 0px;
     color: white;
     float: left;
-    min-height: 40px;
-    max-height: 200px;
+    /* min-height: 40px;
+    max-height: 2000px;
     resize: none;
     overflow-y: auto;
     box-sizing: border-box;
     bottom: 0;
-    transform: translateY(0); /* No shift initially */
+    transform: translateY(0); */
 }
 
 .send-message {
