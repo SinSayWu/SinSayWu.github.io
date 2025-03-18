@@ -251,10 +251,16 @@ a {
     position: relative;
 }
 
-.message-button {
+#delete-button {
     position: absolute;
     top: 0;
     right: 0;
+}
+
+#edit-button {
+    position: absolute;
+    top: 0;
+    right: 5%;
 }
 
 .username {

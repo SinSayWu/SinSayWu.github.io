@@ -20,7 +20,7 @@ function refreshChat() {
     var textarea = document.getElementById('textarea');
 
     // Get the chats from firebase
-    db.ref('chats/').orderByChild("index").on('value', function(messages_object) {
+    db.ref('chats/').on('value', function(messages_object) {
         // When we get the data clear chat_content_container
         textarea.innerHTML = '';
         // if there are no messages in the chat. Return . Don't load anything
@@ -105,7 +105,7 @@ function refreshChat() {
                             var trashButton = document.createElement("button");
                             timeElement.style.visibility = "hidden";
                             trashButton.innerHTML = "🗑️️";
-                            trashButton.setAttribute("class", "message-button");
+                            trashButton.setAttribute("id", "delete-button");
                             trashButton.onclick = () => {
                                 db.ref("chats/" + nodename[index]).update({
                                     removed: true,
@@ -118,7 +118,7 @@ function refreshChat() {
                             var editButton = document.createElement("button");
                             timeElement.style.visibility = "hidden";
                             editButton.innerHTML = "✏️";
-                            editButton.setAttribute("class", "message-button");
+                            editButton.setAttribute("id", "edit-button");
                             editButton.onclick = () => {
                                 db.ref("chats/" + nodename[index]).update({
                                     edited: true,
@@ -131,7 +131,7 @@ function refreshChat() {
                     messageElement.addEventListener("mouseout", function(e) {
                         messageContent.style.backgroundColor = "";
                         timeElement.style.visibility = "visible";
-                        var buttons = messageElement.querySelectorAll(".message-button");
+                        var buttons = messageElement.querySelectorAll("#delete-button, #edit-button");
                         buttons.forEach(function(button) {
                             button.remove();
                         })
@@ -281,18 +281,7 @@ function displayMembers() {
 function sendServerMessage(message) {
     var message = message;
     db.ref('chats/').once('value', function(message_object) {
-        var index = parseFloat(message_object.numChildren()) + 1
         var curr = new Date();
-        // db.ref('chats/' + `${index.toString().padStart(4, '0')}_message`).set({
-        //     name: "[SERVER]",
-        //     message: message,
-        //     display_name: "[SERVER]",
-        //     index: index,
-        //     admin: 9998,
-        //     removed: false,
-        //     edited: false,
-        //     time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
-        // })
         db.ref('chats/').push({
             name: "[SERVER]",
             message: message,
@@ -301,7 +290,6 @@ function sendServerMessage(message) {
             removed: false,
             edited: false,
             time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
-            index: firebase.database.ServerValue.TIMESTAMP,
         })
     })
 }
@@ -619,7 +607,7 @@ function sendMessage() {
                     if (timingUser.admin > timedUser.admin) {
                         sendServerMessage(timingUser.display_name + " timed out @" + timedUser.username + " for " + timeout_time + " seconds!");
                         db.ref("users/" + timedUser.username).update({
-                            sleep: Date.now() + ((timeout_time * 1000) - messageSleep),
+                            sleep: firebase.database.ServerValue.TIMESTAMP + ((timeout_time * 1000) - messageSleep),
                         })
                     }
                     return;
@@ -675,32 +663,16 @@ function sendMessage() {
                     var display_name = obj.display_name;
                     document.getElementById("text-box").value = "";
                     db.ref('chats/').once('value', function(message_object) {
-                        var index = parseFloat(message_object.numChildren()) + 1;
                         var curr = new Date();
-                        // db.ref('chats/' + `${index.toString().padStart(4, '0')}_message`).set({
-                        //     name: username,
-                        //     message: "Whisper to @" + whispered_user + ": " + message.substring(10 + whispered_user.length),
-                        //     display_name: display_name,
-                        //     real_name: obj.name,
-                        //     index: index,
-                        //     whisper: whispered_user,
-                        //     time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
-                        // }).then(function() {
-                        //     db.ref("users/" + username).update({
-                        //         sleep: Date.now(),
-                        //     })
-                        // })
                         db.ref('chats/').push({
                             name: username,
-                            message: message,
+                            message: "Whisper to @" + whispered_user + ": " + message.substring(10 + whispered_user.length),
                             display_name: display_name,
                             real_name: obj.name,
-                            index: index,
                             admin: obj.admin,
                             removed: false,
                             edited: false,
                             time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
-                            index: firebase.database.ServerValue.TIMESTAMP,
                         }).then(function() {
                             db.ref("users/" + username).update({
                                 sleep: firebase.database.ServerValue.TIMESTAMP,
@@ -720,8 +692,8 @@ function sendMessage() {
                     disabledUser = disabledUser.val();
                     disablingUser = obj;
 
-                    sendServerMessage(disablingUser.display_name + " has disabled the XSS for " + disabledUser.display_name);
                     if (disablingUser.admin > disabledUser.admin && disablingUser.admin > medianAdmin) {
+                        sendServerMessage(disablingUser.display_name + " has disabled the XSS for " + disabledUser.display_name);
                         db.ref("users/" + disabledUser.username).update({
                             xss: false,
                         })
@@ -740,8 +712,8 @@ function sendMessage() {
                     disabledUser = disabledUser.val();
                     disablingUser = obj;
 
-                    sendServerMessage(disablingUser.display_name + " has enabled the XSS for " + disabledUser.display_name);
                     if (disablingUser.admin > disabledUser.admin && disablingUser.admin > medianAdmin) {
+                        sendServerMessage(disablingUser.display_name + " has enabled the XSS for " + disabledUser.display_name);
                         db.ref("users/" + disabledUser.username).update({
                             xss: true,
                         })
@@ -787,34 +759,16 @@ function sendMessage() {
             var display_name = obj.display_name;
             document.getElementById("text-box").value = "";
             db.ref('chats/').once('value', function(message_object) {
-                var index = parseFloat(message_object.numChildren()) + 1;
                 var curr = new Date();
-                // db.ref('chats/' + `${index.toString().padStart(4, '0')}_message`).set({
-                //     name: username,
-                //     message: message,
-                //     display_name: display_name,
-                //     real_name: obj.name,
-                //     index: index,
-                //     admin: obj.admin,
-                //     removed: false,
-                //     edited: false,
-                //     time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
-                // }).then(function() {
-                //     db.ref("users/" + username).update({
-                //         sleep: firebase.database.ServerValue.TIMESTAMP,
-                //     })
-                // })
                 db.ref('chats/').push({
                     name: username,
                     message: message,
                     display_name: display_name,
                     real_name: obj.name,
-                    index: index,
                     admin: obj.admin,
                     removed: false,
                     edited: false,
                     time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
-                    index: firebase.database.ServerValue.TIMESTAMP,
                 }).then(function() {
                     db.ref("users/" + username).update({
                         sleep: firebase.database.ServerValue.TIMESTAMP,
