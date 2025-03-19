@@ -10,6 +10,7 @@ button {
     border-radius: 10px;
     background-color: #5864f1;
     color: white;
+    font-size: 15;
 }
 
 button:hover {
@@ -29,6 +30,7 @@ button:active {
 
 .wrapper {
     width: 100%;
+    overflow: visible;
 }
 
 .login-wrapper {
@@ -72,8 +74,13 @@ button:active {
     color: rgb(82, 162, 236);
     background-color: black;
     height: 56%;
-    overflow: auto;
+    overflow: hidden;
+    transition: overflow 3s ease;
     outline: 5px solid rgba(0, 0, 0, 0.2);
+}
+
+.permaAnnouncements:hover{
+    overflow: auto;
 }
 
 .channel {
@@ -440,23 +447,6 @@ textarea:focus {
 .messagechannelimg {
     max-height: 100%;
     text-align: center;
-}
-
-::-webkit-scrollbar {
-    width: 6px;
-}
-
-::-webkit-scrollbar-thumb {
-    background: #555;
-    border-radius: 6px;
-}
-
-::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: #888;
 }
 
 #commands-menu {

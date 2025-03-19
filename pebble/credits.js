@@ -40,7 +40,7 @@ Thou shalt not steal./
 
 Thou shalt not bear false witness against thy neighbour./
 
-Thou shalt not covet thy neighbour's house, thou shalt not covet thy neighbour's wife, nor his manservant, nor his maidservant, nor his ox, nor his ass, nor any thing that is thy neighbour's`;
+Thou shalt not covet thy neighbour's house, thou shalt not covet thy neighbour's wife, nor his manservant, nor his maidservant, nor his ox, nor his ass, nor any thing that is thy neighbour's.`;
 
 
 const commands = `!mute @[username] -- mutes the specified user (@everyone compatible)/

@@ -1108,58 +1108,38 @@ function slowMode() {
 
 function checkCommands() {
     const commandsArray = commands.split("/");
-    const commandsList = document.getElementById("commands-list");
-
-    document.getElementById("commandments-menu").style.display = "none"
-
-    document.getElementById("commands-list").innerHTML = "";
-    document.getElementById("commands-menu").style.display = "block";
-
+    var newComms = "<ul>";
     commandsArray.forEach(command => {
-        const li = document.createElement("li"); // Create a <li> element
-        li.textContent = command.trim(); // Set its text
-        commandsList.appendChild(li); // Add it to the <ul>
-    });
+        newComms += "<li>";
+        newComms += command;
+        newComms += "</li>";
+    })
+    newComms += "</ul>"
+    showPopUp("Admin Commands", newComms);
 }
 
 function userCommands() {
     const commandsArray = usrCommands.split("/");
-    const commandsList = document.getElementById("commands-list");
-
-    document.getElementById("commandments-menu").style.display = "none"
-
-    document.getElementById("commands-list").innerHTML = "";
-    document.getElementById("commands-menu").style.display = "block";
-
+    var newComms = "<ul>";
     commandsArray.forEach(command => {
-        const li = document.createElement("li"); // Create a <li> element
-        li.textContent = command.trim(); // Set its text
-        commandsList.appendChild(li); // Add it to the <ul>
-    });
-}
-
-function closeCommands() {
-    document.getElementById("commands-menu").style.display = "none"
+        newComms += "<li>";
+        newComms += command;
+        newComms += "</li>";
+    })
+    newComms += "</ul>"
+    showPopUp("Commands", newComms);
 }
 
 function commandments() {
     const commandmentsArray = tenCommandments.split("/");
-    const commandmentsList = document.getElementById("commandments-list");
-
-    document.getElementById("commands-menu").style.display = "none"
-
-    document.getElementById("commandments-list").innerHTML = "";
-    document.getElementById("commandments-menu").style.display = "block";
-
-    commandmentsArray.forEach(commandment => {
-        const li = document.createElement("li"); // Create a <li> element
-        li.textContent = commandment.trim(); // Set its text
-        commandmentsList.appendChild(li); // Add it to the <ul>
-    });
-}
-
-function closeCommandments() {
-    document.getElementById("commandments-menu").style.display = "none"
+    var newComms = "<ol>";
+    commandmentsArray.forEach(command => {
+        newComms += "<li>";
+        newComms += command;
+        newComms += "</li>";
+    })
+    newComms += "</ol>"
+    showPopUp("Admin Commands", newComms);
 }
 
 function updateMedianAdmin() {
