@@ -1,6 +1,5 @@
 body {
-    overflow-y: hidden; /* fix this problem of the page being longer than it should */
-    height: 100vh;
+    color: black;
 }
 
 .sidebar {
@@ -46,12 +45,6 @@ button:active {
     transition: 0.2s;
 }
 
-body {
-    background-color: #202225;
-    font-family: Arial;
-    border-width: 0px;
-}
-
 #money-image-title {
     height: 4%;
 }
@@ -75,7 +68,11 @@ body {
     grid-template-areas:
     "game leaderboard";
     grid-template-columns: 4fr 1fr;
-    height: 100%;
+    height: 93%;
+    width: 95%;
+    float: right;
+    background-color: #35393f;
+    padding-top: 1%;
 }
 
 #first-grid {
