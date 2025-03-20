@@ -1,0 +1,38 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="donations.css">
+        <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-database.js"></script>
+        
+        <script src="../universal.js"></script>
+        <link rel="stylesheet" href="../universal.css">
+
+        <script src="donations.js"></script>
+        <title>Donations</title>
+    </head>
+    <body>
+        <div>
+            <h1>Donations</h1>
+            <p>pls donate (this donation site doesn't actually give me money btw, in case anyone is wondering</p>
+            <p>Just give me your money in person :)</p>
+        </div>
+        <div id="amountBox">
+            Amount: $<span id="amount"></span>
+        </div>
+        <div id="money">
+            <button type="button" id="1" class="individualMoney" onclick="addAmount(1)">+$1</button>
+            <button type="button" id="5" class="individualMoney" onclick="addAmount(5)">+$5</button>
+            <button type="button" id="10" class="individualMoney" onclick="addAmount(10)">+$10</button>
+            <button type="button" id="15" class="individualMoney" onclick="addAmount(15)">+$15</button>
+        </div>
+        <button type="button" onclick="window.location.replace('../pebble/pebble.html')">Back</button>
+        <h2>Wishlist</h2>
+        <ul>
+            <li>Better Database ($30 a year?) - More messages, more users, better experience</li>
+            <li>More Domains ($15 per domain) - In case the school blocks this one</li>
+            <li>Backend Server ($5) - For more secure data storage and so people can't do weird stuff to ur passwords</li>
+            <li>UI Overhaul ($10) - Better UI.</li>
+            <li>My Salary ($0.01) - I need to eat.</li>
+        </ul>
+    </body>
+</html>

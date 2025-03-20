@@ -1,38 +1,124 @@
 <html>
     <head>
-        <link rel="stylesheet" href="donations.css">
-        <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-app.js"></script>
-        <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-database.js"></script>
-        
-        <script src="../universal.js"></script>
-        <link rel="stylesheet" href="../universal.css">
+        <title>Clicker</title>
 
+        <link rel="stylesheet" href="../universal.css">
+        <script src="../universal.js"></script>
+
+        <link rel="stylesheet" href="donations.css">
         <script src="donations.js"></script>
-        <title>Donations</title>
     </head>
+
     <body>
-        <div>
-            <h1>Donations</h1>
-            <p>pls donate (this donation site doesn't actually give me money btw, in case anyone is wondering</p>
-            <p>Just give me your money in person :)</p>
+        <div class="sidebar" id="sidebar">
+            <button type="button" class="sidebar-button" title="" onclick="window.location.replace('../index.html');">
+                <img src="../images/logo.png" class="sidebar-logo"/>
+            </button>
+            <hr class="sidebar-line">
+            <button type="button" class="sidebar-button" title="" onclick="window.location.replace('../donations/donations.html');">
+                <img src="../images/money.png" class="sidebar-logo"/>
+            </button>
+            <button type="button" class="sidebar-button" title="" onclick="window.location.replace('..SpaceSeizure/spaceseizure.html');">
+                <img src="../images/spaceseizuremain.png" class="sidebar-logo"/>
+            </button>
+            <button type="button" class="sidebar-button" id="irisu" title="" onclick="play()">
+                <img src="../images/mute.png" class="sidebar-logo" id="speaker"/>
+                <audio id="bg-music" src="../images/secret_files/irisu_01.mp3"></audio>
+            </button>
         </div>
-        <div id="amountBox">
-            Amount: $<span id="amount"></span>
+
+        <div class="main-container">
+            <div class="title"><img src="../images/money.png"/> PvP Donations</div>
+            <div class="money">MONEY: 1490<img src="../images/money.png"/></div>
+            <div class="notification-text">Notifications!</div>
+            <div class="notifications-box">
+                <div class="notification">GOD took $3000 from JESUS!</div>
+                <div class="notification">GOD took $3000 from JESUS!</div>
+                <div class="notification">GOD took $3000 from JESUS!</div>
+                <div class="notification">GOD took $3000 from JESUS!</div>
+            </div>
+
+
+            <div class="buy-text upgrade-text">Upgrades</div>
+            <div class="buy-stuff upgrade-buy">
+                <div class="buy-item upgrade">
+                    <div class="buy-main">
+                        <span id="buyName">+1 MPC</span> - $<span id="buyCost">100</span>
+                    </div>
+                    <div class="buy-description">
+                        (Description Here)
+                    </div>
+                </div>
+                <div class="buy-item upgrade">
+                    <div class="buy-main">
+                        <span id="buyName">+1 MPC</span> - $<span id="buyCost">100</span>
+                    </div>
+                    <div class="buy-description">
+                        (Description Here)
+                    </div>
+                </div>
+                <div class="buy-item upgrade">
+                    <div class="buy-main">
+                        <span id="buyName">+1 MPC</span> - $<span id="buyCost">100</span>
+                    </div>
+                    <div class="buy-description">
+                        (Description Here)
+                    </div>
+                </div>
+            </div>
+
+            <div class="buy-text attack-text">Attacks</div>
+            <div class="buy-stuff attack-buy">
+                <div class="buy-item attack">
+                    <div class="buy-main">
+                        <span id="buyName">+1 MPC</span> - $<span id="buyCost">100</span>
+                    </div>
+                    <div class="buy-description">
+                        (Description Here)
+                    </div>
+                </div>
+            </div>
+
+            <div class="buy-text ability-text">Abilities</div>
+            <div class="buy-stuff ability-buy">
+                <div class="buy-item ability">
+                    <div class="buy-main">
+                        <span id="buyName">+1 MPC</span> - $<span id="buyCost">100</span>
+                    </div>
+                    <div class="buy-description">
+                        (Description Here)
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="clicky-button-div">
+                <button class="clicky-button">+1<img src="../images/money.png"/></button>
+            </div>
+            <div class="leaderboard-text">Leaderboard</div>
+            <div class="leaderboard">
+                <div class="leader">
+                    <div class="leader-header" id="leaderHeader">GOD: <span id="leaderNumber">123455</span><img src="../images/money.png"/></div>
+                    <div class="leader-content" id="leaderContent">hh<br/>hh<br/>hh<br/>hh<br/>hh<br/>hh<br/>hh<br/>h<br/>h</div>
+                </div>
+                <div class="leader">
+                    <div class="leader-header" id="leaderHeader">GOD: <span id="leaderNumber">123455</span><img src="../images/money.png"/></div>
+                    <div class="leader-content" id="leaderContent">hi hi hih ih i</div>
+                </div>
+                <div class="leader">
+                    <div class="leader-header" id="leaderHeader">GOD: <span id="leaderNumber">123455</span><img src="../images/money.png"/></div>
+                    <div class="leader-content" id="leaderContent">hi hh<br/>hh<br/>hh<br/>hh<br/>hh<br/>hh<br/>hh<br/>hh<br/>hi hih ih i</div>
+                </div>
+                <div class="leader">
+                    <div class="leader-header" id="leaderHeader">GOD: <span id="leaderNumber">123455</span><img src="../images/money.png"/></div>
+                    <div class="leader-content" id="leaderContent">hi hi hih ih i</div>
+                </div>
+                <div class="leader">
+                    <div class="leader-header" id="leaderHeader">GOD: <span id="leaderNumber">123455</span><img src="../images/money.png"/></div>
+                    <div class="leader-content" id="leaderContent">hi hih<br/>hh<br/>hh<br/>h hih ih i</div>
+                </div>
+            </div>
+            <hr class="footer">
         </div>
-        <div id="money">
-            <button type="button" id="1" class="individualMoney" onclick="addAmount(1)">+$1</button>
-            <button type="button" id="5" class="individualMoney" onclick="addAmount(5)">+$5</button>
-            <button type="button" id="10" class="individualMoney" onclick="addAmount(10)">+$10</button>
-            <button type="button" id="15" class="individualMoney" onclick="addAmount(15)">+$15</button>
-        </div>
-        <button type="button" onclick="window.location.replace('../pebble/pebble.html')">Back</button>
-        <h2>Wishlist</h2>
-        <ul>
-            <li>Better Database ($30 a year?) - More messages, more users, better experience</li>
-            <li>More Domains ($15 per domain) - In case the school blocks this one</li>
-            <li>Backend Server ($5) - For more secure data storage and so people can't do weird stuff to ur passwords</li>
-            <li>UI Overhaul ($10) - Better UI.</li>
-            <li>My Salary ($0.01) - I need to eat.</li>
-        </ul>
     </body>
 </html>
