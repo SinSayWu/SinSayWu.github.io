@@ -45,6 +45,10 @@ button:active {
     transition: 0.2s;
 }
 
+#irisu {
+    display: none;
+}
+
 #money-image-title {
     height: 4%;
 }
