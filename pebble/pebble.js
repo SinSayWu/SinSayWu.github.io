@@ -115,17 +115,26 @@ function refreshChat() {
                             messageElement.appendChild(trashButton);
                         }
                         if (data.name == getUsername()) {
-                            var editButton = document.createElement("button");
-                            timeElement.style.visibility = "hidden";
-                            editButton.innerHTML = "✏️";
-                            editButton.setAttribute("id", "edit-button");
-                            editButton.onclick = () => {
-                                db.ref("chats/" + nodename[index]).update({
-                                    edited: true,
-                                    message: `edited`,
-                                });
-                            }
-                            messageElement.appendChild(editButton);
+                            db.ref("users/" + getUsername()).once('value', function(user_object) {
+                                var obj = user_object.val();
+                                var editButton = document.createElement("button");
+                                editButton.setAttribute("id", "edit-button");
+                                timeElement.style.visibility = "hidden";
+                                if (obj && "editing" in obj) {
+                                    editButton.innerHTML = "🗙";
+                                    editButton.onclick = () => {
+                                        db.ref("users/" + getUsername() + "/editing").remove()
+                                    };
+                                } else {
+                                    editButton.innerHTML = "✏️";
+                                    editButton.onclick = () => {
+                                        db.ref("users/" + getUsername()).update({
+                                            editing: nodename[index],
+                                        });
+                                    }
+                                }
+                                messageElement.appendChild(editButton);
+                            })
                         }
                     })
                     messageElement.addEventListener("mouseout", function(e) {
@@ -149,6 +158,23 @@ function refreshChat() {
                     textarea.appendChild(messageElement);
                 }
             });
+
+            // voting auto-update integration
+            db.ref('other/vote').on('value', function(vote_object) {
+                vote_object.forEach((vote_child) => {
+                    if (vote_child.key != "message" && vote_child.key != "voters") {
+                        document.getElementById(vote_child.key).innerHTML = vote_child.val();
+                    }
+                })
+                db.ref('other/vote/voters/' + getUsername()).once('value', function(voter_object) {
+                    if (voter_object.exists()) {
+                        const buttons = document.querySelectorAll('.votebutton');
+                        buttons.forEach(button => {
+                        button.disabled = true;
+                        });
+                    }
+                })
+            })
         })
         textarea.scrollTop = textarea.scrollHeight;
 
@@ -755,26 +781,69 @@ function sendMessage() {
                 }
                 document.getElementById("text-box").value = "";
                 return;
+            } else if (message.startsWith("!vote ")) {
+                if (obj.admin > 0) {
+                    if (!(message.substring(6).slice(1, -1).startsWith("[") || message.substring(6).slice(1, -1).endsWith("]"))) {
+                        alert("Please format the options so that it starts with [ and ends with ] and each option is seperated with a comma (,)");
+                        return;
+                    }
+                    db.ref("other/vote/").once('value', function(voting) {
+                        votemessage = voting.val()
+                        db.ref("chats/" + votemessage.message).update({
+                            message: "Voting ended",
+                        });
+                    })
+                    db.ref("other/vote").remove();
+                    var choices = message.substring(6).slice(1, -1).split(",").map(item => item.trim().replace(/ /g, "_"));
+                    var votemessage = choices.map((choice) => choice.replace("_", " ") + ` -- <button onclick="voteButton(${choice})" class="votebutton">Vote</button> <span id="${choice}"></span><br>`);
+                    document.getElementById("text-box").value = "";
+                    const choicekeys = {};
+                    choices.forEach((value) => {
+                        choicekeys[value] = 0;
+                    });
+                    var curr = new Date();
+                    messageref = db.ref('chats/').push({
+                        name: "[SERVER]",
+                        message: votemessage.join(""),
+                        display_name: "VOTING",
+                        admin: 9998,
+                        removed: false,
+                        edited: false,
+                        time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
+                    })
+                    Object.assign(choicekeys, {message: messageref.key})
+                    db.ref("other/vote").update(choicekeys)
+                }
+                return;
             }
             var display_name = obj.display_name;
             document.getElementById("text-box").value = "";
-            db.ref('chats/').once('value', function(message_object) {
-                var curr = new Date();
-                db.ref('chats/').push({
-                    name: username,
-                    message: message,
-                    display_name: display_name,
-                    real_name: obj.name,
-                    admin: obj.admin,
-                    removed: false,
-                    edited: false,
+            var curr = new Date();
+            if (obj && "editing" in obj) {
+                db.ref("chats/" + obj.editing).update({
+                    message: "edited: " + message,
                     time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
                 }).then(function() {
-                    db.ref("users/" + username).update({
-                        sleep: firebase.database.ServerValue.TIMESTAMP,
+                    db.ref("users/" + username + "/editing").remove()
+                })
+            } else {
+                db.ref('chats/').once('value', function(message_object) {
+                    db.ref('chats/').push({
+                        name: username,
+                        message: message,
+                        display_name: display_name,
+                        real_name: obj.name,
+                        admin: obj.admin,
+                        removed: false,
+                        edited: false,
+                        time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
+                    }).then(function() {
+                        db.ref("users/" + username).update({
+                            sleep: firebase.database.ServerValue.TIMESTAMP,
+                        })
                     })
                 })
-            })
+            }
         })
     })
 }
@@ -1166,6 +1235,19 @@ function updateMedianAdmin() {
         db.ref("other/").update({
             medianAdmin: median,
         })
+    })
+}
+
+function voteButton(choice) {
+    var count = parseInt(choice.textContent) || 0;
+    count++;
+    
+    choice.innerHTML = count;
+    db.ref("other/vote/").update({
+        [choice.id]: count,
+    })
+    db.ref("other/vote/voters").update({
+        [getUsername()]: true,
     })
 }
 
