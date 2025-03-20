@@ -18,9 +18,17 @@ function play() {
 
 function check() {
     username = localStorage.getItem("username")
-    if (username == "jesus" || username == "hbrfan") {
+    if (username == "jesus" || username == "hbrfan" || true) {
         document.getElementById("irisu").style.display = "block";
     }
+}
+
+function addAmount(amount) {
+    amount += parseInt(document.getElementById('money').innerHTML);
+    alert(amount);
+    db.ref(`users/${getUsername()}`).update({
+        money: amount,
+    })
 }
 
 window.onload = function() {
@@ -31,4 +39,12 @@ window.onload = function() {
         music.play();
     });
     check();
+    if (getUsername() == null) {
+        document.body.innerHTML = "<h1>Please Log in through Pebble because im too lazy to add the feature here</h1><button onclick='../pebble/pebble.js'>Pebble</button>";
+        return;
+    }
+
+    db.ref(`users/${getUsername()}`).on("value", (amount) => {
+        document.getElementById('money').innerHTML = amount.val().money;
+    })
 }

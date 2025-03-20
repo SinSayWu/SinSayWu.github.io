@@ -10,6 +10,17 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
+function getUsername() {
+    return localStorage.getItem("username");
+}
+
+function getPassword() {
+    return localStorage.getItem("password");
+}
+
+function getDisplayName() {
+    return localStorage.getItem("name");
+}
 
 function checkInput(input) {
     if (input == "") {

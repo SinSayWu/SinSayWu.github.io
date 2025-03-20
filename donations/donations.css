@@ -203,7 +203,6 @@ body {
     height: 1%;
 }
 
-
 .buy-item {
     background-color: gray;
     display: flex;
@@ -268,3 +267,5 @@ body {
 .leader img[src="../images/money.png"] {
     max-height: 30px;
 }
+
+
