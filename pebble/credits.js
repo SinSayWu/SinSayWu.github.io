@@ -71,7 +71,7 @@ const commands = `!mute @[username] -- mutes the specified user (@everyone compa
 
 !setslowmode [seconds] -- sets the slowmode for a specified number of seconds/
 
-!setprofilesleep [seconds] -- sets the duration between when a user can change their profile for a specified number of seconds
+!setprofilesleep [seconds] -- sets the duration between when a user can change their profile for a specified number of seconds/
 
 !vote [option 1, option 2, option 3] -- creates a vote message that allows all users to vote on an option (only one vote message can exist at a time)`;
 
