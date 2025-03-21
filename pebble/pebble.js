@@ -782,8 +782,8 @@ function sendMessage() {
                 document.getElementById("text-box").value = "";
                 return;
             } else if (message.startsWith("!vote ")) {
-                if (obj.admin > 0) {
-                    if (!(message.substring(6).slice(1, -1).startsWith("[") || message.substring(6).slice(1, -1).endsWith("]"))) {
+                if (obj.admin > medianAdmin) {
+                    if (!/\[[^\[\]]*\]/.test(message)) {
                         alert("Please format the options so that it starts with [ and ends with ] and each option is seperated with a comma (,)");
                         return;
                     }
@@ -794,8 +794,9 @@ function sendMessage() {
                         });
                     })
                     db.ref("other/vote").remove();
-                    var choices = message.substring(6).slice(1, -1).split(",").map(item => item.trim().replace(/ /g, "_"));
-                    var votemessage = choices.map((choice) => choice.replace("_", " ") + ` -- <button onclick="voteButton(${choice})" class="votebutton">Vote</button> <span id="${choice}"></span><br>`);
+                    var choices = message.match(/\[(.*?)\]/)[1].split(",").map(item => item.trim().replace(/ /g, "_"));
+                    var title = message.substring(6, message.indexOf(" ["))
+                    var votemessage = choices.map((choice) => choice.replace(/_/g, " ") + ` -- <button onclick="voteButton(${choice})" class="votebutton">Vote</button> <span id="${choice}"></span><br>`);
                     document.getElementById("text-box").value = "";
                     const choicekeys = {};
                     choices.forEach((value) => {
@@ -804,7 +805,7 @@ function sendMessage() {
                     var curr = new Date();
                     messageref = db.ref('chats/').push({
                         name: "[SERVER]",
-                        message: votemessage.join(""),
+                        message: title + "<br>" + votemessage.join(""),
                         display_name: "VOTING",
                         admin: 9998,
                         removed: false,
