@@ -789,9 +789,13 @@ function sendMessage() {
                     }
                     db.ref("other/vote/").once('value', function(voting) {
                         votemessage = voting.val()
-                        db.ref("chats/" + votemessage.message).update({
-                            message: "Voting ended",
-                        });
+                        db.ref("chats/").once('value', function(deletingmessage) {
+                            if (votemessage.message in deletingmessage.val()) {
+                                db.ref("chats/" + votemessage.message).update({
+                                    message: "Voting ended",
+                                });
+                            }
+                        })
                     })
                     db.ref("other/vote").remove();
                     var choices = message.match(/\[(.*?)\]/)[1].split(",").map(item => item.trim().replace(/ /g, "_"));
