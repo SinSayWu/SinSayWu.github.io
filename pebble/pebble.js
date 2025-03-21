@@ -796,7 +796,7 @@ function sendMessage() {
                     db.ref("other/vote").remove();
                     var choices = message.match(/\[(.*?)\]/)[1].split(",").map(item => item.trim().replace(/ /g, "_"));
                     var title = message.substring(6, message.indexOf(" ["))
-                    var votemessage = choices.map((choice) => choice.replace(/_/g, " ") + ` -- <button onclick="voteButton(${choice})" class="votebutton">Vote</button> <span id="${choice}"></span><br>`);
+                    var votemessage = choices.map((choice) => choice.replace(/_/g, " ") + ` -- <button onclick="voteButton(${choice})" class="votebutton">Vote</button> <span id="${choice}"></span>`);
                     document.getElementById("text-box").value = "";
                     const choicekeys = {};
                     choices.forEach((value) => {
@@ -805,7 +805,7 @@ function sendMessage() {
                     var curr = new Date();
                     messageref = db.ref('chats/').push({
                         name: "[SERVER]",
-                        message: title + "<br>" + votemessage.join(""),
+                        message: `<span style="display:none">@everyone</span><h2 class="voteheader">${title}</h2> <div class="votecontent">${votemessage.join("<br/>")}</div>`,
                         display_name: "VOTING",
                         admin: 9998,
                         removed: false,

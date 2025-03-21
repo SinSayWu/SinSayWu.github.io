@@ -622,3 +622,17 @@ iframe {
 .brainrot {
     display: none;
 }
+
+.votebutton {
+    margin-bottom: 7px;
+}
+
+.voteheader {
+    margin-left: 10px;
+    margin-top: 3px;
+    border-bottom: gray solid 1px;
+}
+
+.votecontent {
+    margin-left: 20px;
+}
