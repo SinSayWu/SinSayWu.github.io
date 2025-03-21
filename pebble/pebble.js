@@ -539,18 +539,18 @@ function sendMessage() {
                     removedUser = removedUser.val();
                     removingUser = obj;
 
-                    // If the removed user has a higher admin than the removing user, then it rebounds.
-                    if (removingUser.admin < removedUser.admin + 2) {
-                        alert(removedUser.display_name + " has a higher admin level than you! Rebound!");
-                        sendServerMessage(removedUser.display_name + " rebounded their remove against @" + removingUser.username);
-                        db.ref("users/" + removingUser.username).remove();
-                        return;
-                    }
                     // If the removed user and the removing user have the same admin, then it kamikazes.
                     if (removingUser.admin == removedUser.admin) {
                         sendServerMessage("@" + removingUser.username + " initiated a kamikaze remove against @" + removedUser.username + "!");
                         db.ref("users/" + removingUser.username).remove();
                         db.ref("users/" + removedUser.username).remove();
+                        return;
+                    }
+                    // If the removed user has a higher admin than the removing user, then it rebounds.
+                    if (removingUser.admin < removedUser.admin + 1) {
+                        alert(removedUser.display_name + " has a higher admin level than you! Rebound!");
+                        sendServerMessage(removedUser.display_name + " rebounded their remove against @" + removingUser.username);
+                        db.ref("users/" + removingUser.username).remove();
                         return;
                     }
                     sendServerMessage(removingUser.display_name + " removed @" + removedUser.username + "!");
