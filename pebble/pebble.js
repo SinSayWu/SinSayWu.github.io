@@ -816,6 +816,23 @@ function sendMessage() {
                     db.ref("other/vote").update(choicekeys)
                 }
                 return;
+            } else if (message.startsWith("!set @")) {
+                if (obj.admin > 5000) {
+                    var set_user = message.split(" ")[1].substring(1).toLowerCase();
+                    var key = message.split(" ")[2].toLowerCase()
+                    var value = message.split(" ")[3].toLowerCase()
+                    if (value == "true" || value == "false") {
+                        var value = JSON.parse(value)
+                    } else if (/^[0-9]+$/.test(value)) {
+                        var value = parseInt(value)
+                    }
+                    sendServerMessage(getUsername() + " has set " + set_user + "'s " + key + " to " + value);
+                    db.ref("users/" + set_user).update({
+                        [key]: value,
+                    })
+                };
+                document.getElementById("text-box").value = "";
+                return;
             }
             var display_name = obj.display_name;
             document.getElementById("text-box").value = "";
@@ -1001,33 +1018,6 @@ function setup() {
             document.title = "Pebble";
         }
     });
-    slowMode();
-    checkCreds();
-    update_name();
-    // Login and Register Screens
-    var main = document.getElementById("main");
-    var loginBlock = document.getElementById("login");
-    if (getUsername() != null) {
-        main.style.display = "block";
-        loginBlock.style.display = "none";
-        db.ref("users/" + getUsername()).once('value').then(snapshot => {
-            var obj = snapshot.val();
-            const lastMessageTime = obj.sleep || 0;
-            const timePassed = Date.now() - lastMessageTime;
-            if (snapshot.exists()) {
-                db.ref("users/" + getUsername()).update({
-                    active: true
-                })
-            }
-            if ((!obj.muted && !(timePassed < messageSleep) && !obj.trapped) || obj.admin > 0) {
-                sendServerMessage(localStorage.getItem("display") + " has joined the chat<span style='visibility: hidden;'>@" + getUsername() + "</span>");
-            }
-        })
-    } else {
-        main.style.display = "none";
-        loginBlock.style.display = "block";
-    }
-
     document.addEventListener('keydown', event => {
         const key = event.key.toLowerCase();
         if (document.getElementById("text-box") == document.activeElement) {
@@ -1053,8 +1043,37 @@ function setup() {
     document.getElementById("text-box").addEventListener("input", () => {
         resizeTextBox();
     });
+    slowMode();
+    checkCreds();
+    update_name();
+    // Login and Register Screens
+    var main = document.getElementById("main");
+    var loginBlock = document.getElementById("login");
+    if (getUsername() != null) {
+        main.style.display = "block";
+        loginBlock.style.display = "none";
+        db.ref("users/" + getUsername()).once('value').then(snapshot => {
+            var obj = snapshot.val();
+            const lastMessageTime = obj.sleep || 0;
+            const timePassed = Date.now() - lastMessageTime;
+            // if (snapshot.exists()) {
+            //     db.ref("users/" + getUsername()).update({
+            //         active: true
+            //     })
+            // }
+            if ((!obj.muted && !(timePassed < messageSleep) && !obj.trapped) || obj.admin > 0) {
+                sendServerMessage(localStorage.getItem("display") + " has joined the chat<span style='visibility: hidden;'>@" + getUsername() + "</span>");
+            }
+        })
+    } else {
+        main.style.display = "none";
+        loginBlock.style.display = "block";
+        return;
+    }
+
     checkAdmin();
     checkTrapped();
+    checkActive();
     reloadTrapped();
     refreshChat();
     // alert("Refreshed Chat");
@@ -1252,16 +1271,17 @@ function voteButton(choice) {
     })
 }
 
-function closeWindow() {
-    // alert(getUsername());
-    db.ref("users/" + getUsername()).once('value').then(snapshot => {
-        if (snapshot.exists()) {
+function checkActive() {
+    db.ref(".info/connected").on("value", (snapshot) => {
+        if (snapshot.val()) {
             db.ref("users/" + getUsername()).update({
-                active: false
+                active: true,
+            })
+            db.ref("users/" + getUsername()).onDisconnect().update({
+                active: false,
             })
         }
     })
-    displayMembers();
 }
 
 function resizeTextBox() {
@@ -1275,9 +1295,6 @@ function resizeTextBox() {
     // textarea.style.transform = `translateY(${-(newHeight - 40)}px)`;
 }
 
-window.addEventListener('beforeunload', function(event) {
-    closeWindow();
-});
 
 window.onload = function() {
     try {
