@@ -184,7 +184,7 @@ body {
     border-left: gray solid 1px;
 }
 
-.leaderboard {
+#leaderboard {
     grid-row: 3 / 9;
     grid-column: 4 / 5;
     border-left: gray solid 1px;
