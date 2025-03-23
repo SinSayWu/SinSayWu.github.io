@@ -163,11 +163,11 @@ body {
     max-height: 100px;
 }
 
-.clicky-button img[src="../images/money.png"] {
+#clicky-button img[src="../images/money.png"] {
     height: 4vh;
 }
 
-.clicky-button {
+#clicky-button {
     position: relative;
     width: 95%;
     font-size: 300%;
@@ -226,6 +226,7 @@ body {
 
 .buy-description {
     color: gray;
+    width: 100%
 }
 
 .upgrade {

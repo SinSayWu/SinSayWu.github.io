@@ -35,46 +35,47 @@
             <div class="money">MONEY: <span id="money">0</span><img src="../images/money.png"/></div>
             <div class="notification-text">Notifications!</div>
             <div id="notifications">
-                <div class="notification">GOD took $3000 from JESUS!</div>
             </div>
 
 
             <div class="buy-text upgrade-text">Upgrades</div>
             <div class="buy-stuff upgrade-buy">
-                <div class="buy-item upgrade">
+                <div class="buy-item upgrade" onclick="buyAuto()">
                     <div class="buy-main">
-                        <span id="buyName">+1 MPC</span> - $<span id="buyCost">100</span>
+                        <span id="autoclicker">+1 Auto-Clicker</span> - $<span id="autoCost"></span>
                     </div>
-                    <div class="buy-description">
-                        (Description Here)
+                    <div class="buy-description" id="autoDescription">
                     </div>
                 </div>
-                <div class="buy-item upgrade">
+                <div class="buy-item upgrade" onclick="buyMult()">
                     <div class="buy-main">
-                        <span id="buyName">+1 MPC</span> - $<span id="buyCost">100</span>
+                        <span id="mult">+1 MPC</span> - $<span id="multCost"></span>
                     </div>
-                    <div class="buy-description">
-                        (Description Here)
-                    </div>
-                </div>
-                <div class="buy-item upgrade">
-                    <div class="buy-main">
-                        <span id="buyName">+1 MPC</span> - $<span id="buyCost">100</span>
-                    </div>
-                    <div class="buy-description">
-                        (Description Here)
+                    <div class="buy-description" id="multDescription">
                     </div>
                 </div>
             </div>
 
             <div class="buy-text attack-text">Attacks</div>
             <div class="buy-stuff attack-buy">
-                <div class="buy-item attack">
+                <div class="buy-item attack" id="autominus">
                     <div class="buy-main">
-                        <span id="buyName">+1 MPC</span> - $<span id="buyCost">100</span>
+                        <span id="buyName">-1 Auto-Clicker</span> - $<span id="autominusCost"></span>
                     </div>
                     <div class="buy-description">
-                        (Description Here)
+                        Target: 
+                        <select id="autoselect">
+                        </select>
+                    </div>
+                </div>
+                <div class="buy-item attack" id="multminus">
+                    <div class="buy-main">
+                        <span id="buyName">-1 Mult</span> - $<span id="multminusCost"></span>
+                    </div>
+                    <div class="buy-description">
+                        Target: 
+                        <select id="multselect">
+                        </select>
                     </div>
                 </div>
             </div>
@@ -93,7 +94,7 @@
 
 
             <div class="clicky-button-div">
-                <button class="clicky-button" onclick="addAmount(1)">+1<img src="../images/money.png"/></button>
+                <button id="clicky-button" onclick="addAmount()">+1<img src="../images/money.png"/></button>
             </div>
             <div class="leaderboard-text">Leaderboard</div>
             <div id="leaderboard">
