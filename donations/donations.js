@@ -312,7 +312,7 @@ function minusMoney() {
             var price = Math.round(moneyinput.value);
             var money = victim.money || 0;
 
-            if (attacker.money >= price && money != 0 && attacker.username != victim.username) {
+            if (attacker.money >= price && money != 0 && attacker.username != victim.username && moneyselector.value) {
                 db.ref(`users/${getUsername()}`).update({
                     money: attacker.money - price,
                 })
@@ -337,7 +337,7 @@ function giftAuto() {
 
             var price = Math.round(100 * 1.2 ** (victim.autoclicker || 0));
 
-            if (attacker.money >= price && attacker.username != victim.username) {
+            if (attacker.money >= price && attacker.username != victim.username && autoselector.value) {
                 db.ref(`users/${getUsername()}/money`).set(
                     attacker.money - price
                 )
@@ -360,7 +360,7 @@ function giftMult() {
 
             var price = Math.round(250 * 1.4 ** (victim.mult - 1 || 0));
 
-            if (attacker.money >= price && attacker.username != victim.username) {
+            if (attacker.money >= price && attacker.username != victim.username && multselector.value) {
                 db.ref(`users/${getUsername()}/money`).set(
                     attacker.money - price
                 )
@@ -385,7 +385,7 @@ function giftMoney() {
             var price = Math.round(moneyinput.value);
             var money = victim.money || 0;
 
-            if (attacker.money >= price && money != 0 && attacker.username != victim.username) {
+            if (attacker.money >= price && money != 0 && attacker.username != victim.username && moneyselector.value) {
                 db.ref(`users/${getUsername()}`).update({
                     money: attacker.money - price,
                 })
