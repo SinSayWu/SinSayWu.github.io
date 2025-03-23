@@ -80,7 +80,7 @@ body {
     font-size: 200%;
 }
 
-.notifications-box {
+#notifications {
     grid-column: 3 / 4;
     grid-row: 3 / 5;
     mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 85%, rgba(0, 0, 0, 0) 100%);
@@ -90,7 +90,7 @@ body {
     -ms-overflow-style: none;
 }
 
-.notifications-box::-webkit-scrollbar {
+#notifications::-webkit-scrollbar {
     display: none;
 }
 

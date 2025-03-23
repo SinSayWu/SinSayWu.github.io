@@ -71,7 +71,7 @@ function loadLeaderboard() {
             
             var contentElement = document.createElement("div");
             contentElement.setAttribute("class", "leader-content");
-            contentElement.innerHTML = "testing";
+            contentElement.innerHTML = "Auto-Clickers: " + (username.autoclicker || 0) + "<br>Mult: " + (username.mult || 1);
 
             leader.appendChild(usernameElement);
             leader.appendChild(contentElement);
@@ -93,6 +93,8 @@ function loadNotifications() {
             notifs.push(object_child.val());
         })
 
+        notifs.reverse();
+
         notifs.forEach(function(notif) {
             var notifElement = document.createElement("div");
             notifElement.setAttribute("class", "notification");
@@ -101,6 +103,12 @@ function loadNotifications() {
             notifications.appendChild(notifElement);
         })
     })
+}
+
+function sendNotification(message) {
+    db.ref(`other/clickernotifications/`).push(
+        message
+    )
 }
 
 function autoclickerCheck() {
@@ -151,16 +159,28 @@ function loadSelectors() {
     db.ref("users/").once("value", (object) => {
         autoselector = document.getElementById("autoselect");
         multselector = document.getElementById("multselect");
+        autogiftselector = document.getElementById("autogiftselect")
+        multgiftselector = document.getElementById("multgiftselect")
         object.forEach(function(username) {
             autooption = document.createElement("option");
             autooption.value = username.key;
-            autooption.innerHTML = username.key;
+            autooption.innerHTML = username.val().display_name;
             autoselector.appendChild(autooption);
 
             multoption = document.createElement("option");
             multoption.value = username.key;
-            multoption.innerHTML = username.key;
+            multoption.innerHTML = username.val().display_name;
             multselector.appendChild(multoption);
+
+            autogiftoption = document.createElement("option");
+            autogiftoption.value = username.key;
+            autogiftoption.innerHTML = username.val().display_name;
+            autogiftselector.appendChild(autogiftoption);
+
+            multgiftoption = document.createElement("option");
+            multgiftoption.value = username.key;
+            multgiftoption.innerHTML = username.val().display_name;
+            multgiftselector.appendChild(multgiftoption);
         })
     })
 }
@@ -168,7 +188,7 @@ function loadSelectors() {
 function buyAuto() {
     db.ref(`users/${getUsername()}`).once("value", (object) => {
         obj = object.val();
-        var price = parseInt(document.getElementById("autoCost").innerHTML);
+        var price = Math.round(100 * 1.2 ** (obj.autoclicker || 0));
 
         if (obj.money >= price) {
             db.ref(`users/${getUsername()}`).update({
@@ -182,7 +202,7 @@ function buyAuto() {
 function buyMult() {
     db.ref(`users/${getUsername()}`).once("value", (object) => {
         obj = object.val();
-        var price = parseInt(document.getElementById("multCost").innerHTML);
+        var price = Math.round(250 * 1.4 ** (obj.mult - 1 || 0));
 
         if (obj.money >= price) {
             db.ref(`users/${getUsername()}`).update({
@@ -201,16 +221,17 @@ function minusAuto() {
             attacker = attacker_object.val();
             victim = victim_object.val();
 
-            var price = parseInt(document.getElementById("autominusCost").innerHTML);
+            var price = Math.round(1000 + (0.2 * (victim.money || 0)) + (100 * 1.2 ** (victim.autoclicker || 0)));
             var autoclicker = victim.autoclicker || 0;
 
-            if (attacker.money >= price && autoclicker != 0) {
+            if (attacker.money >= price && autoclicker != 0 && attacker.username != victim.username) {
                 db.ref(`users/${getUsername()}`).update({
                     money: attacker.money - price,
                 })
                 db.ref(`users/${autoselector.value}`).update({
                     autoclicker: victim.autoclicker - 1,
                 })
+                sendNotification(`${attacker.display_name} has just removed an Auto-Clicker from ${victim.display_name}!`);
             }
         })
     })
@@ -224,16 +245,63 @@ function minusMult() {
             attacker = attacker_object.val();
             victim = victim_object.val();
 
-            var price = parseInt(document.getElementById("multminusCost").innerHTML);
+            var price = Math.round(1000 + (0.2 * (victim.money || 0)) + (250 * 1.4 ** (victim.mult - 1 || 0)));
             var mult = victim.mult || 1;
 
-            if (attacker.money >= price && mult != 1) {
+            if (attacker.money >= price && mult != 1 && attacker.username != victim.username) {
                 db.ref(`users/${getUsername()}`).update({
                     money: attacker.money - price,
                 })
                 db.ref(`users/${multselector.value}`).update({
                     mult: victim.mult - 1,
                 })
+                sendNotification(`${attacker.display_name} has just removed one Mult from ${victim.display_name}!`);
+            }
+        })
+    })
+}
+
+function giftAuto() {
+    const autoselector = document.getElementById("autogiftselect");
+
+    db.ref(`users/${getUsername()}`).once("value", (attacker_object) => {
+        db.ref(`users/${autoselector.value}`).once("value", (victim_object) => {
+            attacker = attacker_object.val();
+            victim = victim_object.val();
+
+            var price = Math.round(100 * 1.2 ** (victim.autoclicker || 0));
+
+            if (attacker.money >= price && attacker.username != victim.username) {
+                db.ref(`users/${getUsername()}/money`).set(
+                    attacker.money - price
+                )
+                db.ref(`users/${autoselector.value}/autoclicker`).set(
+                    (victim.autoclicker || 0) + 1,
+                )
+                sendNotification(`${attacker.display_name} has just gifted an Auto-Clicker to ${victim.display_name}!`);
+            }
+        })
+    })
+}
+
+function giftMult() {
+    const multselector = document.getElementById("multgiftselect");
+
+    db.ref(`users/${getUsername()}`).once("value", (attacker_object) => {
+        db.ref(`users/${multselector.value}`).once("value", (victim_object) => {
+            attacker = attacker_object.val();
+            victim = victim_object.val();
+
+            var price = Math.round(250 * 1.4 ** (victim.mult - 1 || 0));
+
+            if (attacker.money >= price && attacker.username != victim.username) {
+                db.ref(`users/${getUsername()}/money`).set(
+                    attacker.money - price
+                )
+                db.ref(`users/${multselector.value}/mult`).set(
+                    (victim.mult || 1) + 1
+                )
+                sendNotification(`${attacker.display_name} has just gifted one Mult to ${victim.display_name}!`);
             }
         })
     })
@@ -282,7 +350,37 @@ window.onload = function() {
             cost.innerHTML = Math.round(1000 + (0.2 * (obj.money || 0)) + (250 * 1.4 ** (obj.mult - 1 || 0)))
         });
 
-        previousautoValue = autoselector.value;
+        previousmultValue = multselector.value;
+    })
+
+    const autogiftselector = document.getElementById("autogiftselect");
+
+    autogiftselector.addEventListener("change", function(event) {
+        if (typeof previousautogiftValue !== 'undefined') {
+            db.ref(`users/${previousautogiftValue}`).off("value", previousautogiftListener);
+        }
+        previousautogiftListener = db.ref(`users/${autogiftselector.value}`).on("value", function(object) {
+            var obj = object.val();
+            var cost = document.getElementById("autogiftCost");
+            cost.innerHTML = Math.round(100 * 1.2 ** (obj.autoclicker || 0));
+        });
+
+        previousautogiftValue = autogiftselector.value;
+    })
+
+    const multgiftselector = document.getElementById("multgiftselect");
+
+    multgiftselector.addEventListener("change", function(event) {
+        if (typeof previousmultgiftValue !== 'undefined') {
+            db.ref(`users/${previousmultgiftValue}`).off("value", previousmultgiftListener);
+        }
+        previousmultgiftListener = db.ref(`users/${multgiftselector.value}`).on("value", function(object) {
+            var obj = object.val();
+            var cost = document.getElementById("multgiftCost");
+            cost.innerHTML = Math.round(250 * 1.4 ** (obj.mult - 1 || 0));
+        });
+
+        previousmultgiftValue = multgiftselector.value;
     })
 
     document.getElementById('autominus').addEventListener('click', function(event) {
@@ -301,8 +399,24 @@ window.onload = function() {
         }
     })
 
-    loadLeaderboard();
+    document.getElementById('autogift').addEventListener('click', function(event) {
+        if (event.target.closest("select")) {
+            return;
+        } else {
+            giftAuto();
+        }
+    })
+
+    document.getElementById('multgift').addEventListener('click', function(event) {
+        if (event.target.closest("select")) {
+            return;
+        } else {
+            giftMult();
+        }
+    })
+
     loadNotifications();
+    loadLeaderboard();
     setTimeout(autoclickerCheck, 2000);
     loadMain();
     loadSelectors();
