@@ -303,7 +303,7 @@ window.onload = function() {
 
     loadLeaderboard();
     loadNotifications();
-    // setTimeout(autoclickerCheck, 2000);
+    setTimeout(autoclickerCheck, 2000);
     loadMain();
     loadSelectors();
 }
