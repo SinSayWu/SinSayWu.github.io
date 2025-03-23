@@ -28,6 +28,10 @@ body {
     margin-left: 0%;
 }
 
+#clear {
+    display: none;
+}
+
 .main-container {
     background-color: #35393f;
     height: 98vh;

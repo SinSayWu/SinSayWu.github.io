@@ -95,6 +95,10 @@ function loadNotifications() {
             notifs.push(object_child.val());
         })
 
+        if (notifs.length > 50) {
+            notifs.splice(0,notifs.length-50)
+        }
+
         notifs.reverse();
 
         notifs.forEach(function(notif) {
@@ -104,6 +108,16 @@ function loadNotifications() {
 
             notifications.appendChild(notifElement);
         })
+    })
+}
+
+function clearNotifs() {
+    db.ref(`users/${getUsername()}`).once("value", function(object) {
+        obj = object.val();
+
+        if (obj.admin > 0) {
+            db.ref("other/clickernotifications").remove();
+        }
     })
 }
 
@@ -160,9 +174,18 @@ function loadMain() {
 function loadSelectors() {
     db.ref("users/").once("value", (object) => {
         autoselector = document.getElementById("autoselect");
+        autoselector.innerHTML = `<option value="" selected disabled>Select an option</option>`;
         multselector = document.getElementById("multselect");
-        autogiftselector = document.getElementById("autogiftselect")
-        multgiftselector = document.getElementById("multgiftselect")
+        multselector.innerHTML = `<option value="" selected disabled>Select an option</option>`;
+        moneyselector = document.getElementById("moneyselect");
+        moneyselector.innerHTML = `<option value="" selected disabled>Select an option</option>`;
+        autogiftselector = document.getElementById("autogiftselect");
+        autogiftselector.innerHTML = `<option value="" selected disabled>Select an option</option>`;
+        multgiftselector = document.getElementById("multgiftselect");
+        multgiftselector.innerHTML = `<option value="" selected disabled>Select an option</option>`;
+        moneygiftselector = document.getElementById("moneygiftselect");
+        moneygiftselector.innerHTML = `<option value="" selected disabled>Select an option</option>`;
+
         object.forEach(function(username) {
             autooption = document.createElement("option");
             autooption.value = username.key;
@@ -174,6 +197,11 @@ function loadSelectors() {
             multoption.innerHTML = username.val().display_name;
             multselector.appendChild(multoption);
 
+            moneyoption = document.createElement("option");
+            moneyoption.value = username.key;
+            moneyoption.innerHTML = username.val().display_name;
+            moneyselector.appendChild(moneyoption)
+
             autogiftoption = document.createElement("option");
             autogiftoption.value = username.key;
             autogiftoption.innerHTML = username.val().display_name;
@@ -183,6 +211,11 @@ function loadSelectors() {
             multgiftoption.value = username.key;
             multgiftoption.innerHTML = username.val().display_name;
             multgiftselector.appendChild(multgiftoption);
+
+            moneygiftoption = document.createElement("option");
+            moneygiftoption.value = username.key;
+            moneygiftoption.innerHTML = username.val().display_name;
+            moneygiftselector.appendChild(moneygiftoption);
         })
     })
 }
@@ -267,6 +300,33 @@ function minusMult() {
     })
 }
 
+function minusMoney() {
+    const moneyselector = document.getElementById("moneyselect");
+    const moneyinput = document.getElementById("moneyminusAmount")
+
+    db.ref(`users/${getUsername()}`).once("value", (attacker_object) => {
+        db.ref(`users/${moneyselector.value}`).once("value", (victim_object) => {
+            attacker = attacker_object.val();
+            victim = victim_object.val();
+
+            var price = Math.round(moneyinput.value);
+            var money = victim.money || 0;
+
+            if (attacker.money >= price && money != 0 && attacker.username != victim.username) {
+                db.ref(`users/${getUsername()}`).update({
+                    money: attacker.money - price,
+                })
+                db.ref(`users/${moneyselector.value}`).update({
+                    money: victim.money - price,
+                })
+                if (price >= 1000) {
+                    sendNotification(`${attacker.display_name} has just removed $${price} from ${victim.display_name}!`);
+                }
+            }
+        })
+    })
+}
+
 function giftAuto() {
     const autoselector = document.getElementById("autogiftselect");
 
@@ -313,6 +373,33 @@ function giftMult() {
     })
 }
 
+function giftMoney() {
+    const moneyselector = document.getElementById("moneygiftselect");
+    const moneyinput = document.getElementById("moneygiftAmount")
+
+    db.ref(`users/${getUsername()}`).once("value", (attacker_object) => {
+        db.ref(`users/${moneyselector.value}`).once("value", (victim_object) => {
+            attacker = attacker_object.val();
+            victim = victim_object.val();
+
+            var price = Math.round(moneyinput.value);
+            var money = victim.money || 0;
+
+            if (attacker.money >= price && money != 0 && attacker.username != victim.username) {
+                db.ref(`users/${getUsername()}`).update({
+                    money: attacker.money - price,
+                })
+                db.ref(`users/${moneyselector.value}/money`).set(
+                    victim.money + price,
+                )
+                if (price >= 1000) {
+                    sendNotification(`${attacker.display_name} has just gifted $${price} to ${victim.display_name}!`);
+                }
+            }
+        })
+    })
+}
+
 window.onload = function() {
     const music = document.getElementById("bg-music");
     const playlist = ["../images/secret_files/irisu_01.mp3", "../images/secret_files/irisu_02.mp3", "../images/secret_files/irisu_03.mp3", "../images/secret_files/irisu_04.mp3", "../images/secret_files/irisu_05.mp3", "../images/secret_files/irisu_06.mp3", ]
@@ -320,10 +407,23 @@ window.onload = function() {
         music.src = playlist[Math.floor(Math.random() * playlist.length)];
         music.play();
     });
+
     if (getUsername() == null) {
-        document.body.innerHTML = "<h1>Please Log in through Pebble because im too lazy to add the feature here</h1><button onclick='../pebble/pebble.js'>Pebble</button>";
+        document.body.innerHTML = `<h1>Please Log in through Pebble because im too lazy to add the feature here</h1><button onclick="window.location.replace('../pebble/pebble.html')">Pebble</button>`;
         return;
     }
+    db.ref(`users/${getUsername()}`).once('value', function(object) {
+        if (!object.exists() || object.val().password !== getPassword() || (object.val().muted || false) || (object.val().trapped || false) || Date.now() - (object.val().sleep || 0) < 0) {
+            document.body.innerHTML = "<h1>Unknown error occurred. Either you are removed, muted, trapped, timed out, etc</h1>";
+            return;
+        }
+    })
+
+    db.ref(`users/${getUsername()}/admin`).once("value", function(object) {
+        if (object.val() > 0) {
+            document.getElementById("clear").style.display = "block";
+        }
+    })
 
     db.ref(`users/${getUsername()}/money`).on("value", (amount) => {
         document.getElementById('money').innerHTML = (amount.val() || 0);
@@ -359,6 +459,24 @@ window.onload = function() {
         previousmultValue = multselector.value;
     })
 
+    const moneyselector = document.getElementById("moneyselect");
+    const moneyinput = document.getElementById("moneyminusAmount");
+
+    moneyselector.addEventListener("change", function(event) {
+        if (typeof previousmoneyValue !== 'undefined') {
+            moneyinput.removeEventListener("input", function(object) {
+                var cost = document.getElementById("moneyminusCost");
+                cost.innerHTML = Math.round(previousmoneyValue);
+                previousmoneyValue = previousmoneyValue;
+            })
+        }
+        moneyinput.addEventListener("input", function(object) {
+            var cost = document.getElementById("moneyminusCost");
+            cost.innerHTML = Math.round(object.target.value);
+            previousmoneyValue = object.target.value;
+        });
+    })
+
     const autogiftselector = document.getElementById("autogiftselect");
 
     autogiftselector.addEventListener("change", function(event) {
@@ -389,6 +507,24 @@ window.onload = function() {
         previousmultgiftValue = multgiftselector.value;
     })
 
+    const moneygiftselector = document.getElementById("moneygiftselect");
+    const moneygiftinput = document.getElementById("moneygiftAmount");
+
+    moneygiftselector.addEventListener("change", function(event) {
+        if (typeof previousmoneyValue !== 'undefined') {
+            moneygiftinput.removeEventListener("input", function(object) {
+                var cost = document.getElementById("moneygiftCost");
+                cost.innerHTML = Math.round(previousmoneyValue);
+                previousmoneyValue = previousmoneyValue;
+            })
+        }
+        moneygiftinput.addEventListener("input", function(object) {
+            var cost = document.getElementById("moneygiftCost");
+            cost.innerHTML = Math.round(object.target.value);
+            previousmoneyValue = object.target.value;
+        });
+    })
+
     document.getElementById('autominus').addEventListener('click', function(event) {
         if (event.target.closest("select")) {
             return;
@@ -405,6 +541,14 @@ window.onload = function() {
         }
     })
 
+    document.getElementById('moneyminus').addEventListener('click', function(event) {
+        if (event.target.closest("select") || event.target.id == "moneyminusAmount") {
+            return;
+        } else {
+            minusMoney();
+        }
+    })
+
     document.getElementById('autogift').addEventListener('click', function(event) {
         if (event.target.closest("select")) {
             return;
@@ -418,6 +562,14 @@ window.onload = function() {
             return;
         } else {
             giftMult();
+        }
+    })
+
+    document.getElementById('moneygift').addEventListener('click', function(event) {
+        if (event.target.closest("select") || event.target.id == "moneygiftAmount") {
+            return;
+        } else {
+            giftMoney();
         }
     })
 

@@ -28,6 +28,9 @@
                 <img src="../images/mute.png" class="sidebar-logo" id="speaker"/>
                 <audio id="bg-music" src="../images/secret_files/irisu_01.mp3"></audio>
             </button>
+            <button type="button" class="sidebar-button" onclick="clearNotifs()" id="clear">
+                <p style="font-size:12px">Clear Notifs</p>
+            </button>
         </div>
 
         <div class="main-container">
@@ -78,6 +81,18 @@
                         </select>
                     </div>
                 </div>
+                <div class="buy-item attack" id="moneyminus">
+                    <div class="buy-main">
+                        <span id="buyName">-1 Mult</span> - $<span id="moneyminusCost"></span>
+                    </div>
+                    <div class="buy-description">
+                        Target: 
+                        <select id="moneyselect">
+                        </select><br>
+                        Amount: 
+                        <input type="text" id="moneyminusAmount">
+                    </div>
+                </div>
             </div>
 
             <div class="buy-text ability-text">Abilities</div>
@@ -100,6 +115,18 @@
                         'Tis the Season to be Jolly<br>
                         <select id="multgiftselect">
                         </select>
+                    </div>
+                </div>
+                <div class="buy-item ability" id="moneygift">
+                    <div class="buy-main">
+                        <span id="buyName">Gift +1 Mult</span> - $<span id="moneygiftCost"></span>
+                    </div>
+                    <div class="buy-description">
+                        'Tis the Season to be Jolly<br>
+                        <select id="moneygiftselect">
+                        </select><br>
+                        Amount: 
+                        <input type="text" id="moneygiftAmount">
                     </div>
                 </div>
             </div>

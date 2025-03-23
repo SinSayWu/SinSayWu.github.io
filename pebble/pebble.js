@@ -633,7 +633,7 @@ function sendMessage() {
                     if (timingUser.admin > timedUser.admin) {
                         sendServerMessage(timingUser.display_name + " timed out @" + timedUser.username + " for " + timeout_time + " seconds!");
                         db.ref("users/" + timedUser.username).update({
-                            sleep: firebase.database.ServerValue.TIMESTAMP + ((timeout_time * 1000) - messageSleep),
+                            sleep: Date.now() + ((timeout_time * 1000) - messageSleep),
                         })
                     }
                     return;
@@ -701,7 +701,7 @@ function sendMessage() {
                             time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
                         }).then(function() {
                             db.ref("users/" + username).update({
-                                sleep: firebase.database.ServerValue.TIMESTAMP,
+                                sleep: Date.now(),
                             })
                         })
                     })
@@ -861,7 +861,7 @@ function sendMessage() {
                         time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
                     }).then(function() {
                         db.ref("users/" + username).update({
-                            sleep: firebase.database.ServerValue.TIMESTAMP,
+                            sleep: Date.now(),
                         })
                     })
                 })
