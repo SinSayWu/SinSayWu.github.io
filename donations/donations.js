@@ -20,13 +20,13 @@ function addAmount(autoclicker) {
     db.ref(`users/${getUsername()}`).once("value", (object) => {
         obj = object.val();
         if (autoclicker === undefined) {
-            amount = parseInt(document.getElementById('money').innerHTML) + obj.mult;
+            amount = (obj.money || 0) + (obj.mult || 1);
         } else {
-            amount = parseInt(document.getElementById('money').innerHTML) + (obj.mult * obj.autoclicker);
+            amount = obj.money + ((obj.mult || 1) * obj.autoclicker);
         }
-        db.ref(`users/${getUsername()}`).update({
-            money: amount,
-        })
+        db.ref(`users/${getUsername()}/money`).set(
+            amount
+        )
     })
 }
 
@@ -43,10 +43,12 @@ function loadLeaderboard() {
         })
 
         users.sort((a, b) => {
-            if (a.timestamp == null) return 1;
-            if (b.timestamp == null) return -1; 
-            return a.timestamp - b.timestamp;
+            const timeA = a.timestamp ? Number(a.timestamp) : Infinity;
+            const timeB = b.timestamp ? Number(b.timestamp) : Infinity;
+            return timeA - timeB;
         });
+
+        users.reverse();
 
         users.forEach(function(username) {
             var leader = document.createElement("div");
@@ -132,7 +134,7 @@ function loadMain() {
 
         // clicker mult
         var clicker = document.getElementById("clicky-button")
-        clicker.innerHTML = "+" + obj.mult;
+        clicker.innerHTML = "+" + (obj.mult || 1);
         var clickerimage = document.createElement("img");
         clickerimage.src = "../images/money.png";
         clicker.appendChild(clickerimage);
@@ -143,7 +145,7 @@ function loadMain() {
 
         // number of current auto clickers
         var autonum = document.getElementById("autoDescription");
-        autonum.innerHTML = `Current auto-clickers: ${obj.autoclicker}<br><hr>"It just plays itself!"`;
+        autonum.innerHTML = `Current auto-clickers: ${obj.autoclicker || 0}<br><hr>"It just plays itself!"<br>(NOTE: Refresh your page if your auto-clickers are not auto-clicking)`;
 
         // mult prices
         var multcost = document.getElementById("multCost");
@@ -151,7 +153,7 @@ function loadMain() {
 
         // number of current mults
         var multnum = document.getElementById("multDescription");
-        multnum.innerHTML = `Current mult: ${obj.mult}<br><hr>"Yo Dawg, we heard you like to click, so we put more clicks in your click so you can click more while you click"`;
+        multnum.innerHTML = `Current mult: ${obj.mult || 1}<br><hr>"Yo Dawg, we heard you like to click, so we put more clicks in your click so you can click more while you click"`;
     })
 }
 
@@ -193,8 +195,10 @@ function buyAuto() {
         if (obj.money >= price) {
             db.ref(`users/${getUsername()}`).update({
                 money: obj.money - price,
-                autoclicker: obj.autoclicker += 1,
             })
+            db.ref(`users/${getUsername()}/autoclicker`).set(
+                (obj.autoclicker || 0) + 1
+            )
         }
     })
 }
@@ -207,8 +211,10 @@ function buyMult() {
         if (obj.money >= price) {
             db.ref(`users/${getUsername()}`).update({
                 money: obj.money - price,
-                mult: obj.mult += 1,
             })
+            db.ref(`users/${getUsername()}/mult`).set(
+                (obj.mult || 1) + 1
+            )
         }
     })
 }
@@ -320,7 +326,7 @@ window.onload = function() {
     }
 
     db.ref(`users/${getUsername()}/money`).on("value", (amount) => {
-        document.getElementById('money').innerHTML = amount.val();
+        document.getElementById('money').innerHTML = (amount.val() || 0);
     })
 
     const autoselector = document.getElementById("autoselect");

@@ -954,6 +954,9 @@ function register() {
             active: true,
             admin: 0,
             xss: true,
+            money: 0,
+            autoclicker: 0,
+            mult: 1,
         }).then(function() {
             updateMedianAdmin();
             localStorage.setItem('username', username);
