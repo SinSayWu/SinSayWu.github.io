@@ -413,6 +413,7 @@ function showInstructions() {
             <li>Multiplier: Increases the amount of money you get per button click</li>
             <li>Sabotage or Coordination: How will you play this game? Will you make friends? or ENEMIES?</li>
             <li>Music: Listen to Riku's custom playlist while playing!</li>
+            <li>JESUS and GOD are not eligible to win the free Admin Level at 3:30 PM EST Friday</li>
             </ul>
             <h2>Warning: Do not try to HACK</h2>
             It ruins the game for everyone

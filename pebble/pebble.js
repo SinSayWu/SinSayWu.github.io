@@ -101,49 +101,59 @@ function refreshChat() {
 
                     messageElement.addEventListener("mouseover", function(e) {
                         messageContent.style.backgroundColor = "gray";
-                        if (data.name == getUsername() || data.admin < obj.admin) {
-                            var trashButton = document.createElement("button");
-                            timeElement.style.visibility = "hidden";
-                            trashButton.innerHTML = "🗑️️";
-                            trashButton.setAttribute("id", "delete-button");
-                            trashButton.onclick = () => {
-                                db.ref("chats/" + nodename[index]).update({
-                                    removed: true,
-                                    message: `<i><b>REMOVED BY ${getDisplayName()}</b></i><span style="display: none">@${getUsername()} @${data.name}</span>`,
-                                });
-                            }
-                            messageElement.appendChild(trashButton);
+                        if ((data.name == getUsername() || data.admin < obj.admin) && !messageElement.querySelector("#delete-button")) {
+                            setTimeout(() => {
+                                var trashButton = document.createElement("button");
+                                timeElement.style.visibility = "hidden";
+                                trashButton.innerHTML = "🗑️️";
+                                trashButton.setAttribute("id", "delete-button");
+                                trashButton.addEventListener("click", function() {
+                                    db.ref("chats/" + nodename[index]).update({
+                                        removed: true,
+                                        message: `<i><b>REMOVED BY ${getDisplayName()}</b></i><span style="display: none">@${getUsername()} @${data.name}</span>`,
+                                    });
+                                })
+                                messageElement.appendChild(trashButton);
+                            }, 100);
                         }
-                        if (data.name == getUsername()) {
+                        if (data.name == getUsername() && !messageElement.querySelector("#edit-button")) {
                             db.ref("users/" + getUsername()).once('value', function(user_object) {
                                 var obj = user_object.val();
                                 var editButton = document.createElement("button");
                                 editButton.setAttribute("id", "edit-button");
                                 timeElement.style.visibility = "hidden";
-                                if (obj && "editing" in obj) {
+                                if (obj && "editing" in obj && obj.editing == nodename[index]) {
                                     editButton.innerHTML = "🗙";
-                                    editButton.onclick = () => {
-                                        db.ref("users/" + getUsername() + "/editing").remove()
-                                    };
                                 } else {
                                     editButton.innerHTML = "✏️";
-                                    editButton.onclick = () => {
+                                }
+                                editButton.addEventListener("click", function() {
+                                    if (obj && "editing" in obj && obj.editing == nodename[index]) {
+                                        editButton.innerHTML = "✏️";
+                                        db.ref("users/" + getUsername() + "/editing").remove()
+                                    } else {
+                                        editButton.innerHTML = "🗙";
                                         db.ref("users/" + getUsername()).update({
                                             editing: nodename[index],
                                         });
                                     }
-                                }
+                                });
+
                                 messageElement.appendChild(editButton);
                             })
                         }
                     })
-                    messageElement.addEventListener("mouseout", function(e) {
+                    messageElement.addEventListener("mouseleave", function(e) {
                         messageContent.style.backgroundColor = "";
                         timeElement.style.visibility = "visible";
-                        var buttons = messageElement.querySelectorAll("#delete-button, #edit-button");
-                        buttons.forEach(function(button) {
-                            button.remove();
-                        })
+
+                        setTimeout(() => {
+                            var buttons = messageElement.querySelectorAll("#delete-button, #edit-button");
+                            buttons.forEach(function(button) {
+                                button.remove();
+                            })
+                            timeElement.style.visibility = "visible";
+                        }, 100)
                     })
                     
 
