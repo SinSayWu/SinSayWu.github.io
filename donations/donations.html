@@ -1,38 +1,148 @@
 <html>
     <head>
-        <link rel="stylesheet" href="donations.css">
+        <title>Donations</title>
+
         <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-app.js"></script>
         <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-database.js"></script>
-        
-        <script src="../universal.js"></script>
-        <link rel="stylesheet" href="../universal.css">
 
+        <link rel="stylesheet" href="../universal.css">
+        <script src="../universal.js"></script>
+
+        <link rel="stylesheet" href="donations.css">
         <script src="donations.js"></script>
-        <title>Donations</title>
+
+        <link rel="shortcut icon" href="../images/money.png" type="image/">
     </head>
+
     <body>
-        <div>
-            <h1>Donations</h1>
-            <p>pls donate (this donation site doesn't actually give me money btw, in case anyone is wondering</p>
-            <p>Just give me your money in person :)</p>
+        <div class="sidebar" id="sidebar">
+            <button type="button" class="sidebar-button" title="" onclick="window.location.replace('../index.html');">
+                <img src="../images/logo.png" class="sidebar-logo"/>
+            </button>
+            <hr class="sidebar-line">
+            <button type="button" class="sidebar-button" title="" onclick="window.location.replace('../donations/donations.html');">
+                <img src="../images/money.png" class="sidebar-logo"/>
+            </button>
+            <button type="button" class="sidebar-button" title="" onclick="window.location.replace('..SpaceSeizure/spaceseizure.html');">
+                <img src="../images/spaceseizuremain.png" class="sidebar-logo"/>
+            </button>
+            <button type="button" class="sidebar-button" id="irisu" title="" onclick="play()">
+                <img src="../images/mute.png" class="sidebar-logo" id="speaker"/>
+                <audio id="bg-music" src="../images/secret_files/irisu_01.mp3"></audio>
+            </button>
+            <button type="button" class="sidebar-button" onclick="clearNotifs()" id="clear">
+                <p style="font-size:12px">Clear Notifs</p>
+            </button>
         </div>
-        <div id="amountBox">
-            Amount: $<span id="amount"></span>
+
+        <div class="main-container">
+            <div class="title"><img src="../images/money.png"/> PvP Donations</div>
+            <div class="money">MONEY: <span id="money">0</span><img src="../images/money.png"/></div>
+            <div class="notification-text">Notifications!</div>
+            <div id="notifications">
+            </div>
+
+
+            <div class="buy-text upgrade-text">Upgrades</div>
+            <div class="buy-stuff upgrade-buy">
+                <div class="buy-item upgrade" onclick="buyAuto()">
+                    <div class="buy-main">
+                        <span id="autoclicker">Buy 1 AutoClicker</span> - $<span id="autoCost"></span>
+                    </div>
+                    <div class="buy-description" id="autoDescription">
+                    </div>
+                </div>
+                <div class="buy-item upgrade" onclick="buyMult()">
+                    <div class="buy-main">
+                        <span id="mult">Buy 1 Mult</span> - $<span id="multCost"></span>
+                    </div>
+                    <div class="buy-description" id="multDescription">
+                    </div>
+                </div>
+            </div>
+
+            <div class="buy-text attack-text">Attacks</div>
+            <div class="buy-stuff attack-buy">
+                <div class="buy-item attack" id="autominus">
+                    <div class="buy-main">
+                        <span id="buyName">Destroy 1 AutoClicker</span> - $<span id="autominusCost">0</span>
+                    </div>
+                    <div class="buy-description">
+                        Target: 
+                        <select id="autoselect">
+                        </select>
+                    </div>
+                </div>
+                <div class="buy-item attack" id="multminus">
+                    <div class="buy-main">
+                        <span id="buyName">Destroy 1 Mult</span> - $<span id="multminusCost">0</span>
+                    </div>
+                    <div class="buy-description">
+                        Target: 
+                        <select id="multselect">
+                        </select>
+                    </div>
+                </div>
+                <div class="buy-item attack" id="moneyminus">
+                    <div class="buy-main">
+                        <span id="buyName">Destroy Money</span> - $<span id="moneyminusCost">0</span>
+                    </div>
+                    <div class="buy-description">
+                        Target: 
+                        <select id="moneyselect">
+                        </select><br>
+                        Amount: 
+                        <input type="text" id="moneyminusAmount">
+                    </div>
+                </div>
+            </div>
+
+            <div class="buy-text ability-text">Abilities</div>
+            <div class="buy-stuff ability-buy">
+                <div class="buy-item ability" id="autogift">
+                    <div class="buy-main">
+                        <span id="buyName">Gift 1 AutoClicker</span> - $<span id="autogiftCost">0</span>
+                    </div>
+                    <div class="buy-description">
+                        'Tis the Season to be Jolly<br>
+                        <select id="autogiftselect">
+                        </select>
+                    </div>
+                </div>
+                <div class="buy-item ability" id="multgift">
+                    <div class="buy-main">
+                        <span id="buyName">Gift 1 Mult</span> - $<span id="multgiftCost">0</span>
+                    </div>
+                    <div class="buy-description">
+                        'Tis the Season to be Jolly<br>
+                        <select id="multgiftselect">
+                        </select>
+                    </div>
+                </div>
+                <div class="buy-item ability" id="moneygift">
+                    <div class="buy-main">
+                        <span id="buyName">Gift Money</span> - $<span id="moneygiftCost">0</span>
+                    </div>
+                    <div class="buy-description">
+                        'Tis the Season to be Jolly<br>
+                        <select id="moneygiftselect">
+                        </select><br>
+                        Amount: 
+                        <input type="text" id="moneygiftAmount">
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="clicky-button-div">
+                <button id="clicky-button" onclick="addAmount()">+1<img src="../images/money.png"/></button>
+            </div>
+            <div class="leaderboard-text">Leaderboard</div>
+            <div id="leaderboard">
+                <div class="leader">
+                </div>
+            </div>
+            <hr class="footer">
         </div>
-        <div id="money">
-            <button type="button" id="1" class="individualMoney" onclick="addAmount(1)">+$1</button>
-            <button type="button" id="5" class="individualMoney" onclick="addAmount(5)">+$5</button>
-            <button type="button" id="10" class="individualMoney" onclick="addAmount(10)">+$10</button>
-            <button type="button" id="15" class="individualMoney" onclick="addAmount(15)">+$15</button>
-        </div>
-        <button type="button" onclick="window.location.replace('../pebble/pebble.html')">Back</button>
-        <h2>Wishlist</h2>
-        <ul>
-            <li>Better Database ($30 a year?) - More messages, more users, better experience</li>
-            <li>More Domains ($15 per domain) - In case the school blocks this one</li>
-            <li>Backend Server ($5) - For more secure data storage and so people can't do weird stuff to ur passwords</li>
-            <li>UI Overhaul ($10) - Better UI.</li>
-            <li>My Salary ($0.01) - I need to eat.</li>
-        </ul>
     </body>
 </html>

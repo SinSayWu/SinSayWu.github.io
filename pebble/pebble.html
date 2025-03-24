@@ -4,7 +4,7 @@
         <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-database.js"></script>
 
         <script src="../universal.js"></script>
-        <link rel="stylesheet" href="universal.css">
+        <link rel="stylesheet" href="../universal.css">
 
         <script src="credits.js"></script>
         <script src="pebble.js"></script>
@@ -14,7 +14,7 @@
             Pebble
         </title>
     </head>
-    <body>
+    <body id = "body">
         <div class="login-wrapper" id="login">
             <div class="login-container" id="logincontain">
                 <div class="login-content">
@@ -57,7 +57,7 @@
                     <img src="../images/logo.png" class="sidebar-logo"/>
                 </button>
                 <hr class="sidebar-line">
-                <button type="button" class="sidebar-button" title="" onclick="window.location.replace('../donations/donations.html');">
+                <button type="button" class="sidebar-button" title="" onclick="window.location.replace('../Donations/donations.html');">
                     <img src="../images/money.png" class="sidebar-logo"/>
                 </button>
                 <button type="button" class="sidebar-button" title="" onclick="window.location.replace('..SpaceSeizure/spaceseizure.html');">
@@ -68,7 +68,7 @@
                 <div class="server-name">
                     <b>Pebble</b>
                 </div>
-                <div class="channels">
+                <div class="channels" id="channels">
                     <div class="category">
                         <a class="category-button"><b>Admin Channel</b></a>
                     </div>
@@ -79,24 +79,24 @@
                         <a class="channel-button"><b>#</b> Test 2</a>
                     </div>
                 </div>
-                <div class="brainrot" id="brainrot">
-                    <iframe
-                        src="https://www.youtube.com/embed/zZ7AimPACzc?autoplay=1&loop=1&controls=0&modestbranding=1&rel=0&disablekb=1&mute=1&playlist=zZ7AimPACzc"
-                        frameborder="0"
-                        allow="autoplay; encrypted-media"
-                        allowfullscreen="false"
-                        class="subway-surfers-clips">
-                    </iframe>
-                    <iframe
-                        src="https://www.youtube.com/embed/ZhpRTAQxCo0?autoplay=1&loop=1&controls=0&modestbranding=1&rel=0&disablekb=1&mute=1&playlist=ZhpRTAQxCo0"
-                        frameborder="0"
-                        allow="autoplay; encrypted-media"
-                        allowfullscreen="false"
-                        class="family-guy-clips">
-                    </iframe>
-                    <div class="cover"></div>
+                <div class="permaAnnouncements" id="permaAnnouncements">
+                    <h2>
+                        Version 4.0 is out!
+                    </h2>
+                    Check the Update Notes here!
+                    <button onclick="window.location.replace('../UpdateNotes/updateNotes.html')">Update Notes</button>
+                    <hr>
+                    <h2>
+                        Give me 1 dollar and I will increase your admin level by 1.
+                    </h2>
+                    <br/>
+                    You can mute or timeout people who's admin level is 1 less than you, and ban people who's admin level is 2 less.
+                    <br/>
+                    <hr>
+                    <h2>
+                        The UI for the donations page has changed!
+                    </h2>
                 </div>
-                
                 <div class="profile" id="profile">
                     <div class="user-changer" id="userdisplay"></div>
                     <button class="profile-button" id="logoutButton" onclick="logout()">Log Out</button>
@@ -109,15 +109,35 @@
                             <a onclick="checkCommands(); toggleMenu()">Commands</a>
                             <a onclick="slowmodeToggle(); toggleMenu()">Slowmode<span id="slowmode-toggle"></span></a>
                             <a onclick="brainRotToggle(); toggleMenu()">Brainrot Mode<span id="brainrot-toggle"></span></a>
+                            <a onclick="commandments(); toggleMenu()">Commandments</a>
                             <a onclick="window.location.replace('../notifications/notifications.html')">Notifications</a>
                         </div>
                         <div class="menu-content" id="userMenu">
                             <a onclick="userCommands(); toggleMenu()">Commands</a>
                             <a onclick="brainRotToggle(); toggleMenu()">Brainrot Mode<span id="brainrot-toggle"></span></a>
+                            <a onclick="commandments(); toggleMenu()">Commandments</a>
                             <a onclick="window.location.replace('../notifications/notifications.html')">Notifications</a>
                         </div>
                     </div>
                 </div>
+                <div class="brainrot" id="brainrot">
+                    <iframe
+                        src="https://www.youtube.com/embed/zZ7AimPACzc?autoplay=1&loop=1&controls=0&modestbranding=1&rel=0&disablekb=1&mute=1&playlist=zZ7AimPACzc"
+                        frameborder="0"
+                        allow="autoplay; encrypted-media"
+                        allowfullscreen="false"
+                        class="subway-surfers-clips">
+                    </iframe>
+                    <iframe
+                        src="https://www.youtube.com/embed/mYKDaxLXVSg?autoplay=1&loop=1&controls=0&modestbranding=1&rel=0&disablekb=1&mute=1&playlist=mYKDaxLXVSg"
+                        frameborder="0"
+                        allow="autoplay; encrypted-media"
+                        allowfullscreen="false"
+                        class="family-guy-clips">
+                    </iframe>
+                    <div class="brainrot-frame"></div>
+                </div>
+                <div class="cover" id="cover"></div>
             </div>
             <div class="message-box" id="messagebox">
                 <div class="message-channel" style="text-align: center;">
@@ -136,8 +156,9 @@
             </div>
             <div class="member-list" id="memberlist">
                 <div class="member-channel">
-                    # Main
+                    # Main<span id="medianAdmin"></span>
                 </div>
+                
                 <hr>
                 <div id="members">
                     
@@ -150,6 +171,26 @@
                 <ul id="commands-list"></ul>
                 <button id="command-close" onclick="closeCommands()">Close</button>
             </div>
+
+            <div id="commandments-menu">
+                Commandments
+                <hr>
+                <ul id="commandments-list"></ul>
+                <button id="commandments-close" onclick="closeCommandments()">Close</button>
+            </div>
         </div>
+
+        <!-- <div class="popup" id="popup">
+            <h1 class="popup-title" id="popupTitle">
+                hihihi
+            </h1>
+            <hr>
+            <div class="popup-content" id="popupContent">
+                content baby
+            </div>
+            <div class="popup-buttons" id="popupButtons">
+                <button id="closeButton">Close</button>
+            </div>
+        </div> -->
     </body>
 </html>
