@@ -1157,16 +1157,31 @@ function announce() {
 
 function brainRotToggle() {
     brainRot = !brainRot;
+    var brainrot = document.getElementById("brainrot");
     if (brainRot) {
+        brainrot.innerHTML = `<iframe
+                                src="https://www.youtube.com/embed/zZ7AimPACzc?autoplay=1&loop=1&controls=0&modestbranding=1&rel=0&disablekb=1&mute=1&playlist=zZ7AimPACzc"
+                                frameborder="0"
+                                allow="autoplay; encrypted-media"
+                                allowfullscreen="false"
+                                class="subway-surfers-clips">
+                            </iframe>
+                            <iframe
+                                src="https://www.youtube.com/embed/mYKDaxLXVSg?autoplay=1&loop=1&controls=0&modestbranding=1&rel=0&disablekb=1&mute=1&playlist=mYKDaxLXVSg"
+                                frameborder="0"
+                                allow="autoplay; encrypted-media"
+                                allowfullscreen="false"
+                                class="family-guy-clips">
+                            </iframe>
+                            <div class="brainrot-frame"></div>`
         document.getElementById("brainrot-toggle").innerHTML = ' ✓';
-        document.getElementById("brainrot").style.display = "block";
         document.getElementById("cover").style.display = "block";
         document.getElementById("channels").style.visibility = "hidden";
         document.getElementById("permaAnnouncements").style.visibility = "hidden";
         // alert("BRAINROT")
     } else {
+        brainrot.innerHTML = "";
         document.getElementById("brainrot-toggle").innerHTML = '';
-        document.getElementById("brainrot").style.display = "none";
         document.getElementById("cover").style.display = "none";
         document.getElementById("channels").style.visibility = "visible";
         document.getElementById("permaAnnouncements").style.visibility = "visible";
