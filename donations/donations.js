@@ -302,7 +302,7 @@ function minusMult() {
 
 function minusMoney() {
     const moneyselector = document.getElementById("moneyselect");
-    const moneyinput = document.getElementById("moneyminusAmount")
+    const moneyinput = document.getElementById("moneyminusAmount");
 
     db.ref(`users/${getUsername()}`).once("value", (attacker_object) => {
         db.ref(`users/${moneyselector.value}`).once("value", (victim_object) => {
@@ -375,7 +375,7 @@ function giftMult() {
 
 function giftMoney() {
     const moneyselector = document.getElementById("moneygiftselect");
-    const moneyinput = document.getElementById("moneygiftAmount")
+    const moneyinput = document.getElementById("moneygiftAmount");
 
     db.ref(`users/${getUsername()}`).once("value", (attacker_object) => {
         db.ref(`users/${moneyselector.value}`).once("value", (victim_object) => {
@@ -398,6 +398,26 @@ function giftMoney() {
             }
         })
     })
+}
+
+function showInstructions() {
+    showPopUp(
+        "Welcome to PvP Donations!",
+        `
+            <h2>This is the slightly reformatted Donations page!</h2>
+            New Feature: Whoever is ranked first by 3:30 PM EST every Friday will get a free Admin Level!
+            <br/><br/>
+            <h2>How this works:</h2>
+            <ul>
+            <li>AutoClicker: Will automatically click the button every second when you are online.</li>
+            <li>Multiplier: Increases the amount of money you get per button click</li>
+            <li>Sabotage or Coordination: How will you play this game? Will you make friends? or ENEMIES?</li>
+            <li>Music: Listen to Riku's custom playlist while playing!</li>
+            </ul>
+            <h2>Warning: Do not try to HACK</h2>
+            It ruins the game for everyone
+        `,
+    );
 }
 
 window.onload = function() {
@@ -578,6 +598,12 @@ window.onload = function() {
     setTimeout(autoclickerCheck, 2000);
     loadMain();
     loadSelectors();
+
+    db.ref(`users/${getUsername()}/money`).once("value", (amount) => {
+        if (amount.val() <= 500) {
+            showInstructions();
+        }
+    })
 }
 
 window.addEventListener('beforeunload', function(event) {

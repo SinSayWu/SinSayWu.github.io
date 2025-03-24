@@ -3,6 +3,50 @@ body {
     flex-direction: row;
 }
 
+/* Base styles for both select and input */
+select, input {
+    background-color: #222; /* Dark background */
+    color: white; /* Light text */
+    border: 2px solid #555; /* Subtle border */
+    padding: 5px 8px;
+    margin-bottom: 8px;
+    font-size: 16px;
+    border-radius: 5px;
+    transition: all 0.2s ease-in-out;
+}
+
+/* Hover effect */
+select:hover, input:hover {
+    border-color: #777;
+    background-color: #333;
+}
+
+/* Focus effect */
+select:focus, input:focus {
+    border-color: #00bfff; /* Highlighted border (cyan) */
+    outline: none;
+}
+
+/* Different themed elements */
+.attack select, .attack input {
+    border-color: #d9534f; /* Red */
+}
+
+.ability select, .ability input {
+    border-color: #00bfff; /* Blue */
+}
+
+.upgrade select, .upgrade input {
+    border-color: #5cb85c; /* Green */
+}
+
+/* Style placeholder text */
+input::placeholder {
+    color: #bbb; /* Light gray placeholder */
+    opacity: 0.7;
+}
+
+
 .sidebar {
     width: 4.5%;
     height: 100%;
@@ -212,7 +256,7 @@ body {
     display: flex;
     justify-content: center;
     flex-direction: column;
-    height: 40%;
+    padding: 10px;
     width: 90%;
     margin: auto;
     margin-top: 4%;
@@ -221,16 +265,25 @@ body {
     align-items: center;
     border-radius: 5px;
     box-shadow: 0 0px 60px rgba(0, 0, 0, 1);
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+}
+
+.buy-item:hover {
+    transform: scale(1.02);
 }
 
 .buy-main {
-    font-size: 250%;
+    font-size: 200%;
     color: black;
+    margin: 5px;
+    margin-bottom: 20px;
 }
 
 .buy-description {
-    color: gray;
-    width: 100%
+    color: rgb(0, 0, 0);
+    width: 95%;
+    margin: auto;
 }
 
 .upgrade {

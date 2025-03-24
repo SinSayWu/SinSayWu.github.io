@@ -64,7 +64,7 @@ function sanitize(string) {
  * @param {float} [width=800] - The width of the popup
  * @returns {null} wow this param feature is kinda cool
  */
-function showPopUp(heading, content, buttonList = [], height=800, width=800) {
+function showPopUp(heading, content, buttonList = [], height=640, width=800) {
     parent = document.body;
     
     // Create the overlay
