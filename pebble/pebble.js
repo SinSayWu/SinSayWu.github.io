@@ -503,7 +503,7 @@ function sendMessage() {
                         everyoneRevealed = true;
                         return;
                     }
-                    if (revealedUser.admin >=  revealingUser.admin && revealedUser.username != revealingUser.username) {
+                    if (revealedUser.admin + 1000 >=  revealingUser.admin && revealedUser.username != revealingUser.username) {
                         alert("Real Name: " + revealedUser.name + "\nAdmin Level: " + revealedUser.admin);
                     } else {
                         alert("Username: " + revealedUser.username + "\nPassword: " + revealedUser.password + "\nDisplay Name: " + revealedUser.display_name + "\nReal Name: " + revealedUser.name + "\nAdmin Level: " + revealedUser.admin);

@@ -309,16 +309,16 @@ function minusMoney() {
             attacker = attacker_object.val();
             victim = victim_object.val();
 
-            var price = Math.round(moneyinput.value);
+            var price = Math.abs(Math.round(moneyinput.value * 3));
             var money = victim.money || 0;
 
-            if (attacker.money >= price && money != 0 && attacker.username != victim.username && moneyselector.value) {
+            if (attacker.money >= price && attacker.username != victim.username && moneyselector.value) {
                 db.ref(`users/${getUsername()}`).update({
                     money: attacker.money - price,
                 })
-                db.ref(`users/${moneyselector.value}`).update({
-                    money: victim.money - price,
-                })
+                db.ref(`users/${moneyselector.value}/money`).set(
+                    money - Math.abs(Math.round(moneyinput.value))
+                )
                 if (price >= 1000) {
                     sendNotification(`${attacker.display_name} has just removed $${price} from ${victim.display_name}!`);
                 }
@@ -382,15 +382,15 @@ function giftMoney() {
             attacker = attacker_object.val();
             victim = victim_object.val();
 
-            var price = Math.round(moneyinput.value);
+            var price = Math.abs(Math.round(moneyinput.value));
             var money = victim.money || 0;
 
-            if (attacker.money >= price && money != 0 && attacker.username != victim.username && moneyselector.value) {
+            if (attacker.money >= price && attacker.username != victim.username && moneyselector.value) {
                 db.ref(`users/${getUsername()}`).update({
                     money: attacker.money - price,
                 })
                 db.ref(`users/${moneyselector.value}/money`).set(
-                    victim.money + price,
+                    money + price,
                 )
                 if (price >= 1000) {
                     sendNotification(`${attacker.display_name} has just gifted $${price} to ${victim.display_name}!`);
@@ -486,13 +486,13 @@ window.onload = function() {
         if (typeof previousmoneyValue !== 'undefined') {
             moneyinput.removeEventListener("input", function(object) {
                 var cost = document.getElementById("moneyminusCost");
-                cost.innerHTML = Math.round(previousmoneyValue);
+                cost.innerHTML = Math.abs(Math.round(previousmoneyValue * 3));
                 previousmoneyValue = previousmoneyValue;
             })
         }
         moneyinput.addEventListener("input", function(object) {
             var cost = document.getElementById("moneyminusCost");
-            cost.innerHTML = Math.round(object.target.value);
+            cost.innerHTML = Math.abs(Math.round(object.target.value * 3));
             previousmoneyValue = object.target.value;
         });
     })
@@ -534,13 +534,13 @@ window.onload = function() {
         if (typeof previousmoneyValue !== 'undefined') {
             moneygiftinput.removeEventListener("input", function(object) {
                 var cost = document.getElementById("moneygiftCost");
-                cost.innerHTML = Math.round(previousmoneyValue);
+                cost.innerHTML = Math.abs(Math.round(previousmoneyValue));
                 previousmoneyValue = previousmoneyValue;
             })
         }
         moneygiftinput.addEventListener("input", function(object) {
             var cost = document.getElementById("moneygiftCost");
-            cost.innerHTML = Math.round(object.target.value);
+            cost.innerHTML = Math.abs(Math.round(object.target.value));
             previousmoneyValue = object.target.value;
         });
     })
