@@ -194,7 +194,7 @@ function refreshChat() {
             var announceNotification = localStorage.getItem("announceNotification") || true;
             var mentionNotification = localStorage.getItem("mentionNotification") || true;
             var messageNotification = localStorage.getItem("messageNotification") || false;
-            try {
+
             if (prevMessage.display_name == "[SERVER]" && JSON.parse(announceNotification)) {
                 notificationNumber += 1
             } else if ((prevMessage.message.includes("@" + getUsername()) || prevMessage.message.includes("@everyone")) && JSON.parse(mentionNotification)) {
@@ -205,9 +205,6 @@ function refreshChat() {
             if (notificationNumber != 0) {
                 document.title = "(" + notificationNumber + ") Pebble";
             }
-        } catch(err) {
-            alert(err)
-        }
         };
     });
     db.ref("users/null").remove();
@@ -1073,12 +1070,8 @@ function setup() {
             var obj = snapshot.val();
             const lastMessageTime = obj.sleep || 0;
             const timePassed = Date.now() - lastMessageTime;
-            // if (snapshot.exists()) {
-            //     db.ref("users/" + getUsername()).update({
-            //         active: true
-            //     })
-            // }
-            if ((!obj.muted && !(timePassed < messageSleep) && !obj.trapped) || obj.admin > 0) {
+            let params = new URLSearchParams(document.location.search);
+            if (((!obj.muted && !(timePassed < messageSleep) && !obj.trapped) || obj.admin > 0) && !(JSON.parse(params.get("ignore")) || false)) {
                 sendServerMessage(localStorage.getItem("display") + " has joined the chat<span style='visibility: hidden;'>@" + getUsername() + "</span>");
             }
         })
@@ -1093,11 +1086,14 @@ function setup() {
     checkActive();
     reloadTrapped();
     refreshChat();
-    // alert("Refreshed Chat");
     displayMembers()
-    // alert("Displayed Members");
     checkMute()
     setInterval(globalUpdate, 1000);
+    
+    var textarea = document.getElementById("textarea");
+    setTimeout(() => {
+        textarea.scrollTop = textarea.scrollHeight;
+    }, 500);
 }
 
 function checkAdmin() {

@@ -128,9 +128,11 @@ function sendNotification(message) {
 }
 
 function autoclickerCheck() {
-    if (localStorage.getItem("autoclicker") != "active") {
-        loadAutoclicker();
-    }
+    db.ref(`users/${getUsername()}`).once("value", function(object) {
+        if (localStorage.getItem("autoclicker") != "active" && Number.isInteger(object.val().money)) {
+            loadAutoclicker();
+        }
+    })
 }
 
 function loadAutoclicker() {
@@ -138,7 +140,7 @@ function loadAutoclicker() {
         obj = object.val();
         addAmount(true);
         localStorage.setItem("autoclicker", "active");
-        setTimeout(() => requestAnimationFrame(loadAutoclicker), 1000);
+        setTimeout(loadAutoclicker, 1000);
     })
 }
 
@@ -320,7 +322,7 @@ function minusMoney() {
                     money - Math.abs(Math.round(moneyinput.value))
                 )
                 if (price >= 1000) {
-                    sendNotification(`${attacker.display_name} has just removed $${price} from ${victim.display_name}!`);
+                    sendNotification(`${attacker.display_name} has just removed $${Math.abs(Math.round(moneyinput.value))} from ${victim.display_name}!`);
                 }
             }
         })
@@ -430,12 +432,12 @@ window.onload = function() {
     });
 
     if (getUsername() == null) {
-        document.body.innerHTML = `<h1>Please Log in through Pebble because im too lazy to add the feature here</h1><button onclick="window.location.replace('../pebble/pebble.html')">Pebble</button>`;
+        document.body.innerHTML = `<h1>Please Log in through Pebble because im too lazy to add the feature here</h1><button onclick="window.location.replace('../pebble/pebble.html?ignore=true')">Pebble</button>`;
         return;
     }
     db.ref(`users/${getUsername()}`).once('value', function(object) {
         if (!object.exists() || object.val().password !== getPassword() || (object.val().muted || false) || (object.val().trapped || false) || Date.now() - (object.val().sleep || 0) < 0) {
-            document.body.innerHTML = "<h1>Unknown error occurred. Either you are removed, muted, trapped, timed out, etc</h1>";
+            document.body.innerHTML = `<h1>Unknown error occurred. Either you are removed, muted, trapped, timed out, etc</h1><button onclick="window.location.replace('../pebble/pebble.html?ignore=true')">Pebble</button>`;
             return;
         }
     })
