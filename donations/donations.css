@@ -294,11 +294,13 @@ input::placeholder {
 .attack {
     background-color: rgb(184, 87, 69);
     box-shadow: 0 0px 20px rgb(248, 13, 13);
+    overflow: hidden;
 }
 
 .ability {
     background-color: rgb(0, 238, 255);
     box-shadow: 0 0px 20px rgb(0, 172, 158);
+    overflow: hidden;
 }
 
 .leader {

@@ -17,17 +17,20 @@ function play() {
 }
 
 function addAmount(autoclicker) {
-    db.ref(`users/${getUsername()}`).once("value", (object) => {
-        obj = object.val();
-        if (autoclicker === undefined) {
-            amount = (obj.money || 0) + (obj.mult || 1);
+    db.ref(`users/${getUsername()}`).once("value", function(snapshot) {
+        let data = snapshot.val() || {};
+        let amount = (data.mult || 1) * (autoclicker === undefined ? 1 : (data.autoclicker || 0));
+
+        if (data.money !== undefined && data.money !== null) {
+            db.ref(`users/${getUsername()}`).update({
+                money: firebase.database.ServerValue.increment(amount)
+            });
         } else {
-            amount = obj.money + ((obj.mult || 1) * obj.autoclicker);
+            db.ref(`users/${getUsername()}`).update({
+                money: amount
+            });
         }
-        db.ref(`users/${getUsername()}/money`).set(
-            amount
-        )
-    })
+    });
 }
 
 function loadLeaderboard() {
@@ -223,34 +226,26 @@ function loadSelectors() {
 }
 
 function buyAuto() {
-    db.ref(`users/${getUsername()}`).once("value", (object) => {
-        obj = object.val();
+    db.ref(`users/${getUsername()}`).transaction((obj) => {
         var price = Math.round(100 * 1.2 ** (obj.autoclicker || 0));
 
         if (obj.money >= price) {
-            db.ref(`users/${getUsername()}`).update({
-                money: obj.money - price,
-            })
-            db.ref(`users/${getUsername()}/autoclicker`).set(
-                (obj.autoclicker || 0) + 1
-            )
+            obj.money -= price
+            obj.autoclicker = (obj.autoclicker || 0) + 1;
         }
+        return obj;
     })
 }
 
 function buyMult() {
-    db.ref(`users/${getUsername()}`).once("value", (object) => {
-        obj = object.val();
+    db.ref(`users/${getUsername()}`).transaction((obj) => {
         var price = Math.round(250 * 1.4 ** (obj.mult - 1 || 0));
 
         if (obj.money >= price) {
-            db.ref(`users/${getUsername()}`).update({
-                money: obj.money - price,
-            })
-            db.ref(`users/${getUsername()}/mult`).set(
-                (obj.mult || 1) + 1
-            )
+            obj.money -= price;
+            obj.mult = (obj.mult || 1) + 1;
         }
+        return obj;
     })
 }
 

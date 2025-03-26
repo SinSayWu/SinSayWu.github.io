@@ -12,7 +12,7 @@ function getPassword() {
 }
 
 function getDisplayName() {
-    return localStorage.getItem("name");
+    return localStorage.getItem("display");
 }
 
 function refreshChat() {
@@ -120,6 +120,7 @@ function refreshChat() {
                             db.ref("users/" + getUsername()).once('value', function(user_object) {
                                 var obj = user_object.val();
                                 var editButton = document.createElement("button");
+                                var textBox = document.getElementById("text-box");
                                 editButton.setAttribute("id", "edit-button");
                                 timeElement.style.visibility = "hidden";
                                 if (obj && "editing" in obj && obj.editing == nodename[index]) {
@@ -133,6 +134,9 @@ function refreshChat() {
                                         db.ref("users/" + getUsername() + "/editing").remove()
                                     } else {
                                         editButton.innerHTML = "🗙";
+                                        db.ref(`chats/${nodename[index]}/message`).once("value", function(edit_message) {
+                                            textBox.value = edit_message.val();
+                                        })
                                         db.ref("users/" + getUsername()).update({
                                             editing: nodename[index],
                                         });
@@ -960,7 +964,7 @@ function register() {
             muted: true,
             active: true,
             admin: 0,
-            xss: true,
+            xss: false,
             money: 0,
             autoclicker: 0,
             mult: 1,
