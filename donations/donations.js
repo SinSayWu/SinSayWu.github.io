@@ -316,7 +316,7 @@ function minusMoney() {
                 db.ref(`users/${moneyselector.value}/money`).set(
                     money - Math.abs(Math.round(moneyinput.value))
                 )
-                if (price >= 1000) {
+                if (Math.abs(Math.round(moneyinput.value)) >= 5000) {
                     sendNotification(`${attacker.display_name} has just removed $${Math.abs(Math.round(moneyinput.value))} from ${victim.display_name}!`);
                 }
             }
@@ -389,7 +389,7 @@ function giftMoney() {
                 db.ref(`users/${moneyselector.value}/money`).set(
                     money + price,
                 )
-                if (price >= 1000) {
+                if (price >= 5000) {
                     sendNotification(`${attacker.display_name} has just gifted $${price} to ${victim.display_name}!`);
                 }
             }
@@ -430,10 +430,25 @@ window.onload = function() {
         document.body.innerHTML = `<h1>Please Log in through Pebble because im too lazy to add the feature here</h1><button onclick="window.location.replace('../pebble/pebble.html?ignore=true')">Pebble</button>`;
         return;
     }
+
     db.ref(`users/${getUsername()}`).once('value', function(object) {
         if (!object.exists() || object.val().password !== getPassword() || (object.val().muted || false) || (object.val().trapped || false) || Date.now() - (object.val().sleep || 0) < 0) {
             document.body.innerHTML = `<h1>Unknown error occurred. Either you are removed, muted, trapped, timed out, etc</h1><button onclick="window.location.replace('../pebble/pebble.html?ignore=true')">Pebble</button>`;
             return;
+        }
+    })
+
+    db.ref(`other/campaign`).on("value", function(object) {
+        if (!object.val()) {
+            db.ref(`users`).orderByChild("money").limitToLast(1).once("value", function(user_object) {
+                user_object.forEach(snapshot => {
+                    topUser = snapshot.val();
+                });
+
+                document.body.innerHTML = `<h1>This week's donation campaign has ended with the winner being ${topUser.display_name} at $${topUser.money}, please participate again in next week's campaign as well</h1><button onclick="window.location.replace('../pebble/pebble.html?ignore=true')">Pebble</button>`;
+                loadAutoclicker = function() {};
+                return;
+            })
         }
     })
 

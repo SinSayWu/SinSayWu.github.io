@@ -132,11 +132,14 @@ function refreshChat() {
                                     if (obj && "editing" in obj && obj.editing == nodename[index]) {
                                         editButton.innerHTML = "✏️";
                                         db.ref("users/" + getUsername() + "/editing").remove()
+                                        textBox.value = "";
+                                        textBox.focus();
                                     } else {
                                         editButton.innerHTML = "🗙";
                                         db.ref(`chats/${nodename[index]}/message`).once("value", function(edit_message) {
                                             textBox.value = edit_message.val();
                                         })
+                                        textBox.focus();
                                         db.ref("users/" + getUsername()).update({
                                             editing: nodename[index],
                                         });
