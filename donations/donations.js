@@ -132,7 +132,7 @@ function sendNotification(message) {
 
 function autoclickerCheck() {
     db.ref(`users/${getUsername()}`).once("value", function(object) {
-        if (localStorage.getItem("autoclicker") != "active" && Number.isInteger(object.val().money)) {
+        if (!object.val().autoactive && Number.isInteger(object.val().money)) {
             loadAutoclicker();
         }
     })
@@ -142,8 +142,8 @@ function loadAutoclicker() {
     db.ref("users/" + getUsername()).once("value", (object) => {
         obj = object.val();
         addAmount(true);
-        localStorage.setItem("autoclicker", "active");
         setTimeout(loadAutoclicker, 1000);
+        db.ref(`users/${getUsername()}/autoactive`).update(true)
     })
 }
 
@@ -418,6 +418,35 @@ function showInstructions() {
     );
 }
 
+function checkAutoclickerActive() {
+    db.ref(".info/connected").on("value", (snapshot) => {
+        db.ref(`users/${getUsername()}`).once("value", function(object) {
+            if (snapshot.val()) {
+                var time = Date.now() - object.val().autosleep
+                days = Math.floor(time / 86400000)
+                hours = Math.floor((time - days * 86400000) / 3600000)
+                minutes = Math.floor((time - days * 86400000 - hours * 3600000) / 60000)
+                seconds = Math.floor((time - days * 86400000 - hours * 3600000 - minutes * 60000) / 1000)
+                money = Math.floor(time / 1000) * (object.val().autoclicker * object.val().mult)
+                if (time > 3600000 && object.val().autoclicker > 0) { // one hour
+                    showPopUp(
+                        "Welcome Back!",
+                        `While you were away for ${days} days, ${hours} hours, ${minutes} minutes, and ${seconds} seconds, you gained $${money}`
+                    )
+                    db.ref(`users/${getUsername()}`).update({
+                        money: firebase.database.ServerValue.increment(money),
+                        autosleep: Date.now(),
+                    })
+                }
+                db.ref("users/" + getUsername()).onDisconnect().update({
+                    autoactive: false,
+                    autosleep: Date.now(),
+                })
+            }
+        })
+    })
+}
+
 window.onload = function() {
     const music = document.getElementById("bg-music");
     const playlist = ["../images/secret_files/irisu_01.mp3", "../images/secret_files/irisu_02.mp3", "../images/secret_files/irisu_03.mp3", "../images/secret_files/irisu_04.mp3", "../images/secret_files/irisu_05.mp3", "../images/secret_files/irisu_06.mp3", ]
@@ -608,17 +637,14 @@ window.onload = function() {
 
     loadNotifications();
     loadLeaderboard();
+    checkAutoclickerActive();
     setTimeout(autoclickerCheck, 2000);
     loadMain();
     loadSelectors();
 
-    db.ref(`users/${getUsername()}/money`).once("value", (amount) => {
-        if (amount.val() <= 500) {
+    db.ref(`users/${getUsername()}`).once("value", (amount) => {
+        if (amount.val().money <= 500 && amount.val().autoclicker == 0) {
             showInstructions();
         }
     })
 }
-
-window.addEventListener('beforeunload', function(event) {
-    localStorage.removeItem("autoclicker");
-});
