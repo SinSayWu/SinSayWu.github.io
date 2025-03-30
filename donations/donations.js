@@ -143,7 +143,9 @@ function loadAutoclicker() {
         obj = object.val();
         addAmount(true);
         setTimeout(loadAutoclicker, 1000);
-        db.ref(`users/${getUsername()}/autoactive`).update(true)
+        db.ref(`users/${getUsername()}`).update({
+            autoactive: true
+        })
     })
 }
 
