@@ -329,3 +329,6 @@ input::placeholder {
 }
 
 
+.sell {
+    all: revert;
+}

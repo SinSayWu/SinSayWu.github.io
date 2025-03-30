@@ -45,18 +45,26 @@
 
             <div class="buy-text upgrade-text">Upgrades</div>
             <div class="buy-stuff upgrade-buy">
-                <div class="buy-item upgrade" onclick="buyAuto()">
+                <div class="buy-item upgrade" id="autobuy">
                     <div class="buy-main">
                         <span id="autoclicker">Buy 1 AutoClicker</span> - $<span id="autoCost"></span>
                     </div>
                     <div class="buy-description" id="autoDescription">
                     </div>
                 </div>
-                <div class="buy-item upgrade" onclick="buyMult()">
+                <div class="buy-item upgrade" id="multbuy">
                     <div class="buy-main">
                         <span id="mult">Buy 1 Mult</span> - $<span id="multCost"></span>
                     </div>
                     <div class="buy-description" id="multDescription">
+                    </div>
+                </div>
+                <div class="buy-item upgrade" onclick="Gambling()">
+                    <div class="buy-main">
+                        <span id="gambling-text">Unlock Gambling - $100,000</span>
+                    </div>
+                    <div class="buy-description">
+                        "Let's go gambling!"
                     </div>
                 </div>
             </div>

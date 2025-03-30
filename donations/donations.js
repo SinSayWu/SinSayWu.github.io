@@ -164,7 +164,7 @@ function loadMain() {
 
         // number of current auto clickers
         var autonum = document.getElementById("autoDescription");
-        autonum.innerHTML = `Current auto-clickers: ${obj.autoclicker || 0}<br><hr>"It just plays itself!"<br>(NOTE: Refresh your page if your auto-clickers are not auto-clicking)`;
+        autonum.innerHTML = `Current auto-clickers: ${obj.autoclicker || 0}<br><hr>"It just plays itself!"<br>(NOTE: Refresh your page if your auto-clickers are not auto-clicking)<br><button class="sell" id="auto-sell" onclick="autoSell()">Sell</button>`;
 
         // mult prices
         var multcost = document.getElementById("multCost");
@@ -172,7 +172,12 @@ function loadMain() {
 
         // number of current mults
         var multnum = document.getElementById("multDescription");
-        multnum.innerHTML = `Current mult: ${obj.mult || 1}<br><hr>"Yo Dawg, we heard you like to click, so we put more clicks in your click so you can click more while you click"`;
+        multnum.innerHTML = `Current mult: ${obj.mult || 1}<br><hr>"Yo Dawg, we heard you like to click, so we put more clicks in your click so you can click more while you click"<br><button class="sell" id="mult-sell" onclick="multSell()">Sell</button>`;
+
+        // check if gambling has been bought
+        if (obj.gambling) {
+            document.getElementById('gambling-text').innerHTML = "Gambling";
+        }
     })
 }
 
@@ -237,6 +242,18 @@ function buyAuto() {
     })
 }
 
+function sellAuto() {
+    db.ref(`users/${getUsername()}`).transaction((obj) => {
+        var price = Math.round((100 * 1.2 ** (obj.autoclicker - 1 || 0)) * 0.9);
+
+        if (obj.autoclicker > 0) {
+            obj.money += price
+            obj.autoclicker = obj.autoclicker - 1;
+        }
+        return obj;
+    })
+}
+
 function buyMult() {
     db.ref(`users/${getUsername()}`).transaction((obj) => {
         var price = Math.round(250 * 1.4 ** (obj.mult - 1 || 0));
@@ -247,6 +264,52 @@ function buyMult() {
         }
         return obj;
     })
+}
+
+function sellMult() {
+    db.ref(`users/${getUsername()}`).transaction((obj) => {
+        var price = Math.round((250 * 1.4 ** (obj.mult - 2 || 0)) * 0.9);
+
+        if (obj.mult > 1) {
+            obj.money += price
+            obj.mult = obj.mult - 1;
+        }
+        return obj;
+    })
+}
+
+function Gambling() {
+    db.ref(`users/${getUsername()}`).once("value", function(object) {
+        if (object.val().gambling) {
+            showPopUp(`Welcome to the Gambling Space! $<span id="gambling-money">${object.val().money}</span>`,`Double or Nothing<hr>$<input type="text" id="double">`, [["gamble", () => DoubleNothing()]]);
+        } else if (object.val().money >= 100000) {
+            db.ref(`users/${getUsername()}`).update({
+                money: firebase.database.ServerValue.increment(-100000),
+                gambling: true,
+            })
+        }
+    })
+}
+
+function DoubleNothing() {
+    var moneyinput = document.getElementById("double").value;
+
+    if (/^[0-9]+$/.test(moneyinput)) {
+        moneyinput = Math.round(Math.abs(Number(moneyinput)))
+        db.ref(`users/${getUsername()}`).once("value", function(object) {
+            if (moneyinput <= object.val().money) {
+                if (Math.random() < 0.5) {
+                    db.ref(`users/${getUsername()}`).update({
+                        money: firebase.database.ServerValue.increment(moneyinput),
+                    })
+                } else {
+                    db.ref(`users/${getUsername()}`).update({
+                        money: firebase.database.ServerValue.increment(-moneyinput),
+                    })
+                }
+            }
+        })
+    }
 }
 
 function minusAuto() {
@@ -447,50 +510,7 @@ function checkAutoclickerActive() {
     })
 }
 
-window.onload = function() {
-    const music = document.getElementById("bg-music");
-    const playlist = ["../images/secret_files/irisu_01.mp3", "../images/secret_files/irisu_02.mp3", "../images/secret_files/irisu_03.mp3", "../images/secret_files/irisu_04.mp3", "../images/secret_files/irisu_05.mp3", "../images/secret_files/irisu_06.mp3", ]
-    music.addEventListener("ended", function () {
-        music.src = playlist[Math.floor(Math.random() * playlist.length)];
-        music.play();
-    });
-
-    if (getUsername() == null) {
-        document.body.innerHTML = `<h1>Please Log in through Pebble because im too lazy to add the feature here</h1><button onclick="window.location.replace('../pebble/pebble.html?ignore=true')">Pebble</button>`;
-        return;
-    }
-
-    db.ref(`users/${getUsername()}`).once('value', function(object) {
-        if (!object.exists() || object.val().password !== getPassword() || (object.val().muted || false) || (object.val().trapped || false) || Date.now() - (object.val().sleep || 0) < 0) {
-            document.body.innerHTML = `<h1>Unknown error occurred. Either you are removed, muted, trapped, timed out, etc</h1><button onclick="window.location.replace('../pebble/pebble.html?ignore=true')">Pebble</button>`;
-            return;
-        }
-    })
-
-    db.ref(`other/campaign`).on("value", function(object) {
-        if (!object.val()) {
-            db.ref(`users`).orderByChild("money").limitToLast(1).once("value", function(user_object) {
-                user_object.forEach(snapshot => {
-                    topUser = snapshot.val();
-                });
-
-                document.body.innerHTML = `<h1>This week's donation campaign has ended with the winner being ${topUser.display_name} at $${topUser.money}, please participate again in next week's campaign as well</h1><button onclick="window.location.replace('../pebble/pebble.html?ignore=true')">Pebble</button>`;
-                loadAutoclicker = function() {};
-                return;
-            })
-        }
-    })
-
-    db.ref(`users/${getUsername()}/admin`).once("value", function(object) {
-        if (object.val() > 0) {
-            document.getElementById("clear").style.display = "block";
-        }
-    })
-
-    db.ref(`users/${getUsername()}/money`).on("value", (amount) => {
-        document.getElementById('money').innerHTML = (amount.val() || 0);
-    })
-
+function selectorListeners() {
     const autoselector = document.getElementById("autoselect");
 
     autoselector.addEventListener("change", function(event) {
@@ -586,6 +606,24 @@ window.onload = function() {
             previousmoneyValue = object.target.value;
         });
     })
+}
+
+function clickExclusion() {
+    document.getElementById('autobuy').addEventListener('click', function(event) {
+        if (event.target.id == "auto-sell") {
+            sellAuto();
+        } else {
+            buyAuto();
+        }
+    })
+
+    document.getElementById('multbuy').addEventListener('click', function(event) {
+        if (event.target.id == "mult-sell") {
+            sellMult();
+        } else {
+            buyMult();
+        }
+    })
 
     document.getElementById('autominus').addEventListener('click', function(event) {
         if (event.target.closest("select")) {
@@ -634,7 +672,55 @@ window.onload = function() {
             giftMoney();
         }
     })
+}
 
+window.onload = function() {
+    const music = document.getElementById("bg-music");
+    const playlist = ["../images/secret_files/irisu_01.mp3", "../images/secret_files/irisu_02.mp3", "../images/secret_files/irisu_03.mp3", "../images/secret_files/irisu_04.mp3", "../images/secret_files/irisu_05.mp3", "../images/secret_files/irisu_06.mp3", ]
+    music.addEventListener("ended", function () {
+        music.src = playlist[Math.floor(Math.random() * playlist.length)];
+        music.play();
+    });
+
+    if (getUsername() == null) {
+        document.body.innerHTML = `<h1>Please Log in through Pebble because im too lazy to add the feature here</h1><button onclick="window.location.replace('../pebble/pebble.html?ignore=true')">Pebble</button>`;
+        return;
+    }
+
+    db.ref(`users/${getUsername()}`).once('value', function(object) {
+        if (!object.exists() || object.val().password !== getPassword() || (object.val().muted || false) || (object.val().trapped || false) || Date.now() - (object.val().sleep || 0) < 0) {
+            document.body.innerHTML = `<h1>Unknown error occurred. Either you are removed, muted, trapped, timed out, etc</h1><button onclick="window.location.replace('../pebble/pebble.html?ignore=true')">Pebble</button>`;
+            return;
+        }
+    })
+
+    db.ref(`other/campaign`).on("value", function(object) {
+        if (!object.val()) {
+            db.ref(`users`).orderByChild("money").limitToLast(1).once("value", function(user_object) {
+                user_object.forEach(snapshot => {
+                    topUser = snapshot.val();
+                });
+
+                document.body.innerHTML = `<h1>This week's donation campaign has ended with the winner being ${topUser.display_name} at $${topUser.money}, please participate again in next week's campaign as well</h1><button onclick="window.location.replace('../pebble/pebble.html?ignore=true')">Pebble</button>`;
+                loadAutoclicker = function() {};
+                return;
+            })
+        }
+    })
+
+    db.ref(`users/${getUsername()}/admin`).once("value", function(object) {
+        if (object.val() > 0) {
+            document.getElementById("clear").style.display = "block";
+        }
+    })
+
+    db.ref(`users/${getUsername()}/money`).on("value", (amount) => {
+        document.getElementById('money').innerHTML = (amount.val() || 0);
+        document.getElementById('gambling-money').innerHTML = (amount.val() || 0)
+    })
+
+    selectorListeners();
+    clickExclusion();
     loadNotifications();
     loadLeaderboard();
     checkAutoclickerActive();
