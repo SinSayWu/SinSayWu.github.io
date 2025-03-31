@@ -1,4 +1,5 @@
 var playing = false;
+var golden_cookie = false;
 
 function play() {
     const music = document.getElementById("bg-music");
@@ -20,6 +21,9 @@ function addAmount(autoclicker) {
     db.ref(`users/${getUsername()}`).once("value", function(snapshot) {
         let data = snapshot.val() || {};
         let amount = (data.mult || 1) * (autoclicker === undefined ? 1 : (data.autoclicker || 0));
+        if (golden_cookie) {
+            amount = amount * 2
+        }
 
         if (data.money !== undefined && data.money !== null) {
             db.ref(`users/${getUsername()}`).update({
@@ -76,7 +80,7 @@ function loadLeaderboard() {
             
             var contentElement = document.createElement("div");
             contentElement.setAttribute("class", "leader-content");
-            contentElement.innerHTML = "Auto-Clickers: " + (username.autoclicker || 0) + "<br>Mult: " + (username.mult || 1);
+            contentElement.innerHTML = "Auto-Clickers: " + (username.autoclicker || 0) + "<br>Mult: " + (username.mult || 1) + (username.gambling ? `<br>Gambling: Unlocked` : "");
 
             leader.appendChild(usernameElement);
             leader.appendChild(contentElement);
@@ -141,6 +145,27 @@ function autoclickerCheck() {
 function loadAutoclicker() {
     db.ref("users/" + getUsername()).once("value", (object) => {
         obj = object.val();
+        if (Math.min((0.004 * Math.log((obj.deeds * 10000) / obj.money) / Math.log(Math.E)), 0.005) >= Math.random() && !golden_cookie) {
+            let overlay = document.createElement("div");
+            overlay.setAttribute("id", "overlay");
+
+            overlay.style.position = "fixed";
+            overlay.style.top = "0";
+            overlay.style.left = "0";
+            overlay.style.width = "100vw";
+            overlay.style.height = "100vh";
+            overlay.style.backgroundColor = "rgba(255, 255, 0, 0.1)";
+            overlay.style.zIndex = "9999";
+            overlay.style.pointerEvents = "none";
+
+            document.body.appendChild(overlay);
+
+            golden_cookie = true;
+            setTimeout(() => {
+                golden_cookie = false;
+                document.getElementById("overlay").remove();
+            }, 60000)
+        }
         addAmount(true);
         setTimeout(loadAutoclicker, 1000);
         db.ref(`users/${getUsername()}`).update({
@@ -328,6 +353,7 @@ function minusAuto() {
             if (attacker.money >= price && autoclicker != 0 && attacker.username != victim.username) {
                 db.ref(`users/${getUsername()}`).update({
                     money: attacker.money - price,
+                    deeds: (attacker.deeds || 0) - Math.round(price * 0.001),
                 })
                 db.ref(`users/${autoselector.value}`).update({
                     autoclicker: victim.autoclicker - 1,
@@ -352,6 +378,7 @@ function minusMult() {
             if (attacker.money >= price && mult != 1 && attacker.username != victim.username) {
                 db.ref(`users/${getUsername()}`).update({
                     money: attacker.money - price,
+                    deeds: (attacker.deeds || 0) - Math.round(price * 0.001),
                 })
                 db.ref(`users/${multselector.value}`).update({
                     mult: victim.mult - 1,
@@ -377,6 +404,7 @@ function minusMoney() {
             if (attacker.money >= price && attacker.username != victim.username && moneyselector.value) {
                 db.ref(`users/${getUsername()}`).update({
                     money: attacker.money - price,
+                    deeds: (attacker.deeds || 0) - Math.round(moneyinput.value * 0.001),
                 })
                 db.ref(`users/${moneyselector.value}/money`).set(
                     money - Math.abs(Math.round(moneyinput.value))
@@ -400,9 +428,10 @@ function giftAuto() {
             var price = Math.round(100 * 1.2 ** (victim.autoclicker || 0));
 
             if (attacker.money >= price && attacker.username != victim.username && autoselector.value) {
-                db.ref(`users/${getUsername()}/money`).set(
-                    attacker.money - price
-                )
+                db.ref(`users/${getUsername()}`).update({
+                    money: attacker.money - price,
+                    deeds: (attacker.deeds || 0) + Math.round(price * 0.001),
+                })
                 db.ref(`users/${autoselector.value}/autoclicker`).set(
                     (victim.autoclicker || 0) + 1,
                 )
@@ -423,9 +452,10 @@ function giftMult() {
             var price = Math.round(250 * 1.4 ** (victim.mult - 1 || 0));
 
             if (attacker.money >= price && attacker.username != victim.username && multselector.value) {
-                db.ref(`users/${getUsername()}/money`).set(
-                    attacker.money - price
-                )
+                db.ref(`users/${getUsername()}`).update({
+                    money: attacker.money - price,
+                    deeds: (attacker.deeds || 0) + Math.round(price * 0.001),
+                })
                 db.ref(`users/${multselector.value}/mult`).set(
                     (victim.mult || 1) + 1
                 )
@@ -450,6 +480,7 @@ function giftMoney() {
             if (attacker.money >= price && attacker.username != victim.username && moneyselector.value) {
                 db.ref(`users/${getUsername()}`).update({
                     money: attacker.money - price,
+                    deeds: (attacker.deeds || 0) + Math.round(price * 0.001),
                 })
                 db.ref(`users/${moneyselector.value}/money`).set(
                     money + price,
@@ -466,17 +497,14 @@ function showInstructions() {
     showPopUp(
         "Welcome to PvP Donations!",
         `
-            <h2>This is the slightly reformatted Donations page!</h2>
-            New Feature: Whoever is ranked first by 3:30 PM EST every Friday will get a free Admin Level!
-            <br/><br/>
-            <h2>How this works:</h2>
+            <h2><b>NEW FEATURES</b></h2>
             <ul>
-            <li>AutoClicker: Will automatically click the button every second when you are online.</li>
-            <li>Multiplier: Increases the amount of money you get per button click</li>
-            <li>Sabotage or Coordination: How will you play this game? Will you make friends? or ENEMIES?</li>
-            <li>Music: Listen to Riku's custom playlist while playing!</li>
-            <li>JESUS and GOD are not eligible to win the free Admin Level at 3:30 PM EST Friday</li>
+            <li>Offline Autoclickers: your autoclickers will now "run" even when you're not on this page</li>
+            <li>Selling: You can now sell your mult and autoclickers but they will be at 90% of the price that you bought them at!</li>
+            <li>Gambling: Self-explanatory, this is the endgame. New gambling games will be added mid-campaign.</li>
+            <li>Frenzy: Every second, there is a small chance for you to be able to double all money output (except gambling) by 2x for 60 seconds. You can increase the chances of this happening, but I won't say what affects it!</li>
             </ul>
+            <h3>Also congratulations to last week's winner, DinoShark who won with around $250,000,000! Now that there are offline autoclickers, I hope everything will be more fair to those that don't have much free-time</h3>
             <h2>Warning: Do not try to HACK</h2>
             It ruins the game for everyone
         `,
@@ -492,7 +520,7 @@ function checkAutoclickerActive() {
                 hours = Math.floor((time - days * 86400000) / 3600000)
                 minutes = Math.floor((time - days * 86400000 - hours * 3600000) / 60000)
                 seconds = Math.floor((time - days * 86400000 - hours * 3600000 - minutes * 60000) / 1000)
-                money = Math.floor(time / 1000) * (object.val().autoclicker * object.val().mult)
+                money = Math.floor(time / 1000) * (object.val().autoclicker * (object.val().mult || 1))
                 if (time > 3600000 && object.val().autoclicker > 0) { // one hour
                     showPopUp(
                         "Welcome Back!",
@@ -718,7 +746,9 @@ window.onload = function() {
 
     db.ref(`users/${getUsername()}/money`).on("value", (amount) => {
         document.getElementById('money').innerHTML = (amount.val() || 0);
-        document.getElementById('gambling-money').innerHTML = (amount.val() || 0)
+        if (document.getElementById('gambling-money')) {
+            document.getElementById('gambling-money').innerHTML = (amount.val() || 0)
+        }
     })
 
     selectorListeners();
@@ -731,7 +761,7 @@ window.onload = function() {
     loadSelectors();
 
     db.ref(`users/${getUsername()}`).once("value", (amount) => {
-        if (amount.val().money <= 500 && amount.val().autoclicker == 0) {
+        if ((amount.val().money || 0) <= 500 && (amount.val().autoclicker || 0) == 0) {
             showInstructions();
         }
     })
