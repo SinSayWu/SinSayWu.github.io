@@ -69,14 +69,14 @@
                     <b>Pebble</b>
                 </div>
                 <div class="channels" id="channels">
-                    <div class="category">
-                        <a class="category-button"><b>Admin Channel</b></a>
+                    <div class="category" onclick="changeChannel(`admin`)">
+                        <a class="category-button"><b># Admin Channel</b></a>
                     </div>
-                    <div class="channel">
-                        <a class="channel-button"><b>#</b> Test 1</a>
+                    <div class="channel" onclick="changeChannel(`general`)">
+                        <a class="channel-button"><b>#</b> general</a>
                     </div>
-                    <div class="channel">
-                        <a class="channel-button"><b>#</b> Test 2</a>
+                    <div class="channel" onclick="changeChannel(`extra`)">
+                        <a class="channel-button"><b>#</b> quiet time</a>
                     </div>
                 </div>
                 <div class="permaAnnouncements" id="permaAnnouncements">

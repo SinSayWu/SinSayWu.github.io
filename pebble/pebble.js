@@ -40,7 +40,7 @@ function refreshChat() {
         db.ref("users/" + getUsername()).once('value', function(user_object) {
             var obj = user_object.val();
             messages.forEach(function(data, index) {
-                if (data.whisper == null || data.whisper == getUsername() || data.name == getUsername() || obj.admin > 0) {
+                if ((data.whisper == null || data.whisper == getUsername() || data.name == getUsername() || obj.admin > 0) && data.channel == (localStorage.getItem("channel") || "general")) {
                     if (everyoneRevealed) {
                         var username = data.real_name || "[SERVER]";
                     } else {
@@ -214,7 +214,6 @@ function refreshChat() {
             }
         };
     });
-    db.ref("users/null").remove();
 }
 
 function displayMembers() {
@@ -327,6 +326,7 @@ function sendServerMessage(message) {
             message: message,
             display_name: "[SERVER]",
             admin: 9998,
+            channel: (localStorage.getItem("channel") || "general"),
             removed: false,
             edited: false,
             time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
@@ -711,6 +711,7 @@ function sendMessage() {
                             real_name: obj.name,
                             admin: obj.admin,
                             removed: false,
+                            channel: (localStorage.getItem("channel") || "general"),
                             edited: false,
                             time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
                         }).then(function() {
@@ -826,6 +827,7 @@ function sendMessage() {
                         message: `<span style="display:none">@everyone</span><h2 class="voteheader">${title}</h2> <div class="votecontent">${votemessage.join("<br/>")}</div>`,
                         display_name: "VOTING",
                         admin: 9998,
+                        channel: (localStorage.getItem("channel") || "general"),
                         removed: false,
                         edited: false,
                         time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
@@ -871,6 +873,7 @@ function sendMessage() {
                         real_name: obj.name,
                         admin: obj.admin,
                         removed: false,
+                        channel: (localStorage.getItem("channel") || "general"),
                         edited: false,
                         time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
                     }).then(function() {
@@ -1029,6 +1032,171 @@ function back() {
 
 function globalUpdate() {
     checkMute();
+}
+
+function changeChannel(channel) {
+    db.ref(`users/${getUsername()}`).once("value", function(user_object) {
+        if (channel == "admin" && user_object.val().admin == 0) {
+            alert("You are not an admin")
+        } else if (localStorage.getItem("channel") != channel) {
+            localStorage.setItem("channel", channel);
+            db.ref('chats/').once('value', function(messages_object) {
+                var textarea = document.getElementById('textarea');
+                // When we get the data clear chat_content_container
+                textarea.innerHTML = '';
+                // if there are no messages in the chat. Return . Don't load anything
+                if(messages_object.numChildren() == 0){
+                    return
+                }
+        
+                var messages = [];
+                var nodename = []; // there's probably a better way to do this
+        
+                messages_object.forEach((messages_child) => {
+                    messages.push(messages_child.val())
+                    nodename.push(messages_child.key)
+                });
+                var obj = user_object.val();
+                messages.forEach(function(data, index) {
+                    if ((data.whisper == null || data.whisper == getUsername() || data.name == getUsername() || obj.admin > 0) && data.channel == (localStorage.getItem("channel") || "general")) {
+                        if (everyoneRevealed) {
+                            var username = data.real_name || "[SERVER]";
+                        } else {
+                            var username = data.display_name;
+                        }
+    
+                        // TODO: FIX THIS TO DO SOMETHING IDK WHAT
+                        if (data.removed) {
+                            var message = data.message;
+                        } else {
+                            var message = data.message;
+                        }
+                        
+                        let prevIndex = index - 1;
+                        let prevItem = prevIndex >= 0 ? messages[prevIndex] : null;
+                        
+                        var messageElement = document.createElement("div");
+                        messageElement.setAttribute("class", "message");
+    
+                        if (data.name == "[SERVER]") {
+                            var messageImg = document.createElement("img");
+                            messageImg.src = "../images/meteorite.png";
+                            messageImg.setAttribute("class", "profile-img");
+                            messageElement.appendChild(messageImg);
+                        }
+    
+                        var timeElement = document.createElement("div");
+                        timeElement.setAttribute("id", "time");
+                        timeElement.innerHTML = data.time;
+                        messageElement.appendChild(timeElement);
+    
+                        if (data.name == "[SERVER]") {
+                            var userElement = document.createElement("div");
+                            userElement.setAttribute("class", "username");
+                            userElement.addEventListener("click", function(e) {
+                                userElement.innerHTML = username + " @(" + data.name + ")" ;
+                            })
+                            userElement.innerHTML = username;
+                            userElement.style.fontWeight = "bold";
+                            userElement.style.color = "Yellow";
+                            messageElement.appendChild(userElement);
+                        } else if (prevItem == null || prevItem.name != data.name || data.edited) {
+                            var userElement = document.createElement("div");
+                            userElement.setAttribute("class", "username");
+                            userElement.addEventListener("click", function(e) {
+                                userElement.innerHTML = username + " @(" + data.name + ")" ;
+                            })
+                            userElement.innerHTML = username;
+                            if (data.edited) {
+                                userElement.innerHTML += " <span style='color: gray; font-size: 60%'>(Edited)</span>";
+                            }
+                            userElement.style.fontWeight = "bold";
+                            timeElement.style.marginTop = "25px";
+                            messageElement.appendChild(userElement);
+                        }
+    
+    
+    
+                        messageElement.addEventListener("mouseover", function(e) {
+                            messageContent.style.backgroundColor = "gray";
+                            if ((data.name == getUsername() || data.admin < obj.admin) && !messageElement.querySelector("#delete-button")) {
+                                setTimeout(() => {
+                                    var trashButton = document.createElement("button");
+                                    timeElement.style.visibility = "hidden";
+                                    trashButton.innerHTML = "🗑️️";
+                                    trashButton.setAttribute("id", "delete-button");
+                                    trashButton.addEventListener("click", function() {
+                                        db.ref("chats/" + nodename[index]).update({
+                                            removed: true,
+                                            message: `<i><b>REMOVED BY ${getDisplayName()}</b></i><span style="display: none">@${getUsername()} @${data.name}</span>`,
+                                        });
+                                    })
+                                    messageElement.appendChild(trashButton);
+                                }, 100);
+                            }
+                            if (data.name == getUsername() && !messageElement.querySelector("#edit-button")) {
+                                db.ref("users/" + getUsername()).once('value', function(user_object) {
+                                    var obj = user_object.val();
+                                    var editButton = document.createElement("button");
+                                    var textBox = document.getElementById("text-box");
+                                    editButton.setAttribute("id", "edit-button");
+                                    timeElement.style.visibility = "hidden";
+                                    if (obj && "editing" in obj && obj.editing == nodename[index]) {
+                                        editButton.innerHTML = "🗙";
+                                    } else {
+                                        editButton.innerHTML = "✏️";
+                                    }
+                                    editButton.addEventListener("click", function() {
+                                        if (obj && "editing" in obj && obj.editing == nodename[index]) {
+                                            editButton.innerHTML = "✏️";
+                                            db.ref("users/" + getUsername() + "/editing").remove()
+                                            textBox.value = "";
+                                            textBox.focus();
+                                        } else {
+                                            editButton.innerHTML = "🗙";
+                                            db.ref(`chats/${nodename[index]}/message`).once("value", function(edit_message) {
+                                                textBox.value = edit_message.val();
+                                            })
+                                            textBox.focus();
+                                            db.ref("users/" + getUsername()).update({
+                                                editing: nodename[index],
+                                            });
+                                        }
+                                    });
+    
+                                    messageElement.appendChild(editButton);
+                                })
+                            }
+                        })
+                        messageElement.addEventListener("mouseleave", function(e) {
+                            messageContent.style.backgroundColor = "";
+                            timeElement.style.visibility = "visible";
+    
+                            setTimeout(() => {
+                                var buttons = messageElement.querySelectorAll("#delete-button, #edit-button");
+                                buttons.forEach(function(button) {
+                                    button.remove();
+                                })
+                                timeElement.style.visibility = "visible";
+                            }, 100)
+                        })
+                        
+    
+                        var messageContent = document.createElement("div");
+                        messageContent.setAttribute("class", "message-text");
+                        messageContent.innerHTML = message;
+                        if (message.includes("@" + getUsername()) || message.includes("@everyone")) {
+                            messageContent.setAttribute("id", "ping-text");
+                        }
+                        messageElement.appendChild(messageContent);
+    
+                        textarea.appendChild(messageElement);
+                    }
+                });
+            });
+        }
+    })
+    textarea.scrollTop = textarea.scrollHeight;
 }
 
 function setup() {

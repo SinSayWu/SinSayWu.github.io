@@ -326,10 +326,16 @@ function DoubleNothing() {
         db.ref(`users/${getUsername()}`).once("value", function(object) {
             if (moneyinput <= object.val().money) {
                 if (Math.random() < 0.5) {
+                    if (moneyinput >= 1000000) {
+                        sendNotification(`${object.val().display_name} just won $${moneyinput} in Double-or-Nothing!`)
+                    }
                     db.ref(`users/${getUsername()}`).update({
                         money: firebase.database.ServerValue.increment(moneyinput),
                     })
                 } else {
+                    if (moneyinput >= 1000000) {
+                        sendNotification(`${object.val().display_name} just lose $${moneyinput} in Double-or-Nothing!`)
+                    }
                     db.ref(`users/${getUsername()}`).update({
                         money: firebase.database.ServerValue.increment(-moneyinput),
                     })

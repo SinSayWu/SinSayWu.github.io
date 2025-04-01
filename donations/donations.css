@@ -1,6 +1,7 @@
 body {
     display: flex;
     flex-direction: row;
+    background-color: #dfdfdf;
 }
 
 /* Base styles for both select and input */
@@ -77,7 +78,7 @@ input::placeholder {
 }
 
 .main-container {
-    background-color: #35393f;
+    background-color: #ffffff;
     height: 98vh;
     flex: 1;
     border-top-left-radius: 15px;
@@ -99,6 +100,7 @@ input::placeholder {
     border-bottom: grey solid 1px;
     max-height: 100px;
     align-content: center;
+    color: black;
 }
 
 .main-container img[src="../images/money.png"] {
@@ -119,6 +121,7 @@ input::placeholder {
     font-weight: bold;
     width: 98%;
     max-height: 200px;
+    color: black;
 }
 
 .notification-text {
@@ -126,6 +129,7 @@ input::placeholder {
     margin: auto;
     width: 90%;
     font-size: 200%;
+    color: black;
 }
 
 #notifications {
@@ -163,14 +167,17 @@ input::placeholder {
 
 .upgrade-text {
     grid-column: 1 / 2;
+    color: black;
 }
 
 .attack-text {
     grid-column: 2 / 3;
+    color: black;
 }
 
 .ability-text {
     grid-column: 3 / 4;
+    color: black;
 }
 
 .buy-stuff {
@@ -230,6 +237,7 @@ input::placeholder {
     font-size: 300%;
     height: 100%;
     border-left: gray solid 1px;
+    color: black;
 }
 
 #leaderboard {
