@@ -510,7 +510,7 @@ function showInstructions() {
             <li>Gambling: Self-explanatory, this is the endgame. New gambling games will be added mid-campaign.</li>
             <li>Frenzy: Every second, there is a small chance for you to be able to double all money output (except gambling) by 2x for 60 seconds. You can increase the chances of this happening, but I won't say what affects it!</li>
             </ul>
-            <h3>Also congratulations to last week's winner, DinoShark who won with around $250,000,000! Now that there are offline autoclickers, I hope everything will be more fair to those that don't have much free-time</h3>
+            <h3>Also congratulations to last week's winner, DinoShark who won with around $350,000,000! Now that there are offline autoclickers, I hope everything will be more fair to those that don't have much free-time</h3>
             <h2>Warning: Do not try to HACK</h2>
             It ruins the game for everyone
         `,
