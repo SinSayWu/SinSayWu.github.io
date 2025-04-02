@@ -424,56 +424,58 @@ function blackStand() {
             sum += parseInt(num);
         })
 
-        if (hand <= 21 && hand > sum) {
-            document.getElementById('blackjack').disabled = false;
-            document.getElementById('blackjack').value = "";
-            document.getElementById("dealer").innerHTML += " Won";
-            document.getElementById("player").innerHTML += " Lost";
-            if (moneyinput > 1000000) {
-                sendNotification(`${getDisplayName()} just lost $${moneyinput} in Blackjack!`)
+        db.ref(`users/${getUsername()}`).once("value", function(object) {
+            if (hand <= 21 && hand > sum) {
+                document.getElementById('blackjack').disabled = false;
+                document.getElementById('blackjack').value = "";
+                document.getElementById("dealer").innerHTML += " Won";
+                document.getElementById("player").innerHTML += " Lost";
+                if (moneyinput > 1000000) {
+                    sendNotification(`${object.val().display_name} just lost $${moneyinput} in Blackjack!`)
+                }
+            } else if (sum > 21) {
+                document.getElementById('blackjack').disabled = false;
+                document.getElementById('blackjack').value = "";
+                document.getElementById("dealer").innerHTML += " Won";
+                document.getElementById("player").innerHTML += " Lost";
+                if (moneyinput > 1000000) {
+                    sendNotification(`${object.val().display_name} just lost $${moneyinput} in Blackjack!`)
+                }
+            } else if (hand == sum) {
+                document.getElementById('blackjack').disabled = false;
+                db.ref(`users/${getUsername()}`).update({
+                    money: firebase.database.ServerValue.increment(moneyinput),
+                })
+                document.getElementById('blackjack').value = "";
+                document.getElementById("dealer").innerHTML += " Tied";
+                document.getElementById("player").innerHTML += " Tied";
+                if (moneyinput > 1000000) {
+                    sendNotification(`${object.val().display_name} just tied with $${moneyinput} in Blackjack!`)
+                }
+            } else if (hand <= 21 && sum > hand) {
+                document.getElementById('blackjack').disabled = false;
+                db.ref(`users/${getUsername()}`).update({
+                    money: firebase.database.ServerValue.increment(moneyinput * 2),
+                })
+                document.getElementById('blackjack').value = "";
+                document.getElementById("dealer").innerHTML += " Lost";
+                document.getElementById("player").innerHTML += " Won";
+                if (moneyinput > 1000000) {
+                    sendNotification(`${object.val().display_name} just won $${moneyinput} in Blackjack!`)
+                }
+            } else if (hand > 21) {
+                document.getElementById('blackjack').disabled = false;
+                db.ref(`users/${getUsername()}`).update({
+                    money: firebase.database.ServerValue.increment(moneyinput * 2),
+                })
+                document.getElementById('blackjack').value = "";
+                document.getElementById("dealer").innerHTML += " Lost";
+                document.getElementById("player").innerHTML += " Won";
+                if (moneyinput > 1000000) {
+                    sendNotification(`${object.val().display_name} just won $${moneyinput} in Blackjack!`)
+                }
             }
-        } else if (sum > 21) {
-            document.getElementById('blackjack').disabled = false;
-            document.getElementById('blackjack').value = "";
-            document.getElementById("dealer").innerHTML += " Won";
-            document.getElementById("player").innerHTML += " Lost";
-            if (moneyinput > 1000000) {
-                sendNotification(`${getDisplayName()} just lost $${moneyinput} in Blackjack!`)
-            }
-        } else if (hand == sum) {
-            document.getElementById('blackjack').disabled = false;
-            db.ref(`users/${getUsername()}`).update({
-                money: firebase.database.ServerValue.increment(moneyinput),
-            })
-            document.getElementById('blackjack').value = "";
-            document.getElementById("dealer").innerHTML += " Tied";
-            document.getElementById("player").innerHTML += " Tied";
-            if (moneyinput > 1000000) {
-                sendNotification(`${getDisplayName()} just tied with $${moneyinput} in Blackjack!`)
-            }
-        } else if (hand <= 21 && sum > hand) {
-            document.getElementById('blackjack').disabled = false;
-            db.ref(`users/${getUsername()}`).update({
-                money: firebase.database.ServerValue.increment(moneyinput * 2),
-            })
-            document.getElementById('blackjack').value = "";
-            document.getElementById("dealer").innerHTML += " Lost";
-            document.getElementById("player").innerHTML += " Won";
-            if (moneyinput > 1000000) {
-                sendNotification(`${getDisplayName()} just won $${moneyinput} in Blackjack!`)
-            }
-        } else if (hand > 21) {
-            document.getElementById('blackjack').disabled = false;
-            db.ref(`users/${getUsername()}`).update({
-                money: firebase.database.ServerValue.increment(moneyinput * 2),
-            })
-            document.getElementById('blackjack').value = "";
-            document.getElementById("dealer").innerHTML += " Lost";
-            document.getElementById("player").innerHTML += " Won";
-            if (moneyinput > 1000000) {
-                sendNotification(`${getDisplayName()} just won $${moneyinput} in Blackjack!`)
-            }
-        }
+        })
     }
 }
 
