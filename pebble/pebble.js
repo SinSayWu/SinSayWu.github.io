@@ -2,6 +2,7 @@ var announceToggle = false;
 var brainRot = false;
 var notificationNumber = 0;
 var everyoneRevealed = false;
+var joined = true;
 
 function getUsername() {
     return localStorage.getItem("username");
@@ -32,15 +33,17 @@ function refreshChat() {
         var nodename = []; // there's probably a better way to do this
 
         messages_object.forEach((messages_child) => {
-            messages.push(messages_child.val())
-            nodename.push(messages_child.key)
+            if (messages_child.val().channel == (sessionStorage.getItem("channel") || "general") || messages_child.val().name == "[SERVER]") {
+                messages.push(messages_child.val())
+                nodename.push(messages_child.key)
+            }
         });
 
         // Now we're done. Simply display the ordered messages
         db.ref("users/" + getUsername()).once('value', function(user_object) {
             var obj = user_object.val();
             messages.forEach(function(data, index) {
-                if ((data.whisper == null || data.whisper == getUsername() || data.name == getUsername() || obj.admin > 0) && data.channel == (localStorage.getItem("channel") || "general")) {
+                if (data.whisper == null || data.whisper == getUsername() || data.name == getUsername() || obj.admin > 0) {
                     if (everyoneRevealed) {
                         var username = data.real_name || "[SERVER]";
                     } else {
@@ -192,27 +195,38 @@ function refreshChat() {
                     }
                 })
             })
+            // Notifications
+            var prevMessage = messages.at(-1)
+
+            if (document.visibilityState === "hidden") {
+                var announceNotification = localStorage.getItem("announceNotification") || true;
+                var mentionNotification = localStorage.getItem("mentionNotification") || true;
+                var messageNotification = localStorage.getItem("messageNotification") || false;
+
+                if (!(prevMessage.channel == "admin" && obj.admin == 0)) {
+                    if (prevMessage.display_name == "[SERVER]" && JSON.parse(announceNotification)) {
+                        notificationNumber += 1
+                    } else if ((prevMessage.message.includes("@" + getUsername()) || prevMessage.message.includes("@everyone")) && JSON.parse(mentionNotification)) {
+                        notificationNumber += 1
+                    } else if (JSON.parse(messageNotification)) {
+                        notificationNumber += 1
+                    }
+                    if (notificationNumber != 0) {
+                        document.title = "(" + notificationNumber + ") Pebble";
+                    }
+                }
+            } else if ((sessionStorage.getItem("channel") || "general") != Object.values(messages_object.val()).at(-1).channel && !(Object.values(messages_object.val()).at(-1).channel == "admin" && obj.admin == 0)) {
+                if (joined) {
+                    joined = false;
+                    return;
+                }
+
+                var notif = document.getElementById(`${Object.values(messages_object.val()).at(-1).channel}-notif`);
+
+                notif.innerHTML = `(${(parseInt(notif.innerHTML.substring(1,2)) || 0) + 1})`;
+            }
         })
         textarea.scrollTop = textarea.scrollHeight;
-
-        // Notifications
-        if (document.visibilityState === "hidden") {
-            var prevMessage = messages.at(-1)
-            var announceNotification = localStorage.getItem("announceNotification") || true;
-            var mentionNotification = localStorage.getItem("mentionNotification") || true;
-            var messageNotification = localStorage.getItem("messageNotification") || false;
-
-            if (prevMessage.display_name == "[SERVER]" && JSON.parse(announceNotification)) {
-                notificationNumber += 1
-            } else if ((prevMessage.message.includes("@" + getUsername()) || prevMessage.message.includes("@everyone")) && JSON.parse(mentionNotification)) {
-                notificationNumber += 1
-            } else if (JSON.parse(messageNotification)) {
-                notificationNumber += 1
-            }
-            if (notificationNumber != 0) {
-                document.title = "(" + notificationNumber + ") Pebble";
-            }
-        };
     });
 }
 
@@ -326,7 +340,7 @@ function sendServerMessage(message) {
             message: message,
             display_name: "[SERVER]",
             admin: 9998,
-            channel: (localStorage.getItem("channel") || "general"),
+            channel: (sessionStorage.getItem("channel") || "general"),
             removed: false,
             edited: false,
             time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
@@ -711,7 +725,7 @@ function sendMessage() {
                             real_name: obj.name,
                             admin: obj.admin,
                             removed: false,
-                            channel: (localStorage.getItem("channel") || "general"),
+                            channel: (sessionStorage.getItem("channel") || "general"),
                             edited: false,
                             time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
                         }).then(function() {
@@ -827,7 +841,7 @@ function sendMessage() {
                         message: `<span style="display:none">@everyone</span><h2 class="voteheader">${title}</h2> <div class="votecontent">${votemessage.join("<br/>")}</div>`,
                         display_name: "VOTING",
                         admin: 9998,
-                        channel: (localStorage.getItem("channel") || "general"),
+                        channel: (sessionStorage.getItem("channel") || "general"),
                         removed: false,
                         edited: false,
                         time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
@@ -873,7 +887,7 @@ function sendMessage() {
                         real_name: obj.name,
                         admin: obj.admin,
                         removed: false,
-                        channel: (localStorage.getItem("channel") || "general"),
+                        channel: (sessionStorage.getItem("channel") || "general"),
                         edited: false,
                         time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
                     }).then(function() {
@@ -1032,14 +1046,24 @@ function back() {
 
 function globalUpdate() {
     checkMute();
+    db.ref(`users/${getUsername()}`).once("value", function(user_object) {
+        if (!user_object.val().active) {
+            db.ref(`users/${getUsername()}`).update({
+                active: true,
+            })
+        }
+    })
 }
 
 function changeChannel(channel) {
     db.ref(`users/${getUsername()}`).once("value", function(user_object) {
         if (channel == "admin" && user_object.val().admin == 0) {
             alert("You are not an admin")
-        } else if (localStorage.getItem("channel") != channel) {
-            localStorage.setItem("channel", channel);
+        } else if ((sessionStorage.getItem("channel") || "general") != channel) {
+            document.getElementById(`${channel}-notif`).innerHTML = "";
+            document.getElementById((sessionStorage.getItem("channel") || "general")).style.backgroundColor = null;
+            document.getElementById(channel).style.backgroundColor = "#42464d";
+            sessionStorage.setItem("channel", channel);
             db.ref('chats/').once('value', function(messages_object) {
                 var textarea = document.getElementById('textarea');
                 // When we get the data clear chat_content_container
@@ -1053,12 +1077,14 @@ function changeChannel(channel) {
                 var nodename = []; // there's probably a better way to do this
         
                 messages_object.forEach((messages_child) => {
-                    messages.push(messages_child.val())
-                    nodename.push(messages_child.key)
+                    if (messages_child.val().channel == (sessionStorage.getItem("channel") || "general") || messages_child.val().name == "[SERVER]") {
+                        messages.push(messages_child.val())
+                        nodename.push(messages_child.key)
+                    }
                 });
                 var obj = user_object.val();
                 messages.forEach(function(data, index) {
-                    if ((data.whisper == null || data.whisper == getUsername() || data.name == getUsername() || obj.admin > 0) && data.channel == (localStorage.getItem("channel") || "general")) {
+                    if (data.whisper == null || data.whisper == getUsername() || data.name == getUsername() || obj.admin > 0) {
                         if (everyoneRevealed) {
                             var username = data.real_name || "[SERVER]";
                         } else {
@@ -1255,6 +1281,7 @@ function setup() {
         loginBlock.style.display = "block";
         return;
     }
+    document.getElementById((sessionStorage.getItem("channel") || "general")).style.backgroundColor = "#42464d";
 
     checkAdmin();
     checkTrapped();

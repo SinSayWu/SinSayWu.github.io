@@ -1,5 +1,6 @@
 var playing = false;
 var golden_cookie = false;
+var gambled_money = 0;
 
 function play() {
     const music = document.getElementById("bg-music");
@@ -169,7 +170,8 @@ function loadAutoclicker() {
         addAmount(true);
         setTimeout(loadAutoclicker, 1000);
         db.ref(`users/${getUsername()}`).update({
-            autoactive: true
+            autoactive: true,
+            autosleep: Date.now(),
         })
     })
 }
@@ -308,7 +310,7 @@ function sellMult() {
 function Gambling() {
     db.ref(`users/${getUsername()}`).once("value", function(object) {
         if (object.val().gambling) {
-            showPopUp(`Welcome to the Gambling Space! $<span id="gambling-money">${object.val().money}</span>`,`Double or Nothing<hr>$<input type="text" id="double">`, [["gamble", () => DoubleNothing()]]);
+            showPopUp(`Welcome to the Gambling Space! $<span id="gambling-money">${object.val().money}</span>`,`Double or Nothing<hr>$<input type="text" id="double"><br><br>Blackjack<hr>Dealer: <span id="dealer"></span><br>You: <span id="player"></span><br>$<input type="text" id="blackjack">`, [["Double-or-Nothing", () => DoubleNothing()], ["Hit", () => blackHit()], ["Stand", () => blackStand()]]);
         } else if (object.val().money >= 100000) {
             db.ref(`users/${getUsername()}`).update({
                 money: firebase.database.ServerValue.increment(-100000),
@@ -334,7 +336,7 @@ function DoubleNothing() {
                     })
                 } else {
                     if (moneyinput >= 1000000) {
-                        sendNotification(`${object.val().display_name} just lose $${moneyinput} in Double-or-Nothing!`)
+                        sendNotification(`${object.val().display_name} just lost $${moneyinput} in Double-or-Nothing!`)
                     }
                     db.ref(`users/${getUsername()}`).update({
                         money: firebase.database.ServerValue.increment(-moneyinput),
@@ -342,6 +344,136 @@ function DoubleNothing() {
                 }
             }
         })
+    }
+}
+
+function blackHit() {
+    var moneyinput = document.getElementById("blackjack").value;
+
+    if (/^[0-9]+$/.test(moneyinput)) {
+        moneyinput = Math.round(Math.abs(moneyinput));
+        var player_hand = document.getElementById("player");
+        var deck = [1,2,3,4,5,6,7,8,9,10,10,10,10];
+
+        if (!document.getElementById('blackjack').disabled) {
+            document.getElementById("dealer").innerHTML = "";
+            var card_1 = deck[Math.floor(Math.random()*deck.length)];
+            var card_2 = deck[Math.floor(Math.random()*deck.length)];
+            if (card_1 == 1) {
+                card_1 = 11;
+            } else if (card_2 == 1) {
+                card_1 = 11;
+            }
+
+            player_hand.innerHTML = `${card_1} + ${card_2}`
+            document.getElementById('blackjack').disabled = true;
+            db.ref(`users/${getUsername()}`).update({
+                money: firebase.database.ServerValue.increment(-moneyinput),
+            })
+        } else {
+            var hand = player_hand.innerHTML.split(" + ");
+            var sum = 0;
+            var card = deck[Math.floor(Math.random()*deck.length)];
+
+            hand.forEach( num => {
+                sum += parseInt(num);
+            })
+
+            if (card == 1 && 11 + sum <= 21) {
+                card = 11
+            }
+
+            if (hand.includes("11") && sum + card > 21) {
+                hand[hand.indexOf("11")] = "1";
+            }
+
+            if (sum <= 21) {
+                player_hand.innerHTML = `${hand.map(item => `${item}`).join(' + ')} + ${card}`
+            }
+        }
+    }
+}
+
+function blackStand() {
+    var player_hand = document.getElementById("player");
+    var moneyinput = document.getElementById("blackjack").value;
+    moneyinput = Math.round(Math.abs(moneyinput));
+    var deck = [1,2,3,4,5,6,7,8,9,10,10,10,10];
+    var dealer = [];
+    var hand = 0;
+
+    if (document.getElementById('blackjack').disabled) {
+        while (hand < 17) {
+            var card = deck[Math.floor(Math.random()*deck.length)];
+            if (card == 1 && card + hand <= 21) {
+                card = 11;
+            }
+            if (dealer.includes(11) && hand + card > 21) {
+                dealer[dealer.indexOf(11)] = 1;
+                hand -= 10;
+            }
+            hand += card;
+            dealer.push(card)
+        }
+
+        document.getElementById("dealer").innerHTML = dealer.map(item => `${item}`).join(' + ');
+
+        var player_hand_value = player_hand.innerHTML.split(" + ");
+        var sum = 0;
+        player_hand_value.forEach( num => {
+            sum += parseInt(num);
+        })
+
+        if (hand <= 21 && hand > sum) {
+            document.getElementById('blackjack').disabled = false;
+            document.getElementById('blackjack').value = "";
+            document.getElementById("dealer").innerHTML += " Won";
+            document.getElementById("player").innerHTML += " Lost";
+            if (moneyinput > 1000000) {
+                sendNotification(`${getDisplayName()} just lost $${moneyinput} in Blackjack!`)
+            }
+        } else if (sum > 21) {
+            document.getElementById('blackjack').disabled = false;
+            document.getElementById('blackjack').value = "";
+            document.getElementById("dealer").innerHTML += " Won";
+            document.getElementById("player").innerHTML += " Lost";
+            if (moneyinput > 1000000) {
+                sendNotification(`${getDisplayName()} just lost $${moneyinput} in Blackjack!`)
+            }
+        } else if (hand == sum) {
+            document.getElementById('blackjack').disabled = false;
+            db.ref(`users/${getUsername()}`).update({
+                money: firebase.database.ServerValue.increment(moneyinput),
+            })
+            document.getElementById('blackjack').value = "";
+            document.getElementById("dealer").innerHTML += " Tied";
+            document.getElementById("player").innerHTML += " Tied";
+            if (moneyinput > 1000000) {
+                sendNotification(`${getDisplayName()} just tied with $${moneyinput} in Blackjack!`)
+            }
+        } else if (hand <= 21 && sum > hand) {
+            document.getElementById('blackjack').disabled = false;
+            db.ref(`users/${getUsername()}`).update({
+                money: firebase.database.ServerValue.increment(moneyinput * 2),
+            })
+            document.getElementById('blackjack').value = "";
+            document.getElementById("dealer").innerHTML += " Lost";
+            document.getElementById("player").innerHTML += " Won";
+            if (moneyinput > 1000000) {
+                sendNotification(`${getDisplayName()} just won $${moneyinput} in Blackjack!`)
+            }
+        } else if (hand > 21) {
+            document.getElementById('blackjack').disabled = false;
+            db.ref(`users/${getUsername()}`).update({
+                money: firebase.database.ServerValue.increment(moneyinput * 2),
+            })
+            document.getElementById('blackjack').value = "";
+            document.getElementById("dealer").innerHTML += " Lost";
+            document.getElementById("player").innerHTML += " Won";
+            if (moneyinput > 1000000) {
+                sendNotification(`${getDisplayName()} just won $${moneyinput} in Blackjack!`)
+            }
+        }
     }
 }
 
