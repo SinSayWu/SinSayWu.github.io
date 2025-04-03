@@ -358,47 +358,47 @@ function blackHit() {
             if (object.val().money < moneyinput) {
                 return;
             }
+            
+            var player_hand = document.getElementById("player");
+            var deck = [1,2,3,4,5,6,7,8,9,10,10,10,10];
+
+            if (!document.getElementById('blackjack').disabled) {
+                document.getElementById("dealer").innerHTML = "";
+                var card_1 = deck[Math.floor(Math.random()*deck.length)];
+                var card_2 = deck[Math.floor(Math.random()*deck.length)];
+                if (card_1 == 1) {
+                    card_1 = 11;
+                } else if (card_2 == 1) {
+                    card_1 = 11;
+                }
+
+                player_hand.innerHTML = `${card_1} + ${card_2}`
+                document.getElementById('blackjack').disabled = true;
+                db.ref(`users/${getUsername()}`).update({
+                    money: firebase.database.ServerValue.increment(-moneyinput),
+                })
+            } else {
+                var hand = player_hand.innerHTML.split(" + ");
+                var sum = 0;
+                var card = deck[Math.floor(Math.random()*deck.length)];
+
+                hand.forEach( num => {
+                    sum += parseInt(num);
+                })
+
+                if (card == 1 && 11 + sum <= 21) {
+                    card = 11
+                }
+
+                if (hand.includes("11") && sum + card > 21) {
+                    hand[hand.indexOf("11")] = "1";
+                }
+
+                if (sum <= 21) {
+                    player_hand.innerHTML = `${hand.map(item => `${item}`).join(' + ')} + ${card}`
+                }
+            }
         })
-
-        var player_hand = document.getElementById("player");
-        var deck = [1,2,3,4,5,6,7,8,9,10,10,10,10];
-
-        if (!document.getElementById('blackjack').disabled) {
-            document.getElementById("dealer").innerHTML = "";
-            var card_1 = deck[Math.floor(Math.random()*deck.length)];
-            var card_2 = deck[Math.floor(Math.random()*deck.length)];
-            if (card_1 == 1) {
-                card_1 = 11;
-            } else if (card_2 == 1) {
-                card_1 = 11;
-            }
-
-            player_hand.innerHTML = `${card_1} + ${card_2}`
-            document.getElementById('blackjack').disabled = true;
-            db.ref(`users/${getUsername()}`).update({
-                money: firebase.database.ServerValue.increment(-moneyinput),
-            })
-        } else {
-            var hand = player_hand.innerHTML.split(" + ");
-            var sum = 0;
-            var card = deck[Math.floor(Math.random()*deck.length)];
-
-            hand.forEach( num => {
-                sum += parseInt(num);
-            })
-
-            if (card == 1 && 11 + sum <= 21) {
-                card = 11
-            }
-
-            if (hand.includes("11") && sum + card > 21) {
-                hand[hand.indexOf("11")] = "1";
-            }
-
-            if (sum <= 21) {
-                player_hand.innerHTML = `${hand.map(item => `${item}`).join(' + ')} + ${card}`
-            }
-        }
     }
 }
 
