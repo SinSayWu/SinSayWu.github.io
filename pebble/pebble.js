@@ -1293,6 +1293,11 @@ function setup() {
     displayMembers()
     checkMute()
     setInterval(globalUpdate, 1000);
+
+    db.ref("other/").on('value', (obj) => {
+        obj = obj.val();
+        document.getElementById("medianAdmin").innerHTML = obj.medianAdmin;
+    })    
     
     var textarea = document.getElementById("textarea");
     setTimeout(() => {
@@ -1549,8 +1554,3 @@ window.onload = function() {
         alert(err);
     }
 };
-
-db.ref("other/").on('value', (obj) => {
-    obj = obj.val();
-    document.getElementById("medianAdmin").innerHTML = obj.medianAdmin;
-})
