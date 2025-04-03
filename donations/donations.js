@@ -1,6 +1,7 @@
 var playing = false;
 var golden_cookie = false;
 var gambled_money = 0;
+const db = firebase.database();
 
 function play() {
     const music = document.getElementById("bg-music");

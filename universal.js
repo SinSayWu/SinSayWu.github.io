@@ -1,14 +1,17 @@
-const firebaseConfig = {
-    apiKey: "AIzaSyDOAj76E00Rg8Qyc5DQndWXHtCy2umC6vA",
-    authDomain: "chatter-97e8c.firebaseapp.com",
-    projectId: "chatter-97e8c",
-    storageBucket: "chatter-97e8c.appspot.com",
-    messagingSenderId: "281722915171",
-    appId: "1:281722915171:web:3b136d8a0b79389f2f6b56",
-    measurementId: "G-4CGJ1JFX58",
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
+async function getApiKey() {
+    try {
+        const response = await fetch("https://us-central1-pebble-rocks.cloudfunctions.net/api/getApiKey");
+        const data = await response.json();
+        if (data.apiKey) {
+            console.log("Received API Key:", data.apiKey);
+            return data.apiKey;
+        } else {
+            console.error("Failed to retrieve API Key");
+        }
+    } catch (error) {
+        console.error("Error fetching API Key:", error);
+    }
+}
 
 function getUsername() {
     return localStorage.getItem("username");
@@ -120,4 +123,19 @@ function showPopUp(heading, content, buttonList = [], height=640, width=800) {
     // Set the content of header and body
     header.innerHTML = heading;
     body.innerHTML = content;
+}
+
+window.onload = function() {
+    getApiKey().then(apiKey => {
+        const firebaseConfig = {
+            apiKey: apiKey,
+            authDomain: "chatter-97e8c.firebaseapp.com",
+            projectId: "chatter-97e8c",
+            storageBucket: "chatter-97e8c.appspot.com",
+            messagingSenderId: "281722915171",
+            appId: "1:281722915171:web:3b136d8a0b79389f2f6b56",
+            measurementId: "G-4CGJ1JFX58",
+        };
+        firebase.initializeApp(firebaseConfig);
+    });
 }

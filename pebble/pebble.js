@@ -3,6 +3,7 @@ var brainRot = false;
 var notificationNumber = 0;
 var everyoneRevealed = false;
 var joined = true;
+const db = firebase.database();
 
 function getUsername() {
     return localStorage.getItem("username");

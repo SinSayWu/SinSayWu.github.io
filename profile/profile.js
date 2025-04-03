@@ -1,10 +1,4 @@
-function getUsername() {
-    if (localStorage.getItem("username") != null) {
-        return localStorage.getItem("username");
-    } else {
-        return null;
-    }
-}
+const db = firebase.database();
 
 function submit() {
     var newDisplay = document.getElementById("display-input").value;
