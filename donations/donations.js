@@ -852,22 +852,7 @@ function clickExclusion() {
     })
 }
 
-window.onload = function() {
-    getApiKey().then(apiKey => {
-        const firebaseConfig = {
-            apiKey: apiKey,
-            authDomain: "pebble-rocks.firebaseapp.com",
-            databaseURL: "https://pebble-rocks-default-rtdb.firebaseio.com",
-            projectId: "pebble-rocks",
-            storageBucket: "pebble-rocks.firebasestorage.app",
-            messagingSenderId: "552791834164",
-            appId: "1:552791834164:web:20806230c909ac8d991461",
-            measurementId: "G-01XW810CT5"
-            };        
-        firebase.initializeApp(firebaseConfig);
-        db = firebase.database();
-    });
-
+function setup() {
     const music = document.getElementById("bg-music");
     const playlist = ["../images/secret_files/irisu_01.mp3", "../images/secret_files/irisu_02.mp3", "../images/secret_files/irisu_03.mp3", "../images/secret_files/irisu_04.mp3", "../images/secret_files/irisu_05.mp3", "../images/secret_files/irisu_06.mp3", ]
     music.addEventListener("ended", function () {
@@ -929,3 +914,26 @@ window.onload = function() {
         }
     })
 }
+
+window.onload = function() {
+    try {
+        getApiKey().then(apiKey => {
+            const firebaseConfig = {
+                apiKey: apiKey,
+                authDomain: "pebble-rocks.firebaseapp.com",
+                databaseURL: "https://pebble-rocks-default-rtdb.firebaseio.com",
+                projectId: "pebble-rocks",
+                storageBucket: "pebble-rocks.firebasestorage.app",
+                messagingSenderId: "552791834164",
+                appId: "1:552791834164:web:20806230c909ac8d991461",
+                measurementId: "G-01XW810CT5"
+                };        
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.database();
+
+            setup();
+        });
+    } catch(err) {
+        alert(err);
+    }
+};

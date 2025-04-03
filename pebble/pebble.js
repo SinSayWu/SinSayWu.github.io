@@ -1548,8 +1548,9 @@ window.onload = function() {
                 };        
             firebase.initializeApp(firebaseConfig);
             db = firebase.database();
+
+            setup();
         });
-        setup();
     } catch(err) {
         alert(err);
     }
