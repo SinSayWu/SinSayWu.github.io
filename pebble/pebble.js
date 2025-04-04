@@ -35,7 +35,7 @@ function refreshChat() {
         var nodename = []; // there's probably a better way to do this
 
         messages_object.forEach((messages_child) => {
-            if (messages_child.val().channel == (sessionStorage.getItem("channel") || "general") || messages_child.val().name == "[SERVER]") {
+            if (messages_child.val().channel == (sessionStorage.getItem("channel") || "general") || (messages_child.val().name == "[SERVER]" && messages_child.val().channel !== "extra")) {
                 messages.push(messages_child.val())
                 nodename.push(messages_child.key)
             }
@@ -217,7 +217,9 @@ function refreshChat() {
                         document.title = "(" + notificationNumber + ") Pebble";
                     }
                 }
-            } else if ((sessionStorage.getItem("channel") || "general") != Object.values(messages_object.val()).at(-1).channel && !(Object.values(messages_object.val()).at(-1).channel == "admin" && obj.admin == 0)) {
+            }
+            
+            if ((sessionStorage.getItem("channel") || "general") != Object.values(messages_object.val()).at(-1).channel && !(Object.values(messages_object.val()).at(-1).channel == "admin" && obj.admin == 0)) {
                 if (joined) {
                     joined = false;
                     return;
@@ -855,8 +857,8 @@ function sendMessage() {
             } else if (message.startsWith("!set @")) {
                 if (obj.admin > 5000) {
                     var set_user = message.split(" ")[1].substring(1).toLowerCase();
-                    var key = message.split(" ")[2].toLowerCase()
-                    var value = message.split(" ")[3].toLowerCase()
+                    var key = message.split(" ")[2]
+                    var value = message.split(" ")[3]
                     if (value == "true" || value == "false") {
                         var value = JSON.parse(value)
                     } else if (/^[0-9]+$/.test(value)) {
@@ -1538,14 +1540,14 @@ window.onload = function() {
         getApiKey().then(apiKey => {
             const firebaseConfig = {
                 apiKey: apiKey,
-                authDomain: "pebble-rocks.firebaseapp.com",
-                databaseURL: "https://pebble-rocks-default-rtdb.firebaseio.com",
-                projectId: "pebble-rocks",
-                storageBucket: "pebble-rocks.firebasestorage.app",
-                messagingSenderId: "552791834164",
-                appId: "1:552791834164:web:20806230c909ac8d991461",
-                measurementId: "G-01XW810CT5"
-                };        
+                authDomain: "chatter-97e8c.firebaseapp.com",
+                databaseURL: "https://chatter-97e8c-default-rtdb.firebaseio.com",
+                projectId: "chatter-97e8c",
+                storageBucket: "chatter-97e8c.firebasestorage.app",
+                messagingSenderId: "281722915171",
+                appId: "1:281722915171:web:3b136d8a0b79389f2f6b56",
+                measurementId: "G-4CGJ1JFX58"
+            };
             firebase.initializeApp(firebaseConfig);
             db = firebase.database();
 

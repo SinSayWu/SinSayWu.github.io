@@ -55,14 +55,14 @@ window.onload = function() {
     getApiKey().then(apiKey => {
         const firebaseConfig = {
             apiKey: apiKey,
-            authDomain: "pebble-rocks.firebaseapp.com",
-            databaseURL: "https://pebble-rocks-default-rtdb.firebaseio.com",
-            projectId: "pebble-rocks",
-            storageBucket: "pebble-rocks.firebasestorage.app",
-            messagingSenderId: "552791834164",
-            appId: "1:552791834164:web:20806230c909ac8d991461",
-            measurementId: "G-01XW810CT5"
-            };        
+            authDomain: "chatter-97e8c.firebaseapp.com",
+            databaseURL: "https://chatter-97e8c-default-rtdb.firebaseio.com",
+            projectId: "chatter-97e8c",
+            storageBucket: "chatter-97e8c.firebasestorage.app",
+            messagingSenderId: "281722915171",
+            appId: "1:281722915171:web:3b136d8a0b79389f2f6b56",
+            measurementId: "G-4CGJ1JFX58"
+        };    
         firebase.initializeApp(firebaseConfig);
         db = firebase.database();
     });

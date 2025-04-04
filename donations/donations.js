@@ -355,14 +355,10 @@ function blackHit() {
         moneyinput = Math.round(Math.abs(moneyinput));
         
         db.ref(`users/${getUsername()}`).once("value", function(object) {
-            if (object.val().money < moneyinput) {
-                return;
-            }
-            
             var player_hand = document.getElementById("player");
             var deck = [1,2,3,4,5,6,7,8,9,10,10,10,10];
 
-            if (!document.getElementById('blackjack').disabled) {
+            if (!document.getElementById('blackjack').disabled && object.val().money >= moneyinput) {
                 document.getElementById("dealer").innerHTML = "";
                 var card_1 = deck[Math.floor(Math.random()*deck.length)];
                 var card_2 = deck[Math.floor(Math.random()*deck.length)];
@@ -669,7 +665,7 @@ function checkAutoclickerActive() {
                 minutes = Math.floor((time - days * 86400000 - hours * 3600000) / 60000)
                 seconds = Math.floor((time - days * 86400000 - hours * 3600000 - minutes * 60000) / 1000)
                 money = Math.floor(time / 1000) * (object.val().autoclicker * (object.val().mult || 1))
-                if (time > 3600000 && object.val().autoclicker > 0) { // one hour
+                if (time > 600000 && object.val().autoclicker > 0) { // 10 minutes
                     showPopUp(
                         "Welcome Back!",
                         `While you were away for ${days} days, ${hours} hours, ${minutes} minutes, and ${seconds} seconds, you gained $${money}`
@@ -920,14 +916,14 @@ window.onload = function() {
         getApiKey().then(apiKey => {
             const firebaseConfig = {
                 apiKey: apiKey,
-                authDomain: "pebble-rocks.firebaseapp.com",
-                databaseURL: "https://pebble-rocks-default-rtdb.firebaseio.com",
-                projectId: "pebble-rocks",
-                storageBucket: "pebble-rocks.firebasestorage.app",
-                messagingSenderId: "552791834164",
-                appId: "1:552791834164:web:20806230c909ac8d991461",
-                measurementId: "G-01XW810CT5"
-                };        
+                authDomain: "chatter-97e8c.firebaseapp.com",
+                databaseURL: "https://chatter-97e8c-default-rtdb.firebaseio.com",
+                projectId: "chatter-97e8c",
+                storageBucket: "chatter-97e8c.firebasestorage.app",
+                messagingSenderId: "281722915171",
+                appId: "1:281722915171:web:3b136d8a0b79389f2f6b56",
+                measurementId: "G-4CGJ1JFX58"
+            };     
             firebase.initializeApp(firebaseConfig);
             db = firebase.database();
 
