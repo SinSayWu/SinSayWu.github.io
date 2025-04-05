@@ -1,8 +1,8 @@
 async function getApiKey() {
     const response = await fetch("https://us-central1-pebble-rocks.cloudfunctions.net/api/getApiKey");
     const data = await response.json();
-    if (data.API_KEY) {
-        return data;
+    if (data.apiKey) {
+        return data.apiKey;
     } else {
         console.error("Failed to retrieve API Key");
     }

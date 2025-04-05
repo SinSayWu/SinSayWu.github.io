@@ -1537,15 +1537,16 @@ function resizeTextBox() {
 
 window.onload = function() {
     try {
-        getApiKey().then(data => {
+        getApiKey().then(apiKey => {
             const firebaseConfig = {
-                apiKey: data.API_KEY,
-                authDomain: data.AUTH_DOMAIN,  
-                projectId: data.PROJECT_ID, 
-                storageBucket: data.STORAGE_BUCKET,
-                messagingSenderId: data.MESSAGING_SENDER_ID,
-                appId: data.APP_ID,
-                measurementId: data.MEASUREMENT_ID,
+                apiKey: apiKey,
+                authDomain: "chatter-97e8c.firebaseapp.com",
+                databaseURL: "https://chatter-97e8c-default-rtdb.firebaseio.com",
+                projectId: "chatter-97e8c",
+                storageBucket: "chatter-97e8c.firebasestorage.app",
+                messagingSenderId: "281722915171",
+                appId: "1:281722915171:web:3b136d8a0b79389f2f6b56",
+                measurementId: "G-4CGJ1JFX58"
             };
             firebase.initializeApp(firebaseConfig);
             db = firebase.database();
