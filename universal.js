@@ -1,10 +1,16 @@
 async function getApiKey() {
-    const response = await fetch("https://us-central1-pebble-rocks.cloudfunctions.net/api/getApiKey");
-    const data = await response.json();
-    if (data.apiKey) {
-        return data.apiKey;
+    const script = document.createElement('script');
+    script.src = 'config.js';
+    if (window.CONFIG.API_KEY) {
+        return window.CONFIG.API_KEY
     } else {
-        console.error("Failed to retrieve API Key");
+        const response = await fetch("https://us-central1-pebble-rocks.cloudfunctions.net/api/getApiKey");
+        const data = await response.json();
+        if (data.apiKey) {
+            return data.apiKey;
+        } else {
+            console.error("Failed to retrieve API Key");
+        }
     }
 }
 

@@ -1287,7 +1287,6 @@ function setup() {
     }
     document.getElementById((sessionStorage.getItem("channel") || "general")).style.backgroundColor = "#42464d";
 
-    checkAdmin();
     checkTrapped();
     checkActive();
     reloadTrapped();
@@ -1305,17 +1304,6 @@ function setup() {
     setTimeout(() => {
         textarea.scrollTop = textarea.scrollHeight;
     }, 500);
-}
-
-function checkAdmin() {
-    db.ref("users/" + getUsername()).once('value', function(user_object) {
-        var obj = user_object.val();
-        if (obj.admin > 0) {
-            document.getElementById("adminControls").style.display = "block";
-        } else {
-            document.getElementById("admin-controls").style.display = "none";
-        }
-    })
 }
 
 function checkTrapped() {
