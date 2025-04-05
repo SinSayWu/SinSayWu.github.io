@@ -35,7 +35,7 @@ function refreshChat() {
         var nodename = []; // there's probably a better way to do this
 
         messages_object.forEach((messages_child) => {
-            if (messages_child.val().channel == (sessionStorage.getItem("channel") || "general") || (messages_child.val().name == "[SERVER]" && (sessionStorage.getItem("channel") || "general") !== "extra")) {
+            if (messages_child.val().channel == (sessionStorage.getItem("channel") || "general") || (messages_child.val().name == "[SERVER]" && messages_child.val().channel !== "extra")) {
                 messages.push(messages_child.val())
                 nodename.push(messages_child.key)
             }
@@ -817,13 +817,7 @@ function sendMessage() {
             } else if (message.startsWith("!vote ")) {
                 if (obj.admin > medianAdmin) {
                     if (!/\[[^\[\]]*\]/.test(message)) {
-                        alert("Please format the options so that it starts with [ and ends with ] and each option is seperated with a comma (,). Example: !vote Is pizza tasty? [Absolutely!, Yuck!]");
-                        return;
-                    } else if (message.match(/\[/g).length !== 1 || message.match(/\]/g).length !== 1) {
-                        alert("Please only use [ and ] once to indicate when the options start and end. Example: !vote Is pizza tasty? [Absolutely!, Yuck!]");
-                        return;
-                    } else if (message.charAt(6) !== "[") {
-                        alert("Please include a title in your vote. Example: !vote Is pizza tasty? [Absolutely!, Yuck!]");
+                        alert("Please format the options so that it starts with [ and ends with ] and each option is seperated with a comma (,)");
                         return;
                     }
                     db.ref("other/vote/").once('value', function(voting) {
@@ -838,7 +832,7 @@ function sendMessage() {
                     })
                     db.ref("other/vote").remove();
                     var choices = message.match(/\[(.*?)\]/)[1].split(",").map(item => item.trim().replace(/ /g, "_"));
-                    var title = message.substring(6, message.indexOf(" ["));
+                    var title = message.substring(6, message.indexOf(" ["))
                     var votemessage = choices.map((choice) => choice.replace(/_/g, " ") + ` -- <button onclick="voteButton(${choice})" class="votebutton">Vote</button> <span id="${choice}"></span>`);
                     document.getElementById("text-box").value = "";
                     const choicekeys = {};
@@ -863,23 +857,16 @@ function sendMessage() {
             } else if (message.startsWith("!set @")) {
                 if (obj.admin > 5000) {
                     var set_user = message.split(" ")[1].substring(1).toLowerCase();
-
-                    db.ref(`users/${set_user}`).once("value", function(object) {
-                        if (!object.exists()) {
-                            alert("User cannot be set, " + set_user + " does not exist!");
-                            return;
-                        }
-                        var key = message.split(" ")[2]
-                        var value = message.split(" ")[3]
-                        if (value == "true" || value == "false") {
-                            var value = JSON.parse(value)
-                        } else if (/^[0-9]+$/.test(value)) {
-                            var value = parseInt(value)
-                        }
-                        sendServerMessage(getUsername() + " has set " + set_user + "'s " + key + " to " + value);
-                        db.ref("users/" + set_user).update({
-                            [key]: value,
-                        })
+                    var key = message.split(" ")[2]
+                    var value = message.split(" ")[3]
+                    if (value == "true" || value == "false") {
+                        var value = JSON.parse(value)
+                    } else if (/^[0-9]+$/.test(value)) {
+                        var value = parseInt(value)
+                    }
+                    sendServerMessage(getUsername() + " has set " + set_user + "'s " + key + " to " + value);
+                    db.ref("users/" + set_user).update({
+                        [key]: value,
                     })
                 };
                 document.getElementById("text-box").value = "";
