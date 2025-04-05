@@ -6,18 +6,6 @@ var joined = true;
 var messageSleep = 0;
 let db;
 
-function getUsername() {
-    return localStorage.getItem("username");
-}
-
-function getPassword() {
-    return localStorage.getItem("password");
-}
-
-function getDisplayName() {
-    return localStorage.getItem("display");
-}
-
 function refreshChat() {
     // alert("Refresh Chat");
     var textarea = document.getElementById('textarea');
@@ -49,7 +37,7 @@ function refreshChat() {
                     if (everyoneRevealed) {
                         var username = data.real_name || "[SERVER]";
                     } else {
-                        var username = data.display_name;
+                        var username = data.name;
                     }
 
                     // TODO: FIX THIS TO DO SOMETHING IDK WHAT
@@ -80,9 +68,6 @@ function refreshChat() {
                     if (data.name == "[SERVER]") {
                         var userElement = document.createElement("div");
                         userElement.setAttribute("class", "username");
-                        userElement.addEventListener("click", function(e) {
-                            userElement.innerHTML = username + " @(" + data.name + ")" ;
-                        })
                         userElement.innerHTML = username;
                         userElement.style.fontWeight = "bold";
                         userElement.style.color = "Yellow";
@@ -91,7 +76,11 @@ function refreshChat() {
                         var userElement = document.createElement("div");
                         userElement.setAttribute("class", "username");
                         userElement.addEventListener("click", function(e) {
-                            userElement.innerHTML = username + " @(" + data.name + ")" ;
+                            if (userElement.innerHTML.includes("@")) {
+                                userElement.innerHTML = username;
+                            } else {
+                                userElement.innerHTML = username + " @(" + data.real_name + ")";
+                            }
                         })
                         userElement.innerHTML = username;
                         if (data.edited) {
@@ -115,7 +104,7 @@ function refreshChat() {
                                 trashButton.addEventListener("click", function() {
                                     db.ref("chats/" + nodename[index]).update({
                                         removed: true,
-                                        message: `<i><b>REMOVED BY ${getDisplayName()}</b></i><span style="display: none">@${getUsername()} @${data.name}</span>`,
+                                        message: `<i><b>REMOVED BY ${getUsername()}</b></i><span style="display: none">@${getUsername()} @${data.name}</span>`,
                                     });
                                 })
                                 messageElement.appendChild(trashButton);
@@ -206,7 +195,7 @@ function refreshChat() {
                 var messageNotification = localStorage.getItem("messageNotification") || false;
 
                 if (!(prevMessage.channel == "admin" && obj.admin == 0)) {
-                    if (prevMessage.display_name == "[SERVER]" && JSON.parse(announceNotification)) {
+                    if (prevMessage.username == "[SERVER]" && JSON.parse(announceNotification)) {
                         notificationNumber += 1
                     } else if ((prevMessage.message.includes("@" + getUsername()) || prevMessage.message.includes("@everyone")) && JSON.parse(mentionNotification)) {
                         notificationNumber += 1
@@ -248,10 +237,10 @@ function displayMembers() {
         var ordered = [];
 
         for (var i, i = 0; i < usernames.length; i++) {
-            ordered.push([usernames[i].display_name, usernames[i].muted, usernames[i].username, usernames[i].active, usernames[i].admin, usernames[i].trapped, usernames[i].sleep, usernames[i].name]);
+            ordered.push([usernames[i].username, usernames[i].muted, usernames[i].active, usernames[i].admin, usernames[i].trapped, usernames[i].sleep, usernames[i].name]);
         }
-        ordered.sort((a, b) => b[4]-a[4]);
         ordered.sort((a, b) => b[3]-a[3]);
+        ordered.sort((a, b) => b[2]-a[2]);
         var isActive = true;
         ordered.forEach(function(properties) {
             var mainElement = document.createElement("div");
@@ -259,14 +248,14 @@ function displayMembers() {
             memberElement.setAttribute("class", "member");
             var inner = "";
             if (everyoneRevealed) {
-                inner += properties[7];
+                inner += properties[6];
             } else {
                 inner += properties[0];
             }
             memberElement.innerHTML = inner;
             var text = memberElement.innerHTML;
-            if (properties[3]) {
-                if (properties[4] > 0) {
+            if (properties[2]) {
+                if (properties[3] > 0) {
                     memberElement.style.color = "SkyBlue";
                 } else {
                     memberElement.style.color = "White";
@@ -280,35 +269,13 @@ function displayMembers() {
                     isActive = false;
                 }
             }
-            memberElement.addEventListener("click", function(e) {
-                memberElement.innerHTML = text + " @(" + properties[2] + ")";
-                if (properties[1]) {
-                    var mutedElement = document.createElement("span");
-                    mutedElement.setAttribute("class", "muted-element");
-                    mutedElement.style.color = "Red";
-                    mutedElement.innerHTML = "&nbsp;[Muted]";
-                    memberElement.appendChild(mutedElement);
-                } else if (properties[5]) {
-                    var mutedElement = document.createElement("span");
-                    mutedElement.setAttribute("class", "muted-element");
-                    mutedElement.style.color = "rgb(145, 83, 196)";
-                    mutedElement.innerHTML = "&nbsp;[Trapped]";
-                    memberElement.appendChild(mutedElement);
-                } else if ((Date.now() - (properties[6] || 0) + messageSleep + 200 < 0) && properties[4] == 0) {
-                    var mutedElement = document.createElement("span");
-                    mutedElement.setAttribute("class", "muted-element");
-                    mutedElement.style.color = "rgb(145, 83, 196)";
-                    mutedElement.innerHTML = "&nbsp;[Timed Out]";
-                    memberElement.appendChild(mutedElement);
-                }
-            })
 
             mainElement.append(memberElement);
 
             var adminLevel = document.createElement("div");
             adminLevel.setAttribute("id", "admin-level");
             adminLevel.setAttribute("class", "member");
-            adminLevel.innerHTML = ` (${properties[4]})`;
+            adminLevel.innerHTML = ` (${properties[3]})`;
 
 
             if (properties[1]) {
@@ -316,17 +283,18 @@ function displayMembers() {
                 mutedElement.style.color = "Red";
                 mutedElement.innerHTML = "&nbsp;[Muted]";
                 memberElement.appendChild(mutedElement);
-            } else if (properties[5]) {
+            } else if (properties[4]) {
                 var mutedElement = document.createElement("span");
                     mutedElement.style.color = "rgb(145, 83, 196)";
                     mutedElement.innerHTML = "&nbsp;[Trapped]";
                     memberElement.appendChild(mutedElement);
-            } else if ((Date.now() - (properties[6] || 0) + messageSleep + 200 < 0) && properties[4] == 0) {
+            } else if ((Date.now() - (properties[5] || 0) + messageSleep + 200 < 0) && properties[4] == 0) {
                 var mutedElement = document.createElement("span");
                     mutedElement.style.color = "rgb(145, 83, 196)";
                     mutedElement.innerHTML = "&nbsp;[Timed Out]";
                     memberElement.appendChild(mutedElement);
             }
+
             mainElement.append(adminLevel);
             members.appendChild(mainElement);
         });
@@ -342,7 +310,6 @@ function sendServerMessage(message) {
         db.ref('chats/').push({
             name: "[SERVER]",
             message: message,
-            display_name: "[SERVER]",
             admin: 9998,
             channel: (sessionStorage.getItem("channel") || "general"),
             removed: false,
@@ -431,7 +398,7 @@ function sendMessage() {
                     mutingUser = obj;
 
                     if (muted_user == 'everyone' && mutingUser.admin > 0) {
-                        sendServerMessage(mutingUser.display_name + " muted @everyone... Social Darwinism at its finest.");
+                        sendServerMessage(mutingUser.username + " muted @everyone... Social Darwinism at its finest.");
                         db.ref("users/").once('value', function(usrObj) {
                             var obj = Object.values(usrObj.val())
                             obj.forEach(function(usr) {
@@ -447,13 +414,13 @@ function sendMessage() {
                     }
                     // If the muted user is already muted
                     if (mutedUser.muted) {
-                        alert(mutedUser.display_name + " is already muted!");
+                        alert(mutedUser.username + " is already muted!");
                         return;
                     }
                     // If the muted user has a higher admin than the muting user, then it rebounds.
                     if (mutingUser.admin < mutedUser.admin) {
-                        alert(mutedUser.display_name + " has a higher admin level than you! Rebound!");
-                        sendServerMessage(mutedUser.display_name + " rebounded their mute against @" + mutingUser.username);
+                        alert(mutedUser.username + " has a higher admin level than you! Rebound!");
+                        sendServerMessage(mutedUser.username + " rebounded their mute against @" + mutingUser.username);
                         db.ref("users/" + username).update({
                             muted: true
                         })
@@ -470,7 +437,7 @@ function sendMessage() {
                         })
                         return;
                     }
-                    sendServerMessage(mutingUser.display_name + " muted @" + mutedUser.username + "!");
+                    sendServerMessage(mutingUser.username + " muted @" + mutedUser.username + "!");
                     db.ref("users/" + mutedUser.username).update({
                         muted: true
                     })
@@ -490,7 +457,7 @@ function sendMessage() {
 
                     // Unmuting everyone
                     if (unmuted_user == 'everyone' && unmutingUser.admin > 0) {
-                        sendServerMessage(unmutingUser.display_name + " unmuted @everyone! Thank the Lord!");
+                        sendServerMessage(unmutingUser.username + " unmuted @everyone! Thank the Lord!");
                         db.ref("users/").once('value', function(usrObj) {
                             var obj = Object.values(usrObj.val());
                             var usernames = obj;
@@ -507,7 +474,7 @@ function sendMessage() {
                     }
                     // If the unmuted user is already unmuted
                     if (!unmutedUser.muted) {
-                        alert(unmutedUser.display_name + " is not muted!");
+                        alert(unmutedUser.username + " is not muted!");
                         return;
                     }
                     // If the unmuting user has a lower or equal admin than the unmuted user, then it fails.
@@ -516,7 +483,7 @@ function sendMessage() {
                         return;
                     }
                     if (unmutingUser.admin > unmutedUser.admin) {
-                        sendServerMessage(unmutingUser.display_name + " unmuted @" + unmutedUser.username + "!");
+                        sendServerMessage(unmutingUser.username + " unmuted @" + unmutedUser.username + "!");
                         db.ref("users/" + unmutedUser.username).update({
                             muted: false
                         })
@@ -538,7 +505,7 @@ function sendMessage() {
                     if (revealedUser.admin + 1000 >=  revealingUser.admin && revealedUser.username != revealingUser.username) {
                         alert("Real Name: " + revealedUser.name + "\nAdmin Level: " + revealedUser.admin);
                     } else {
-                        alert("Username: " + revealedUser.username + "\nPassword: " + revealedUser.password + "\nDisplay Name: " + revealedUser.display_name + "\nReal Name: " + revealedUser.name + "\nAdmin Level: " + revealedUser.admin);
+                        alert("Username: " + revealedUser.username + "\nPassword: " + revealedUser.password + "\nReal Name: " + revealedUser.name + "\nAdmin Level: " + revealedUser.admin);
                     }
                     return;
                 })
@@ -548,7 +515,7 @@ function sendMessage() {
                 // To delete spam accounts
                 removingUser = obj;
                 if (removingUser.admin > medianAdmin) {
-                    sendServerMessage(removingUser.display_name + " removed all muted users! What a just punishment!");
+                    sendServerMessage(removingUser.username + " removed all muted users! What a just punishment!");
                     db.ref("users/").once('value', function(usrObj) {
                         var obj = Object.values(usrObj.val());
                         var usernames = obj;
@@ -580,12 +547,12 @@ function sendMessage() {
                     }
                     // If the removed user has a higher admin than the removing user, then it rebounds.
                     if (removingUser.admin < removedUser.admin + 1) {
-                        alert(removedUser.display_name + " has a higher admin level than you! Rebound!");
-                        sendServerMessage(removedUser.display_name + " rebounded their remove against @" + removingUser.username);
+                        alert(removedUser.username + " has a higher admin level than you! Rebound!");
+                        sendServerMessage(removedUser.username + " rebounded their remove against @" + removingUser.username);
                         db.ref("users/" + removingUser.username).remove();
                         return;
                     }
-                    sendServerMessage(removingUser.display_name + " removed @" + removedUser.username + "!");
+                    sendServerMessage(removingUser.username + " removed @" + removedUser.username + "!");
                     db.ref("users/" + removedUser.username).remove();
                     return;
                 })
@@ -601,7 +568,7 @@ function sendMessage() {
                     trappedUser = trappedUser.val();
                     trappingUser = obj;
                     if (trappingUser.admin >= trappedUser.admin + 3) {
-                        sendServerMessage(trappingUser.display_name + " trapped @" + trappedUser.username + "!");
+                        sendServerMessage(trappingUser.username + " trapped @" + trappedUser.username + "!");
                         db.ref("users/" + trappedUser.username).update({
                             trapped: true,
                             reload: true,
@@ -621,7 +588,7 @@ function sendMessage() {
                     untrappedUser = untrappedUser.val();
                     untrappingUser = obj;
                     if (untrapped_user == 'everyone' && untrappingUser.admin > 0) {
-                        sendServerMessage(untrappingUser.display_name + " released @everyone! Thank the Lord!");
+                        sendServerMessage(untrappingUser.username + " released @everyone! Thank the Lord!");
                         db.ref("users/").once('value', function(usrObj) {
                             var obj = Object.values(usrObj.val());
                             var usernames = obj;
@@ -637,7 +604,7 @@ function sendMessage() {
                         return;
                     }
                     if (untrappingUser.admin >= untrappedUser.admin + 3) {
-                        sendServerMessage(untrappingUser.display_name + " released @" + untrappedUser.username + "!");
+                        sendServerMessage(untrappingUser.username + " released @" + untrappedUser.username + "!");
                         db.ref("users/" + untrappedUser.username).update({
                             trapped: false,
                             reload: true,
@@ -663,7 +630,7 @@ function sendMessage() {
                     timedUser = timedUser.val();
                     timingUser = obj;
                     if (timingUser.admin > timedUser.admin) {
-                        sendServerMessage(timingUser.display_name + " timed out @" + timedUser.username + " for " + timeout_time + " seconds!");
+                        sendServerMessage(timingUser.username + " timed out @" + timedUser.username + " for " + timeout_time + " seconds!");
                         db.ref("users/" + timedUser.username).update({
                             sleep: Date.now() + ((timeout_time * 1000) - messageSleep),
                         })
@@ -682,7 +649,7 @@ function sendMessage() {
                     removetimedUser = removetimedUser.val();
                     removetimingUser = obj;
                     if (removetimingUser.admin > removetimedUser.admin) {
-                        sendServerMessage(removetimingUser.display_name + " removed the timeout for @" + removetimedUser.username + "!");
+                        sendServerMessage(removetimingUser.username + " removed the timeout for @" + removetimedUser.username + "!");
                         db.ref("users/" + removetimedUser.username).update({
                             sleep: 0,
                         })
@@ -694,7 +661,7 @@ function sendMessage() {
             } else if (message.startsWith("!lockdown")) {
                 lockdownUser = obj;
                 if (lockdownUser.admin > medianAdmin) {
-                    sendServerMessage(lockdownUser.display_name + " has locked down the server!");
+                    sendServerMessage(lockdownUser.username + " has locked down the server!");
                     db.ref("other/").update({
                         lockdown: true,
                     })
@@ -704,7 +671,7 @@ function sendMessage() {
             } else if (message.startsWith("!removelockdown")) {
                 lockdownUser = obj;
                 if (lockdownUser.admin > medianAdmin) {
-                    sendServerMessage(lockdownUser.display_name + " has removed the lock down for the server!");
+                    sendServerMessage(lockdownUser.username + " has removed the lock down for the server!");
                     db.ref("other/").update({
                         lockdown: false,
                     })
@@ -718,14 +685,12 @@ function sendMessage() {
                         alert("User cannot be whispered to, " + whispered_user + " does not exist!");
                         return;
                     }
-                    var display_name = obj.display_name;
                     document.getElementById("text-box").value = "";
                     db.ref('chats/').once('value', function(message_object) {
                         var curr = new Date();
                         db.ref('chats/').push({
                             name: username,
                             message: "Whisper to @" + whispered_user + ": " + message.substring(10 + whispered_user.length),
-                            display_name: display_name,
                             real_name: obj.name,
                             admin: obj.admin,
                             removed: false,
@@ -752,7 +717,7 @@ function sendMessage() {
                     disablingUser = obj;
 
                     if (disablingUser.admin > disabledUser.admin && disablingUser.admin > medianAdmin) {
-                        sendServerMessage(disablingUser.display_name + " has disabled the XSS for " + disabledUser.display_name);
+                        sendServerMessage(disablingUser.username + " has disabled the XSS for " + disabledUser.username);
                         db.ref("users/" + disabledUser.username).update({
                             xss: false,
                         })
@@ -772,7 +737,7 @@ function sendMessage() {
                     disablingUser = obj;
 
                     if (disablingUser.admin > disabledUser.admin && disablingUser.admin > medianAdmin) {
-                        sendServerMessage(disablingUser.display_name + " has enabled the XSS for " + disabledUser.display_name);
+                        sendServerMessage(disablingUser.username + " has enabled the XSS for " + disabledUser.username);
                         db.ref("users/" + disabledUser.username).update({
                             xss: true,
                         })
@@ -791,7 +756,7 @@ function sendMessage() {
                 slowmodeUser = obj;
 
                 if (slowmodeUser.admin > medianAdmin) {
-                    sendServerMessage(slowmodeUser.display_name + " has changed the slowmode time to " + slowmodetime);
+                    sendServerMessage(slowmodeUser.username + " has changed the slowmode time to " + slowmodetime);
                     db.ref("other/").update({
                         slowmodetime: slowmodetime,
                     })
@@ -807,7 +772,7 @@ function sendMessage() {
                 }
                 profileUser = obj;
                 if (profileUser.admin > medianAdmin) {
-                    sendServerMessage(profileUser.display_name + " has changed the profile sleep time to " + profilesleeptime);
+                    sendServerMessage(profileUser.username + " has changed the profile sleep time to " + profilesleeptime);
                     db.ref("other/").update({
                         profilesleeptime: profilesleeptime,
                     })
@@ -843,7 +808,6 @@ function sendMessage() {
                     messageref = db.ref('chats/').push({
                         name: "[SERVER]",
                         message: `<span style="display:none">@everyone</span><h2 class="voteheader">${title}</h2> <div class="votecontent">${votemessage.join("<br/>")}</div>`,
-                        display_name: "VOTING",
                         admin: 9998,
                         channel: (sessionStorage.getItem("channel") || "general"),
                         removed: false,
@@ -872,7 +836,6 @@ function sendMessage() {
                 document.getElementById("text-box").value = "";
                 return;
             }
-            var display_name = obj.display_name;
             document.getElementById("text-box").value = "";
             var curr = new Date();
             if (obj && "editing" in obj) {
@@ -887,7 +850,6 @@ function sendMessage() {
                     db.ref('chats/').push({
                         name: username,
                         message: message,
-                        display_name: display_name,
                         real_name: obj.name,
                         admin: obj.admin,
                         removed: false,
@@ -915,23 +877,8 @@ function logout() {
     })
 }
 
-// updates display name
-function update_name() {
-    var name = getUsername();
-    if (name == null) {
-        return;
-    }
-    db.ref("users/" + name).once('value', function(user_object) {
-        var obj = user_object.val();
-        var display_name = obj.display_name;
-        localStorage.setItem("display", display_name);
-        document.getElementById("userdisplay").innerHTML = display_name + ` (@${name})`;
-    })
-}
-
 function login() {
     var username = document.getElementById("username-login").value;
-    username = username.toLowerCase();
     var password = document.getElementById("password-login").value;
     if (password == "") {
         return;
@@ -942,7 +889,6 @@ function login() {
             if (obj.password == password) {
                 localStorage.setItem('username', username);
                 localStorage.setItem('password', password);
-                localStorage.setItem("display", obj.display_name);
                 localStorage.setItem("name", obj.name);
                 alert(credits);
                 alert(termsOfService);
@@ -957,21 +903,19 @@ function login() {
 
 function register() {
     var username = document.getElementById("username-register").value;
-    username = username.toLowerCase();
     var password = document.getElementById("password-register").value;
-    var displayName = document.getElementById("display-register").value;
     var realName = document.getElementById("name-register").value;
-    if (username == "" || password == "" || displayName == "" || username == "[SERVER]" || realName == "") {
+    if (username == "" || password == "" || username == "[SERVER]" || realName == "") {
         alert("Fill out all fields");
         return;
     }
 
-    if (!(checkInput(username) && checkInput(password) && checkInput(realName) && checkInput(displayName))) {
+    if (!(checkInput(username) && checkInput(password) && checkInput(realName))) {
         return;
     }
 
-    if (username.length > 20 || displayName.length > 20) {
-        alert("Username or display name cannot be longer than 20 characters");
+    if (username.length > 20) {
+        alert("Username cannot be longer than 20 characters");
         return;
     }
     
@@ -981,7 +925,6 @@ function register() {
             return;
         }
         db.ref("users/" + username).set({
-            display_name: displayName,
             password: password,
             username: username,
             name: realName,
@@ -996,12 +939,11 @@ function register() {
             updateMedianAdmin();
             localStorage.setItem('username', username);
             localStorage.setItem('password', password);
-            localStorage.setItem("display", displayName);
             localStorage.setItem("name", realName);
             alert(credits);
             alert(termsOfService);
             window.location.reload();
-            sendServerMessage(localStorage.getItem("display") + " has joined the chat for the first time<span style='visibility: hidden;'>@" + getUsername() + "</span>");
+            sendServerMessage(getUsername() + " has joined the chat for the first time<span style='visibility: hidden;'>@" + getUsername() + "</span>");
         })
     })
 }
@@ -1059,6 +1001,18 @@ function globalUpdate() {
     })
 }
 
+// updates display name
+function update_name() {
+    var name = getUsername();
+    if (name == null) {
+        return;
+    }
+    db.ref("users/" + name).once('value', function(user_object) {
+        var obj = user_object.val();
+        document.getElementById("userdisplay").innerHTML = obj.username;
+    })
+}
+
 function changeChannel(channel) {
     db.ref(`users/${getUsername()}`).once("value", function(user_object) {
         if (channel == "admin" && user_object.val().admin == 0) {
@@ -1092,14 +1046,7 @@ function changeChannel(channel) {
                         if (everyoneRevealed) {
                             var username = data.real_name || "[SERVER]";
                         } else {
-                            var username = data.display_name;
-                        }
-    
-                        // TODO: FIX THIS TO DO SOMETHING IDK WHAT
-                        if (data.removed) {
-                            var message = data.message;
-                        } else {
-                            var message = data.message;
+                            var username = data.name;
                         }
                         
                         let prevIndex = index - 1;
@@ -1158,7 +1105,7 @@ function changeChannel(channel) {
                                     trashButton.addEventListener("click", function() {
                                         db.ref("chats/" + nodename[index]).update({
                                             removed: true,
-                                            message: `<i><b>REMOVED BY ${getDisplayName()}</b></i><span style="display: none">@${getUsername()} @${data.name}</span>`,
+                                            message: `<i><b>REMOVED BY ${getUsername()}</b></i><span style="display: none">@${getUsername()} @${data.name}</span>`,
                                         });
                                     })
                                     messageElement.appendChild(trashButton);
@@ -1237,6 +1184,7 @@ function setup() {
             document.title = "Pebble";
         }
     });
+
     document.addEventListener('keydown', event => {
         const key = event.key.toLowerCase();
         if (document.getElementById("text-box") == document.activeElement) {
@@ -1262,6 +1210,7 @@ function setup() {
     document.getElementById("text-box").addEventListener("input", () => {
         resizeTextBox();
     });
+
     slowMode();
     checkCreds();
     update_name();
@@ -1277,7 +1226,7 @@ function setup() {
             const timePassed = Date.now() - lastMessageTime;
             let params = new URLSearchParams(document.location.search);
             if (((!obj.muted && !(timePassed < messageSleep) && !obj.trapped) || obj.admin > 0) && !(JSON.parse(params.get("ignore")) || false)) {
-                sendServerMessage(localStorage.getItem("display") + " has joined the chat<span style='visibility: hidden;'>@" + getUsername() + "</span>");
+                sendServerMessage(getUsername() + " has joined the chat<span style='visibility: hidden;'>@" + getUsername() + "</span>");
             }
         })
     } else {
@@ -1342,7 +1291,7 @@ function toggleMenu() {
 }
 
 function wipeChat() {
-    var name = localStorage.getItem("display");
+    var name = getUsername();
     db.ref("wipeMessage").on("value", function(message) {
         var wipeMessage = message.val();
         db.ref("chats/").remove();

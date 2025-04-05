@@ -9,7 +9,7 @@ async function getApiKey() {
         if (data.apiKey) {
             return data.apiKey;
         } else {
-            console.error("Failed to retrieve API Key");
+            alert("Failed to retrieve API Key");
         }
     }
 }
@@ -20,10 +20,6 @@ function getUsername() {
 
 function getPassword() {
     return localStorage.getItem("password");
-}
-
-function getDisplayName() {
-    return localStorage.getItem("name");
 }
 
 function checkInput(input) {
