@@ -239,6 +239,7 @@ function displayMembers() {
         for (var i, i = 0; i < usernames.length; i++) {
             ordered.push([usernames[i].username, usernames[i].muted, usernames[i].active, usernames[i].admin, usernames[i].trapped, usernames[i].sleep, usernames[i].name]);
         }
+        // alert(ordered);
         ordered.sort((a, b) => b[3]-a[3]);
         ordered.sort((a, b) => b[2]-a[2]);
         var isActive = true;
@@ -253,7 +254,6 @@ function displayMembers() {
                 inner += properties[0];
             }
             memberElement.innerHTML = inner;
-            var text = memberElement.innerHTML;
             if (properties[2]) {
                 if (properties[3] > 0) {
                     memberElement.style.color = "SkyBlue";
@@ -388,7 +388,7 @@ function sendMessage() {
                 document.getElementById("text-box").value = "";
                 return;
             } else if (message.startsWith("!mute @")) {
-                var muted_user = message.substring(7).toLowerCase();
+                var muted_user = message.substring(7);
                 db.ref("users/" + muted_user).once('value', function(mutedUser) {
                     if (!mutedUser.exists() && muted_user != "everyone") {
                         alert("User cannot be muted, " + muted_user + " does not exist!");
@@ -446,7 +446,7 @@ function sendMessage() {
                 document.getElementById("text-box").value = "";
                 return;
             } else if (message.startsWith("!unmute @")) {
-                var unmuted_user = message.substring(9).toLowerCase();
+                var unmuted_user = message.substring(9);
                 db.ref("users/" + unmuted_user).once('value', function(unmutedUser) {
                     if (!unmutedUser.exists() && unmuted_user != "everyone") {
                         alert("User cannot be unmuted, " + unmuted_user + " does not exist!");
@@ -493,7 +493,7 @@ function sendMessage() {
                 document.getElementById("text-box").value = "";
                 return;
             } else if (message.startsWith("!reveal @")) {
-                var revealed_user = message.substring(9).toLowerCase();
+                var revealed_user = message.substring(9);
                 db.ref("users/" + revealed_user).once('value', function(revealedUser) {
                     revealedUser = revealedUser.val();
                     revealingUser = obj;
@@ -529,7 +529,7 @@ function sendMessage() {
                 document.getElementById("text-box").value = "";
                 return;
             } else if (message.startsWith("!remove @")){
-                var removed_user = message.substring(9).toLowerCase();
+                var removed_user = message.substring(9);
                 db.ref("users/" + removed_user).once('value', function(removedUser) {
                     if (!removedUser.exists()) {
                         alert("User cannot be removed, " + removed_user + " does not exist!");
@@ -559,7 +559,7 @@ function sendMessage() {
                 document.getElementById("text-box").value = "";
                 return;
             } else if (message.startsWith("!trap @")){
-                var trapped_user = message.substring(7).toLowerCase();
+                var trapped_user = message.substring(7);
                 db.ref("users/" + trapped_user).once('value', function(trappedUser) {
                     if (!trappedUser.exists()) {
                         alert("User cannot be trapped, " + trapped_user + " does not exist!");
@@ -579,7 +579,7 @@ function sendMessage() {
                 document.getElementById("text-box").value = "";
                 return;
             } else if (message.startsWith("!release @")){
-                var untrapped_user = message.substring(10).toLowerCase();
+                var untrapped_user = message.substring(10);
                 db.ref("users/" + untrapped_user).once('value', function(untrappedUser) {
                     if (!untrappedUser.exists() && untrapped_user != 'everyone') {
                         alert("User cannot be released, " + untrapped_user + " does not exist!");
@@ -615,7 +615,7 @@ function sendMessage() {
                 document.getElementById("text-box").value = "";
                 return;
             } else if (message.startsWith("!timeout @")){
-                var timed_user = message.split(" ")[1].substring(1).toLowerCase();
+                var timed_user = message.split(" ")[1].substring(1);
                 var timeout_time = message.split(" ")[2];
                 if (!/^[0-9]+$/.test(timeout_time)) {
                     alert("Please enter a valid number of seconds to time the user out");
@@ -640,7 +640,7 @@ function sendMessage() {
                 document.getElementById("text-box").value = "";
                 return;
             } else if (message.startsWith("!removetimeout @")){
-                var removetimed_user = message.split(" ")[1].substring(1).toLowerCase();
+                var removetimed_user = message.split(" ")[1].substring(1);
                 db.ref("users/" + removetimed_user).once('value', function(removetimedUser) {
                     if (!removetimedUser.exists()) {
                         alert("User's timeout cannot be removed, " + timed_user + " does not exist!");
@@ -679,7 +679,7 @@ function sendMessage() {
                 document.getElementById("text-box").value = "";
                 return;
             } else if (message.startsWith("!whisper @")) {
-                var whispered_user = message.split(" ")[1].substring(1).toLowerCase();
+                var whispered_user = message.split(" ")[1].substring(1);
                 db.ref("users/" + whispered_user).once('value', function(whisperedUser) {
                     if (!whisperedUser.exists()) {
                         alert("User cannot be whispered to, " + whispered_user + " does not exist!");
@@ -707,7 +707,7 @@ function sendMessage() {
                 document.getElementById("text-box").value = "";
                 return;
             } else if (message.startsWith("!disablexss @")) {
-                var disabled_user = message.substring(13).toLowerCase();
+                var disabled_user = message.substring(13);
                 db.ref("users/" + disabled_user).once('value', function(disabledUser) {
                     if (!disabledUser.exists()) {
                         alert("User's XSS cannot be disabled, " + disabled_user + " does not exist!");
@@ -727,7 +727,7 @@ function sendMessage() {
                 document.getElementById("text-box").value = "";
                 return;
             } else if (message.startsWith("!enablexss @")) {
-                var disabled_user = message.substring(12).toLowerCase();
+                var disabled_user = message.substring(12);
                 db.ref("users/" + disabled_user).once('value', function(disabledUser) {
                     if (!disabledUser.exists()) {
                         alert("User's XSS cannot be enabled, " + disabled_user + " does not exist!");
@@ -747,7 +747,7 @@ function sendMessage() {
                 document.getElementById("text-box").value = "";
                 return;
             } else if (message.startsWith("!setslowmode ")) {
-                var slowmodetime = message.substring(13).toLowerCase();
+                var slowmodetime = message.substring(13);
                 if (!/^[0-9]+$/.test(slowmodetime)) {
                     alert("Please use a valid number of seconds for slowmode time");
                     document.getElementById("text-box").value = "";
@@ -764,7 +764,7 @@ function sendMessage() {
                 document.getElementById("text-box").value = "";
                 return;
             } else if (message.startsWith("!setprofilesleep ")) {
-                var profilesleeptime = message.substring(17).toLowerCase();
+                var profilesleeptime = message.substring(17);
                 if (!/^[0-9]+$/.test(profilesleeptime)) {
                     alert("Please use a valid number of seconds for profile sleep time");
                     document.getElementById("text-box").value = "";
@@ -820,7 +820,7 @@ function sendMessage() {
                 return;
             } else if (message.startsWith("!set @")) {
                 if (obj.admin > 5000) {
-                    var set_user = message.split(" ")[1].substring(1).toLowerCase();
+                    var set_user = message.split(" ")[1].substring(1);
                     var key = message.split(" ")[2]
                     var value = message.split(" ")[3]
                     if (value == "true" || value == "false") {

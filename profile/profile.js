@@ -6,7 +6,6 @@ function submit() {
     var newCopyPassword = document.getElementById("copy-input").value;
     var oldPassword = document.getElementById("old-input").value;
     try {
-            alert(db);
         db.ref("users/" + getUsername()).once('value', function(user_object) {
             db.ref("other/").once('value', function(server_object) {
                 var obj = user_object.val();
@@ -42,12 +41,13 @@ function submit() {
                             return newRef.set(data).then(() => {
                                 newRef.update({
                                     profilesleep: Date.now(),
+                                    username: newUsername,
                                 }).then(() => {
                                     return oldRef.remove();
                                 })
                             })
                         } else {
-                            alert("No data found under god");
+                            alert("No data found");
                         }
                     }).then(() => {
                         localStorage.setItem("username", newUsername);
