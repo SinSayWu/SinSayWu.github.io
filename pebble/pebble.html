@@ -83,7 +83,7 @@
                 </div>
                 <div class="permaAnnouncements" id="permaAnnouncements">
                     <h2>
-                        Version 4.0 is out!
+                        Version 4.1 is out!
                     </h2>
                     Check the Update Notes here!
                     <button onclick="window.location.replace('../UpdateNotes/updateNotes.html')">Update Notes</button>
@@ -96,7 +96,7 @@
                     <br/>
                     <hr>
                     <p>
-                        The UI for the donations page has changed!
+                        Huge change! Display names are removed for less confusion. Usernames now show up, which are editable in profile settings. When clicking on a username, their real name pops up. You can now post images!
                     </p>
                 </div>
                 <div class="profile" id="profile">
@@ -134,6 +134,7 @@
                     
                 </div>
                 <div class="text-area" id="downbar">
+                    <button class="send-image" onclick="imagePopup()">+</button>
                     <textarea class="box-message" placeholder="Message" id="text-box"></textarea>
                     <button class="send-message" onclick="sendMessage()">➤</button>
                 </div>

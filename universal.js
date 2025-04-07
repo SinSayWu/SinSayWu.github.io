@@ -81,8 +81,10 @@ function showPopUp(heading, content, buttonList = [], height=640, width=800) {
     // Create the header and body
     var header = document.createElement("h1");
     header.setAttribute("class", "popup-heading");
+    header.setAttribute("id", "popupHeading");
     var body = document.createElement("div");
     body.setAttribute("class", "popup-body");
+    body.setAttribute("id", "popupBody");
 
     // Create the buttons
     var buttons = document.createElement("div");

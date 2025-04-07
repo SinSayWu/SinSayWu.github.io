@@ -4,6 +4,7 @@ var notificationNumber = 0;
 var everyoneRevealed = false;
 var joined = true;
 var messageSleep = 0;
+var imageSleep = 0;
 let db;
 
 function refreshChat() {
@@ -706,40 +707,40 @@ function sendMessage() {
                 })
                 document.getElementById("text-box").value = "";
                 return;
-            } else if (message.startsWith("!disablexss @")) {
-                var disabled_user = message.substring(13);
+            } else if (message.startsWith("!disableimage @")) {
+                var disabled_user = message.substring(15).toLowerCase();
                 db.ref("users/" + disabled_user).once('value', function(disabledUser) {
                     if (!disabledUser.exists()) {
-                        alert("User's XSS cannot be disabled, " + disabled_user + " does not exist!");
+                        alert("User's image privileges cannot be disabled, " + disabled_user + " does not exist!");
                         return;
                     }
                     disabledUser = disabledUser.val();
                     disablingUser = obj;
 
                     if (disablingUser.admin > disabledUser.admin && disablingUser.admin > medianAdmin) {
-                        sendServerMessage(disablingUser.username + " has disabled the XSS for " + disabledUser.username);
+                        sendServerMessage(disablingUser.username + " has disabled the image priveleges for " + disabledUser.username);
                         db.ref("users/" + disabledUser.username).update({
-                            xss: false,
+                            image: false,
                         })
                     }
                     return;
                 })
                 document.getElementById("text-box").value = "";
                 return;
-            } else if (message.startsWith("!enablexss @")) {
-                var disabled_user = message.substring(12);
+            } else if (message.startsWith("!enableimage @")) {
+                var disabled_user = message.substring(14).toLowerCase();
                 db.ref("users/" + disabled_user).once('value', function(disabledUser) {
                     if (!disabledUser.exists()) {
-                        alert("User's XSS cannot be enabled, " + disabled_user + " does not exist!");
+                        alert("User's image privileges cannot be enabled, " + disabled_user + " does not exist!");
                         return;
                     }
                     disabledUser = disabledUser.val();
                     disablingUser = obj;
 
                     if (disablingUser.admin > disabledUser.admin && disablingUser.admin > medianAdmin) {
-                        sendServerMessage(disablingUser.username + " has enabled the XSS for " + disabledUser.username);
+                        sendServerMessage(disablingUser.username + " has enabled the image privileges for " + disabledUser.username);
                         db.ref("users/" + disabledUser.username).update({
-                            xss: true,
+                            image: true,
                         })
                     }
                     return;
@@ -1212,6 +1213,7 @@ function setup() {
     });
 
     slowMode();
+    imageSleepCheck();
     checkCreds();
     update_name();
     // Login and Register Screens
@@ -1371,6 +1373,13 @@ function slowMode() {
     })
 }
 
+function imageSleepCheck() {
+    db.ref("other/").on("value", function(obj) {
+        var obj = obj.val();
+        imageSleep = obj.imageSleep
+    })
+}
+
 function checkCommands() {
     const commandsArray = commands.split("/");
     var newComms = "<ul>";
@@ -1471,6 +1480,94 @@ function resizeTextBox() {
     // textarea.style.transform = `translateY(${-(newHeight - 40)}px)`;
 }
 
+function imagePopup() {
+    showPopUp("Images",`
+        <img id="image1" style="max-width:40%;max-height:10vh"><button onclick="editImage(1)">Edit</button><button onclick="useImage(1)">Use</button><br>
+        <img id="image2" style="max-width:40%;max-height:10vh"><button onclick="editImage(2)">Edit</button><button onclick="useImage(2)">Use</button><br>
+        <img id="image3" style="max-width:40%;max-height:10vh"><button onclick="editImage(3)">Edit</button><button onclick="useImage(3)">Use</button><br>`)
+    db.ref(`users/${getUsername()}`).once("value", function(object) {
+        document.getElementById("image1").src = (object.val().images ? (object.val().images.image1 || "../images/image_placeholder.jpg") : "../images/image_placeholder.jpg");
+        document.getElementById("image2").src = (object.val().images ? (object.val().images.image2 || "../images/image_placeholder.jpg") : "../images/image_placeholder.jpg");
+        document.getElementById("image3").src = (object.val().images ? (object.val().images.image3 || "../images/image_placeholder.jpg") : "../images/image_placeholder.jpg");
+    })
+}
+
+function checkImageURL(url, callback) {
+    const img = new Image();
+    
+    img.onload = function() {
+      callback(true);
+    };
+    
+    img.onerror = function() {
+      callback(false);
+    };
+    
+    img.src = url;
+  }
+
+function useImage(index) {
+    db.ref(`users/${getUsername()}`).once("value", function(object) {
+        var obj = object.val();
+        var curr = new Date();
+
+        if (obj.images[`image${index}`]) {
+            if (obj.image || obj.admin > 0 || typeof(obj.image) == "undefined") {
+                document.getElementById("popup").remove();
+                db.ref('chats/').push({
+                    name: obj.username,
+                    message: `<img src="${obj.images[`image${index}`]}" style="max-width:70%;max-height:30vh">`,
+                    real_name: obj.name,
+                    admin: obj.admin,
+                    removed: false,
+                    channel: (sessionStorage.getItem("channel") || "general"),
+                    edited: false,
+                    time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
+                }).then(function() {
+                    db.ref("users/" + username).update({
+                        sleep: Date.now(),
+                    })
+                })
+            } else {
+                alert("You do not have image privileges")
+            }
+        } else {
+            alert(`Please set an image for image ${index} before using it`)
+        }
+    })
+}
+
+function editImage(index) {
+    db.ref(`users/${getUsername()}/images/image${index}`).once("value", function(object) {
+        document.getElementById("popupHeading").innerHTML = `Editing Image ${index}`;
+        document.getElementById("popupBody").innerHTML = `<img id="previewImage" src="${object.val() || "../images/image_placeholder.jpg"}" style="max-width:40%;max-height:30vh"><br>URL: <input id="ImageURL" type="text" style="color:white;width:100%" value="${object.val() || ""}"><br><button onclick="imagePreview()">Preview Image</button><button onclick="submitImage(${index})">Submit</button><br><img src="../images/image_instructions.png" style="height:30%">`;
+    })
+}
+
+function imagePreview() {
+    document.getElementById("previewImage").src = document.getElementById("ImageURL").value;
+}
+
+function submitImage(index) {
+    db.ref(`users/${getUsername()}`).once("value", function(object) {
+        checkImageURL(document.getElementById("ImageURL").value, function(isValid) {
+            if (!isValid) {
+                alert(`Please use a valid URL for an image`);
+                return;
+            }
+
+            if (typeof(object.val().images) == "undefined" || Date.now() - (object.val().images[`image${index}sleep`] || 0) > imageSleep || object.val().admin > 0) {
+                db.ref(`users/${getUsername()}`).update({
+                    [`images/image${index}`]: document.getElementById("ImageURL").value,
+                    [`images/image${index}sleep`]: Date.now(),
+                })
+                document.getElementById("popup").remove();
+            } else {
+                alert(`You are changing image ${index} too quickly`);
+            }
+        })
+    })
+}
 
 window.onload = function() {
     try {

@@ -65,9 +65,9 @@ const commands = `!mute @[username] -- mutes the specified user (@everyone compa
 
 !removelockdown -- removes the lockdown on the site/
 
-!enablexss @[username] -- allows the specified user to do XSS exploits (images, html tags, etc)/
+!enableimage @[username] -- allows the specified user to send images/
 
-!disablexss @[username] -- removes the ability for the specified user to do XSS exploits/
+!disableimage @[username] -- removes the ability for the specified user to send images/
 
 !setslowmode [seconds] -- sets the slowmode for a specified number of seconds/
 

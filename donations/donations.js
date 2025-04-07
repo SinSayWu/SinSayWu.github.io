@@ -875,7 +875,7 @@ function setup() {
                     topUser = snapshot.val();
                 });
 
-                document.body.innerHTML = `<h1>This week's donation campaign has ended with the winner being ${topUser.display_name} at $${topUser.money}, please participate again in next week's campaign as well</h1><button onclick="window.location.replace('../pebble/pebble.html?ignore=true')">Pebble</button>`;
+                document.body.innerHTML = `<h1>This week's donation campaign has ended with the winner being ${topUser.username} at $${topUser.money}, please participate again in next week's campaign as well</h1><button onclick="window.location.replace('../pebble/pebble.html?ignore=true')">Pebble</button>`;
                 loadAutoclicker = function() {};
                 return;
             })
