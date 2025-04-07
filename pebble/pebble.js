@@ -24,7 +24,7 @@ function refreshChat() {
         var nodename = []; // there's probably a better way to do this
 
         messages_object.forEach((messages_child) => {
-            if (messages_child.val().channel == (sessionStorage.getItem("channel") || "general") || (messages_child.val().name == "[SERVER]" && messages_child.val().channel !== "extra")) {
+            if (messages_child.val().channel == (sessionStorage.getItem("channel") || "general") || (messages_child.val().name == "[SERVER]" && sessionStorage.getItem("channel") !== "extra")) {
                 messages.push(messages_child.val())
                 nodename.push(messages_child.key)
             }
@@ -1036,7 +1036,7 @@ function changeChannel(channel) {
                 var nodename = []; // there's probably a better way to do this
         
                 messages_object.forEach((messages_child) => {
-                    if (messages_child.val().channel == (sessionStorage.getItem("channel") || "general") || messages_child.val().name == "[SERVER]") {
+                    if (messages_child.val().channel == (sessionStorage.getItem("channel") || "general") || (messages_child.val().name == "[SERVER]" && sessionStorage.getItem("channel") !== "extra")) {
                         messages.push(messages_child.val())
                         nodename.push(messages_child.key)
                     }
@@ -1162,8 +1162,8 @@ function changeChannel(channel) {
     
                         var messageContent = document.createElement("div");
                         messageContent.setAttribute("class", "message-text");
-                        messageContent.innerHTML = message;
-                        if (message.includes("@" + getUsername()) || message.includes("@everyone")) {
+                        messageContent.innerHTML = data.message;
+                        if (data.message.includes("@" + getUsername()) || data.message.includes("@everyone")) {
                             messageContent.setAttribute("id", "ping-text");
                         }
                         messageElement.appendChild(messageContent);

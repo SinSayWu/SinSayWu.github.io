@@ -66,7 +66,7 @@ function loadLeaderboard() {
 
             var usernameElement = document.createElement("div");
             usernameElement.setAttribute("class", "leader-header");
-            usernameElement.innerHTML = username.display_name + ": ";
+            usernameElement.innerHTML = username.username + ": ";
             
             
             var usernameAmount = document.createElement("span");
@@ -229,32 +229,32 @@ function loadSelectors() {
         object.forEach(function(username) {
             autooption = document.createElement("option");
             autooption.value = username.key;
-            autooption.innerHTML = username.val().display_name;
+            autooption.innerHTML = username.val().username;
             autoselector.appendChild(autooption);
 
             multoption = document.createElement("option");
             multoption.value = username.key;
-            multoption.innerHTML = username.val().display_name;
+            multoption.innerHTML = username.val().username;
             multselector.appendChild(multoption);
 
             moneyoption = document.createElement("option");
             moneyoption.value = username.key;
-            moneyoption.innerHTML = username.val().display_name;
+            moneyoption.innerHTML = username.val().username;
             moneyselector.appendChild(moneyoption)
 
             autogiftoption = document.createElement("option");
             autogiftoption.value = username.key;
-            autogiftoption.innerHTML = username.val().display_name;
+            autogiftoption.innerHTML = username.val().username;
             autogiftselector.appendChild(autogiftoption);
 
             multgiftoption = document.createElement("option");
             multgiftoption.value = username.key;
-            multgiftoption.innerHTML = username.val().display_name;
+            multgiftoption.innerHTML = username.val().username;
             multgiftselector.appendChild(multgiftoption);
 
             moneygiftoption = document.createElement("option");
             moneygiftoption.value = username.key;
-            moneygiftoption.innerHTML = username.val().display_name;
+            moneygiftoption.innerHTML = username.val().username;
             moneygiftselector.appendChild(moneygiftoption);
         })
     })
@@ -330,14 +330,14 @@ function DoubleNothing() {
             if (moneyinput <= object.val().money) {
                 if (Math.random() < 0.5) {
                     if (moneyinput >= 1000000) {
-                        sendNotification(`${object.val().display_name} just won $${moneyinput} in Double-or-Nothing!`)
+                        sendNotification(`${object.val().username} just won $${moneyinput} in Double-or-Nothing!`)
                     }
                     db.ref(`users/${getUsername()}`).update({
                         money: firebase.database.ServerValue.increment(moneyinput),
                     })
                 } else {
                     if (moneyinput >= 1000000) {
-                        sendNotification(`${object.val().display_name} just lost $${moneyinput} in Double-or-Nothing!`)
+                        sendNotification(`${object.val().username} just lost $${moneyinput} in Double-or-Nothing!`)
                     }
                     db.ref(`users/${getUsername()}`).update({
                         money: firebase.database.ServerValue.increment(-moneyinput),
@@ -435,7 +435,7 @@ function blackStand() {
                 document.getElementById("dealer").innerHTML += " Won";
                 document.getElementById("player").innerHTML += " Lost";
                 if (moneyinput > 1000000) {
-                    sendNotification(`${object.val().display_name} just lost $${moneyinput} in Blackjack!`)
+                    sendNotification(`${object.val().username} just lost $${moneyinput} in Blackjack!`)
                 }
             } else if (sum > 21) {
                 document.getElementById('blackjack').disabled = false;
@@ -443,7 +443,7 @@ function blackStand() {
                 document.getElementById("dealer").innerHTML += " Won";
                 document.getElementById("player").innerHTML += " Lost";
                 if (moneyinput > 1000000) {
-                    sendNotification(`${object.val().display_name} just lost $${moneyinput} in Blackjack!`)
+                    sendNotification(`${object.val().username} just lost $${moneyinput} in Blackjack!`)
                 }
             } else if (hand == sum) {
                 document.getElementById('blackjack').disabled = false;
@@ -454,7 +454,7 @@ function blackStand() {
                 document.getElementById("dealer").innerHTML += " Tied";
                 document.getElementById("player").innerHTML += " Tied";
                 if (moneyinput > 1000000) {
-                    sendNotification(`${object.val().display_name} just tied with $${moneyinput} in Blackjack!`)
+                    sendNotification(`${object.val().username} just tied with $${moneyinput} in Blackjack!`)
                 }
             } else if (hand <= 21 && sum > hand) {
                 document.getElementById('blackjack').disabled = false;
@@ -465,7 +465,7 @@ function blackStand() {
                 document.getElementById("dealer").innerHTML += " Lost";
                 document.getElementById("player").innerHTML += " Won";
                 if (moneyinput > 1000000) {
-                    sendNotification(`${object.val().display_name} just won $${moneyinput} in Blackjack!`)
+                    sendNotification(`${object.val().username} just won $${moneyinput} in Blackjack!`)
                 }
             } else if (hand > 21) {
                 document.getElementById('blackjack').disabled = false;
@@ -476,7 +476,7 @@ function blackStand() {
                 document.getElementById("dealer").innerHTML += " Lost";
                 document.getElementById("player").innerHTML += " Won";
                 if (moneyinput > 1000000) {
-                    sendNotification(`${object.val().display_name} just won $${moneyinput} in Blackjack!`)
+                    sendNotification(`${object.val().username} just won $${moneyinput} in Blackjack!`)
                 }
             }
         })
@@ -502,7 +502,7 @@ function minusAuto() {
                 db.ref(`users/${autoselector.value}`).update({
                     autoclicker: victim.autoclicker - 1,
                 })
-                sendNotification(`${attacker.display_name} has just removed an Auto-Clicker from ${victim.display_name}!`);
+                sendNotification(`${attacker.username} has just removed an Auto-Clicker from ${victim.username}!`);
             }
         })
     })
@@ -527,7 +527,7 @@ function minusMult() {
                 db.ref(`users/${multselector.value}`).update({
                     mult: victim.mult - 1,
                 })
-                sendNotification(`${attacker.display_name} has just removed one Mult from ${victim.display_name}!`);
+                sendNotification(`${attacker.username} has just removed one Mult from ${victim.username}!`);
             }
         })
     })
@@ -554,7 +554,7 @@ function minusMoney() {
                     money - Math.abs(Math.round(moneyinput.value))
                 )
                 if (Math.abs(Math.round(moneyinput.value)) >= 5000) {
-                    sendNotification(`${attacker.display_name} has just removed $${Math.abs(Math.round(moneyinput.value))} from ${victim.display_name}!`);
+                    sendNotification(`${attacker.username} has just removed $${Math.abs(Math.round(moneyinput.value))} from ${victim.username}!`);
                 }
             }
         })
@@ -579,7 +579,7 @@ function giftAuto() {
                 db.ref(`users/${autoselector.value}/autoclicker`).set(
                     (victim.autoclicker || 0) + 1,
                 )
-                sendNotification(`${attacker.display_name} has just gifted an Auto-Clicker to ${victim.display_name}!`);
+                sendNotification(`${attacker.username} has just gifted an Auto-Clicker to ${victim.username}!`);
             }
         })
     })
@@ -603,7 +603,7 @@ function giftMult() {
                 db.ref(`users/${multselector.value}/mult`).set(
                     (victim.mult || 1) + 1
                 )
-                sendNotification(`${attacker.display_name} has just gifted one Mult to ${victim.display_name}!`);
+                sendNotification(`${attacker.username} has just gifted one Mult to ${victim.username}!`);
             }
         })
     })
@@ -630,7 +630,7 @@ function giftMoney() {
                     money + price,
                 )
                 if (price >= 5000) {
-                    sendNotification(`${attacker.display_name} has just gifted $${price} to ${victim.display_name}!`);
+                    sendNotification(`${attacker.username} has just gifted $${price} to ${victim.username}!`);
                 }
             }
         })
