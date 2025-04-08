@@ -5,6 +5,8 @@ var everyoneRevealed = false;
 var joined = true;
 var messageSleep = 0;
 var imageSleep = 0;
+let globalMessages = [];
+let globalNodenames = [];
 let db;
 
 function refreshChat() {
@@ -17,18 +19,32 @@ function refreshChat() {
         textarea.innerHTML = '';
         // if there are no messages in the chat. Return . Don't load anything
         if(messages_object.numChildren() == 0){
-            return
+            return;
         }
 
         var messages = [];
         var nodename = []; // there's probably a better way to do this
 
-        messages_object.forEach((messages_child) => {
-            if (messages_child.val().channel == (sessionStorage.getItem("channel") || "general") || (messages_child.val().name == "[SERVER]" && sessionStorage.getItem("channel") !== "extra")) {
-                messages.push(messages_child.val())
-                nodename.push(messages_child.key)
-            }
-        });
+        if (globalMessages.length == 0 && globalNodenames.length == 0) {
+            messages_object.forEach((messages_child) => {
+                if (messages_child.val().channel == (sessionStorage.getItem("channel") || "general") || (messages_child.val().name == "[SERVER]" && sessionStorage.getItem("channel") !== "extra")) {
+                    globalMessages.push(messages_child.val())
+                    globalNodenames.push(messages_child.key)
+                }
+            });
+        } else {
+            db.ref("chats/").limitToLast(1).once("value", function(messages_child) {
+                messages_child.forEach(function(childSnapshot) {
+                    if (childSnapshot.val().channel == (sessionStorage.getItem("channel") || "general") || (childSnapshot.val().name == "[SERVER]" && sessionStorage.getItem("channel") !== "extra")) {
+                        globalMessages.push(childSnapshot.val())
+                        globalNodenames.push(childSnapshot.key)
+                    }
+                })
+            })
+        }
+
+        messages = globalMessages;
+        nodename = globalNodenames;
 
         // Now we're done. Simply display the ordered messages
         db.ref("users/" + getUsername()).once('value', function(user_object) {
@@ -328,17 +344,14 @@ function checkCreds() {
         return;
     }
     db.ref("users/" + username).once('value', function(user_object) {
-        if (user_object.exists() == true) {
-            var obj = user_object.val()
-            if (obj.password == password) {
-                return;
-            }
-            var main = document.getElementById("main");
-            var login = document.getElementById("login");
-            main.style.display = "none";
-            login.style.display = "block";
-            localStorage.clear();
-        } 
+        if (user_object.exists() && user_object.val().password == password) {
+            return;
+        }
+        var main = document.getElementById("main");
+        var login = document.getElementById("login");
+        main.style.display = "none";
+        login.style.display = "block";
+        localStorage.clear();
     })
 }
 
@@ -895,9 +908,11 @@ function login() {
                 alert(termsOfService);
                 window.location.reload();
                 return;
+            } else {
+                alert("Password is incorrect!")
             }
         } else {
-            alert("Incorrect password!");
+            alert("User does not exist!");
         }
     });
 }
@@ -944,7 +959,7 @@ function register() {
             alert(credits);
             alert(termsOfService);
             window.location.reload();
-            sendServerMessage(getUsername() + " has joined the chat for the first time<span style='visibility: hidden;'>@" + getUsername() + "</span>");
+            sendServerMessage(username + " has joined the chat for the first time<span style='visibility: hidden;'>@" + username + "</span>");
         })
     })
 }
@@ -1019,6 +1034,8 @@ function changeChannel(channel) {
         if (channel == "admin" && user_object.val().admin == 0) {
             alert("You are not an admin")
         } else if ((sessionStorage.getItem("channel") || "general") != channel) {
+            globalMessages = [];
+            globalNodenames = [];
             document.getElementById(`${channel}-notif`).innerHTML = "";
             document.getElementById((sessionStorage.getItem("channel") || "general")).style.backgroundColor = null;
             document.getElementById(channel).style.backgroundColor = "#42464d";
@@ -1035,12 +1052,27 @@ function changeChannel(channel) {
                 var messages = [];
                 var nodename = []; // there's probably a better way to do this
         
-                messages_object.forEach((messages_child) => {
-                    if (messages_child.val().channel == (sessionStorage.getItem("channel") || "general") || (messages_child.val().name == "[SERVER]" && sessionStorage.getItem("channel") !== "extra")) {
-                        messages.push(messages_child.val())
-                        nodename.push(messages_child.key)
-                    }
-                });
+                if (globalMessages.length == 0 && globalNodenames.length == 0) {
+                    messages_object.forEach((messages_child) => {
+                        if (messages_child.val().channel == (sessionStorage.getItem("channel") || "general") || (messages_child.val().name == "[SERVER]" && sessionStorage.getItem("channel") !== "extra")) {
+                            globalMessages.push(messages_child.val())
+                            globalNodenames.push(messages_child.key)
+                        }
+                    });
+                } else {
+                    db.ref("chats/").limitToLast(1).once("value", function(messages_child) {
+                        messages_child.forEach(function(childSnapshot) {
+                            if (childSnapshot.val().channel == (sessionStorage.getItem("channel") || "general") || (childSnapshot.val().name == "[SERVER]" && sessionStorage.getItem("channel") !== "extra")) {
+                                globalMessages.push(childSnapshot.val())
+                                globalNodenames.push(childSnapshot.key)
+                            }
+                        })
+                    })
+                }
+        
+                messages = globalMessages;
+                nodename = globalNodenames;
+
                 var obj = user_object.val();
                 messages.forEach(function(data, index) {
                     if (data.whisper == null || data.whisper == getUsername() || data.name == getUsername() || obj.admin > 0) {
@@ -1178,6 +1210,11 @@ function changeChannel(channel) {
 }
 
 function setup() {
+    // deletion check
+    db.ref(`users/${getUsername()}`).on("child_removed", function(object) {
+        db.ref("users/" + getUsername()).onDisconnect().cancel();
+    })
+
     // Notification check
     document.addEventListener("visibilitychange", function() {
         if (document.visibilityState === "visible") {
@@ -1458,14 +1495,16 @@ function voteButton(choice) {
 
 function checkActive() {
     db.ref(".info/connected").on("value", (snapshot) => {
-        if (snapshot.val()) {
-            db.ref("users/" + getUsername()).update({
-                active: true,
-            })
-            db.ref("users/" + getUsername()).onDisconnect().update({
-                active: false,
-            })
-        }
+        db.ref(`users/${getUsername()}`).once("value", function(object) {
+            if (snapshot.val() && object.exists()) {
+                db.ref("users/" + getUsername()).update({
+                    active: true,
+                })
+                db.ref("users/" + getUsername()).onDisconnect().update({
+                    active: false,
+                })
+            }
+        })
     })
 }
 
@@ -1485,7 +1524,7 @@ function imagePopup() {
         <img id="image1" style="max-width:40%;max-height:10vh"><button onclick="editImage(1)">Edit</button><button onclick="useImage(1)">Use</button><br>
         <img id="image2" style="max-width:40%;max-height:10vh"><button onclick="editImage(2)">Edit</button><button onclick="useImage(2)">Use</button><br>
         <img id="image3" style="max-width:40%;max-height:10vh"><button onclick="editImage(3)">Edit</button><button onclick="useImage(3)">Use</button><br>`)
-    db.ref(`users/${getUsername()}`).once("value", function(object) {
+    db.ref(`userimages/${getUsername()}`).once("value", function(object) {
         document.getElementById("image1").src = (object.val().images ? (object.val().images.image1 || "../images/image_placeholder.jpg") : "../images/image_placeholder.jpg");
         document.getElementById("image2").src = (object.val().images ? (object.val().images.image2 || "../images/image_placeholder.jpg") : "../images/image_placeholder.jpg");
         document.getElementById("image3").src = (object.val().images ? (object.val().images.image3 || "../images/image_placeholder.jpg") : "../images/image_placeholder.jpg");
@@ -1507,40 +1546,54 @@ function checkImageURL(url, callback) {
   }
 
 function useImage(index) {
-    db.ref(`users/${getUsername()}`).once("value", function(object) {
-        var obj = object.val();
-        var curr = new Date();
+    db.ref(`userimages/${getUsername()}`).once("value", function(object) {
+        db.ref(`users/${getUsername()}`).once("value", function(user_object) {
+            var obj = user_object.val();
+            var curr = new Date();
 
-        if (obj.images[`image${index}`]) {
-            if (obj.image || obj.admin > 0 || typeof(obj.image) == "undefined") {
-                document.getElementById("popup").remove();
-                db.ref('chats/').push({
-                    name: obj.username,
-                    message: `<img src="${obj.images[`image${index}`]}" style="max-width:70%;max-height:30vh">`,
-                    real_name: obj.name,
-                    admin: obj.admin,
-                    removed: false,
-                    channel: (sessionStorage.getItem("channel") || "general"),
-                    edited: false,
-                    time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
-                }).then(function() {
-                    db.ref("users/" + username).update({
-                        sleep: Date.now(),
+            if (object.val().images[`image${index}`]) {
+                if (obj.image || obj.admin > 0 || typeof(obj.image) == "undefined") {
+                    document.getElementById("popup").remove();
+                    db.ref('chats/').push({
+                        name: obj.username,
+                        message: `<img src="${object.val().images[`image${index}`]}" style="max-width:70%;max-height:30vh">`,
+                        real_name: obj.name,
+                        admin: obj.admin,
+                        removed: false,
+                        channel: (sessionStorage.getItem("channel") || "general"),
+                        edited: false,
+                        time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
+                    }).then(function() {
+                        db.ref("users/" + username).update({
+                            sleep: Date.now(),
+                        })
                     })
-                })
+                } else {
+                    alert("You do not have image privileges")
+                }
             } else {
-                alert("You do not have image privileges")
+                alert(`Please set an image for image ${index} before using it`)
             }
-        } else {
-            alert(`Please set an image for image ${index} before using it`)
-        }
+        })
     })
 }
 
 function editImage(index) {
-    db.ref(`users/${getUsername()}/images/image${index}`).once("value", function(object) {
+    db.ref(`userimages/${getUsername()}/images/image${index}`).once("value", function(object) {
         document.getElementById("popupHeading").innerHTML = `Editing Image ${index}`;
-        document.getElementById("popupBody").innerHTML = `<img id="previewImage" src="${object.val() || "../images/image_placeholder.jpg"}" style="max-width:40%;max-height:30vh"><br>URL: <input id="ImageURL" type="text" style="color:white;width:100%" value="${object.val() || ""}"><br><button onclick="imagePreview()">Preview Image</button><button onclick="submitImage(${index})">Submit</button><br><img src="../images/image_instructions.png" style="height:30%">`;
+        document.getElementById("popupBody").innerHTML = `<img id="previewImage" src="${object.val() || "../images/image_placeholder.jpg"}" style="max-width:40%;max-height:30vh"><br>URL: <input id="ImageURL" type="text" style="color:white;width:100%" value="${object.val() || ""}"><br><button onclick="imagePreview()">Preview Image</button><input type="file" id="imageUpload"><button onclick="submitImage(${index})">Submit</button><br><img src="../images/image_instructions.png" style="height:30%"><br>If you are having trouble getting the file size under 5MB, refer to this instruction on how you can use URLs to upload images`;
+        document.getElementById('imageUpload').addEventListener('change', function () {
+            const file = this.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function () {
+            const base64 = reader.result;
+                document.getElementById('ImageURL').value = base64;
+                imagePreview();
+            };
+            reader.readAsDataURL(file);
+        })
     })
 }
 
@@ -1549,22 +1602,33 @@ function imagePreview() {
 }
 
 function submitImage(index) {
-    db.ref(`users/${getUsername()}`).once("value", function(object) {
-        checkImageURL(document.getElementById("ImageURL").value, function(isValid) {
-            if (!isValid) {
-                alert(`Please use a valid URL for an image`);
-                return;
-            }
+    db.ref(`userimages/${getUsername()}`).once("value", function(object) {
+        db.ref(`users/${getUsername()}`).once("value", function(user_object) {
+            checkImageURL(document.getElementById("ImageURL").value, function(isValid) {
+                if (!isValid) {
+                    alert(`Please use a valid URL for an image`);
+                    return;
+                }
 
-            if (typeof(object.val().images) == "undefined" || Date.now() - (object.val().images[`image${index}sleep`] || 0) > imageSleep || object.val().admin > 0) {
-                db.ref(`users/${getUsername()}`).update({
-                    [`images/image${index}`]: document.getElementById("ImageURL").value,
-                    [`images/image${index}sleep`]: Date.now(),
-                })
-                document.getElementById("popup").remove();
-            } else {
-                alert(`You are changing image ${index} too quickly`);
-            }
+                if (typeof(object.val().images) == "undefined" || Date.now() - (object.val().images[`image${index}sleep`] || 0) > imageSleep || user_object.val().admin > 0) {
+                    let base64 = document.getElementById("ImageURL").value.split(',')[1] || document.getElementById("ImageURL").value;
+                    let padding = (base64.match(/=+$/) || [''])[0].length;
+                    let sizeInBytes = (base64.length * 3) / 4 - padding;
+
+                    if (sizeInBytes > 5 * 1024 * 1024) {
+                        alert("Image cannot be larger than 5 MB");
+                        return;
+                    }
+                    
+                    db.ref(`userimages/${getUsername()}`).update({
+                        [`images/image${index}`]: document.getElementById("ImageURL").value,
+                        [`images/image${index}sleep`]: Date.now(),
+                    })
+                    document.getElementById("popup").remove();
+                } else {
+                    alert(`You are changing image ${index} too quickly`);
+                }
+            })
         })
     })
 }

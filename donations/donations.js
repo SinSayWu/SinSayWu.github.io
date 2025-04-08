@@ -27,14 +27,16 @@ function addAmount(autoclicker) {
             amount = amount * 2
         }
 
-        if (data.money !== undefined && data.money !== null) {
-            db.ref(`users/${getUsername()}`).update({
-                money: firebase.database.ServerValue.increment(amount)
-            });
-        } else {
-            db.ref(`users/${getUsername()}`).update({
-                money: amount
-            });
+        if (snapshot.exists()) {
+            if (data.money !== undefined && data.money !== null && Number.isInteger(data.money)) {
+                db.ref(`users/${getUsername()}`).update({
+                    money: firebase.database.ServerValue.increment(amount)
+                });
+            } else {
+                db.ref(`users/${getUsername()}`).update({
+                    money: amount
+                });
+            }
         }
     });
 }
@@ -42,7 +44,7 @@ function addAmount(autoclicker) {
 function loadLeaderboard() {
     var leaderboard = document.getElementById('leaderboard');
 
-    db.ref("users/").orderByChild("money").on("value", (object) => {
+    db.ref("users/").orderByChild("money").on("value", (object) => { // this one is a problem
         leaderboard.innerHTML = "";
 
         users = [];
@@ -95,7 +97,7 @@ function loadLeaderboard() {
 function loadNotifications() {
     var notifications = document.getElementById("notifications");
 
-    db.ref("other/clickernotifications/").on("value", (object) => {
+    db.ref("other/clickernotifications/").on("value", (object) => { // this one is fine
         notifications.innerHTML = "";
         
         let notifs = [];
@@ -178,7 +180,7 @@ function loadAutoclicker() {
 }
 
 function loadMain() {
-    db.ref("users/" + getUsername()).on("value", (object) => {
+    db.ref("users/" + getUsername()).on("value", (object) => { // this one is a problem
         obj = object.val();
 
         // clicker mult
@@ -684,7 +686,7 @@ function checkAutoclickerActive() {
     })
 }
 
-function selectorListeners() {
+function selectorListeners() { // these are all a problem
     const autoselector = document.getElementById("autoselect");
 
     autoselector.addEventListener("change", function(event) {
@@ -880,6 +882,10 @@ function setup() {
                 return;
             })
         }
+    })
+
+    db.ref(`users/${getUsername()}`).on("child_removed", function(object) {
+        db.ref("users/" + getUsername()).onDisconnect().cancel();
     })
 
     db.ref(`users/${getUsername()}/admin`).once("value", function(object) {
