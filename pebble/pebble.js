@@ -110,69 +110,69 @@ function refreshChat() {
 
 
 
-                    messageElement.addEventListener("mouseover", function(e) {
-                        messageContent.style.backgroundColor = "gray";
-                        if ((data.name == getUsername() || data.admin < obj.admin) && !messageElement.querySelector("#delete-button")) {
-                            setTimeout(() => {
-                                var trashButton = document.createElement("button");
-                                timeElement.style.visibility = "hidden";
-                                trashButton.innerHTML = "🗑️️";
-                                trashButton.setAttribute("id", "delete-button");
-                                trashButton.addEventListener("click", function() {
-                                    db.ref("chats/" + nodename[index]).update({
-                                        removed: true,
-                                        message: `<i><b>REMOVED BY ${getUsername()}</b></i><span style="display: none">@${getUsername()} @${data.name}</span>`,
-                                    });
-                                })
-                                messageElement.appendChild(trashButton);
-                            }, 100);
-                        }
-                        if (data.name == getUsername() && !messageElement.querySelector("#edit-button")) {
-                            db.ref("users/" + getUsername()).once('value', function(user_object) {
-                                var obj = user_object.val();
-                                var editButton = document.createElement("button");
-                                var textBox = document.getElementById("text-box");
-                                editButton.setAttribute("id", "edit-button");
-                                timeElement.style.visibility = "hidden";
-                                if (obj && "editing" in obj && obj.editing == nodename[index]) {
-                                    editButton.innerHTML = "🗙";
-                                } else {
-                                    editButton.innerHTML = "✏️";
-                                }
-                                editButton.addEventListener("click", function() {
-                                    if (obj && "editing" in obj && obj.editing == nodename[index]) {
-                                        editButton.innerHTML = "✏️";
-                                        db.ref("users/" + getUsername() + "/editing").remove()
-                                        textBox.value = "";
-                                        textBox.focus();
-                                    } else {
-                                        editButton.innerHTML = "🗙";
-                                        db.ref(`chats/${nodename[index]}/message`).once("value", function(edit_message) {
-                                            textBox.value = edit_message.val();
-                                        })
-                                        textBox.focus();
-                                        db.ref("users/" + getUsername()).update({
-                                            editing: nodename[index],
-                                        });
-                                    }
-                                });
+                    // messageElement.addEventListener("mouseover", function(e) {
+                    //     messageContent.style.backgroundColor = "gray";
+                    //     if ((data.name == getUsername() || data.admin < obj.admin) && !messageElement.querySelector("#delete-button")) {
+                    //         setTimeout(() => {
+                    //             var trashButton = document.createElement("button");
+                    //             timeElement.style.visibility = "hidden";
+                    //             trashButton.innerHTML = "🗑️️";
+                    //             trashButton.setAttribute("id", "delete-button");
+                    //             trashButton.addEventListener("click", function() {
+                    //                 db.ref("chats/" + nodename[index]).update({
+                    //                     removed: true,
+                    //                     message: `<i><b>REMOVED BY ${getUsername()}</b></i><span style="display: none">@${getUsername()} @${data.name}</span>`,
+                    //                 });
+                    //             })
+                    //             messageElement.appendChild(trashButton);
+                    //         }, 100);
+                    //     }
+                    //     if (data.name == getUsername() && !messageElement.querySelector("#edit-button")) {
+                    //         db.ref("users/" + getUsername()).once('value', function(user_object) {
+                    //             var obj = user_object.val();
+                    //             var editButton = document.createElement("button");
+                    //             var textBox = document.getElementById("text-box");
+                    //             editButton.setAttribute("id", "edit-button");
+                    //             timeElement.style.visibility = "hidden";
+                    //             if (obj && "editing" in obj && obj.editing == nodename[index]) {
+                    //                 editButton.innerHTML = "🗙";
+                    //             } else {
+                    //                 editButton.innerHTML = "✏️";
+                    //             }
+                    //             editButton.addEventListener("click", function() {
+                    //                 if (obj && "editing" in obj && obj.editing == nodename[index]) {
+                    //                     editButton.innerHTML = "✏️";
+                    //                     db.ref("users/" + getUsername() + "/editing").remove()
+                    //                     textBox.value = "";
+                    //                     textBox.focus();
+                    //                 } else {
+                    //                     editButton.innerHTML = "🗙";
+                    //                     db.ref(`chats/${nodename[index]}/message`).once("value", function(edit_message) {
+                    //                         textBox.value = edit_message.val();
+                    //                     })
+                    //                     textBox.focus();
+                    //                     db.ref("users/" + getUsername()).update({
+                    //                         editing: nodename[index],
+                    //                     });
+                    //                 }
+                    //             });
 
-                                messageElement.appendChild(editButton);
-                            })
-                        }
-                    })
-                    messageElement.addEventListener("mouseleave", function(e) {
-                        messageContent.style.backgroundColor = "";
-                        timeElement.style.visibility = "visible";
+                    //             messageElement.appendChild(editButton);
+                    //         })
+                    //     }
+                    // })
+                    // messageElement.addEventListener("mouseleave", function(e) {
+                    //     messageContent.style.backgroundColor = "";
+                    //     timeElement.style.visibility = "visible";
 
-                        setTimeout(() => {
-                            var buttons = messageElement.querySelectorAll("#delete-button, #edit-button");
-                            buttons.forEach(function(button) {
-                                button.remove();
-                            })
-                            timeElement.style.visibility = "visible";
-                        }, 100)
-                    })
+                    //     setTimeout(() => {
+                    //         var buttons = messageElement.querySelectorAll("#delete-button, #edit-button");
+                    //         buttons.forEach(function(button) {
+                    //             button.remove();
+                    //         })
+                    //         timeElement.style.visibility = "visible";
+                    //     }, 100)
+                    // })
                     
 
                     var messageContent = document.createElement("div");
@@ -1127,69 +1127,69 @@ function changeChannel(channel) {
     
     
     
-                        messageElement.addEventListener("mouseover", function(e) {
-                            messageContent.style.backgroundColor = "gray";
-                            if ((data.name == getUsername() || data.admin < obj.admin) && !messageElement.querySelector("#delete-button")) {
-                                setTimeout(() => {
-                                    var trashButton = document.createElement("button");
-                                    timeElement.style.visibility = "hidden";
-                                    trashButton.innerHTML = "🗑️️";
-                                    trashButton.setAttribute("id", "delete-button");
-                                    trashButton.addEventListener("click", function() {
-                                        db.ref("chats/" + nodename[index]).update({
-                                            removed: true,
-                                            message: `<i><b>REMOVED BY ${getUsername()}</b></i><span style="display: none">@${getUsername()} @${data.name}</span>`,
-                                        });
-                                    })
-                                    messageElement.appendChild(trashButton);
-                                }, 100);
-                            }
-                            if (data.name == getUsername() && !messageElement.querySelector("#edit-button")) {
-                                db.ref("users/" + getUsername()).once('value', function(user_object) {
-                                    var obj = user_object.val();
-                                    var editButton = document.createElement("button");
-                                    var textBox = document.getElementById("text-box");
-                                    editButton.setAttribute("id", "edit-button");
-                                    timeElement.style.visibility = "hidden";
-                                    if (obj && "editing" in obj && obj.editing == nodename[index]) {
-                                        editButton.innerHTML = "🗙";
-                                    } else {
-                                        editButton.innerHTML = "✏️";
-                                    }
-                                    editButton.addEventListener("click", function() {
-                                        if (obj && "editing" in obj && obj.editing == nodename[index]) {
-                                            editButton.innerHTML = "✏️";
-                                            db.ref("users/" + getUsername() + "/editing").remove()
-                                            textBox.value = "";
-                                            textBox.focus();
-                                        } else {
-                                            editButton.innerHTML = "🗙";
-                                            db.ref(`chats/${nodename[index]}/message`).once("value", function(edit_message) {
-                                                textBox.value = edit_message.val();
-                                            })
-                                            textBox.focus();
-                                            db.ref("users/" + getUsername()).update({
-                                                editing: nodename[index],
-                                            });
-                                        }
-                                    });
+                        // messageElement.addEventListener("mouseover", function(e) {
+                        //     messageContent.style.backgroundColor = "gray";
+                        //     if ((data.name == getUsername() || data.admin < obj.admin) && !messageElement.querySelector("#delete-button")) {
+                        //         setTimeout(() => {
+                        //             var trashButton = document.createElement("button");
+                        //             timeElement.style.visibility = "hidden";
+                        //             trashButton.innerHTML = "🗑️️";
+                        //             trashButton.setAttribute("id", "delete-button");
+                        //             trashButton.addEventListener("click", function() {
+                        //                 db.ref("chats/" + nodename[index]).update({
+                        //                     removed: true,
+                        //                     message: `<i><b>REMOVED BY ${getUsername()}</b></i><span style="display: none">@${getUsername()} @${data.name}</span>`,
+                        //                 });
+                        //             })
+                        //             messageElement.appendChild(trashButton);
+                        //         }, 100);
+                        //     }
+                        //     if (data.name == getUsername() && !messageElement.querySelector("#edit-button")) {
+                        //         db.ref("users/" + getUsername()).once('value', function(user_object) {
+                        //             var obj = user_object.val();
+                        //             var editButton = document.createElement("button");
+                        //             var textBox = document.getElementById("text-box");
+                        //             editButton.setAttribute("id", "edit-button");
+                        //             timeElement.style.visibility = "hidden";
+                        //             if (obj && "editing" in obj && obj.editing == nodename[index]) {
+                        //                 editButton.innerHTML = "🗙";
+                        //             } else {
+                        //                 editButton.innerHTML = "✏️";
+                        //             }
+                        //             editButton.addEventListener("click", function() {
+                        //                 if (obj && "editing" in obj && obj.editing == nodename[index]) {
+                        //                     editButton.innerHTML = "✏️";
+                        //                     db.ref("users/" + getUsername() + "/editing").remove()
+                        //                     textBox.value = "";
+                        //                     textBox.focus();
+                        //                 } else {
+                        //                     editButton.innerHTML = "🗙";
+                        //                     db.ref(`chats/${nodename[index]}/message`).once("value", function(edit_message) {
+                        //                         textBox.value = edit_message.val();
+                        //                     })
+                        //                     textBox.focus();
+                        //                     db.ref("users/" + getUsername()).update({
+                        //                         editing: nodename[index],
+                        //                     });
+                        //                 }
+                        //             });
     
-                                    messageElement.appendChild(editButton);
-                                })
-                            }
-                        })
-                        messageElement.addEventListener("mouseleave", function(e) {
-                            messageContent.style.backgroundColor = "";
-                            timeElement.style.visibility = "visible";
+                        //             messageElement.appendChild(editButton);
+                        //         })
+                        //     }
+                        // })
+                        // messageElement.addEventListener("mouseleave", function(e) {
+                        //     messageContent.style.backgroundColor = "";
+                        //     timeElement.style.visibility = "visible";
     
-                            setTimeout(() => {
-                                var buttons = messageElement.querySelectorAll("#delete-button, #edit-button");
-                                buttons.forEach(function(button) {
-                                    button.remove();
-                                })
-                                timeElement.style.visibility = "visible";
-                            }, 100)
-                        })
+                        //     setTimeout(() => {
+                        //         var buttons = messageElement.querySelectorAll("#delete-button, #edit-button");
+                        //         buttons.forEach(function(button) {
+                        //             button.remove();
+                        //         })
+                        //         timeElement.style.visibility = "visible";
+                        //     }, 100)
+                        // })
                         
     
                         var messageContent = document.createElement("div");
@@ -1213,6 +1213,12 @@ function setup() {
     // deletion check
     db.ref(`users/${getUsername()}`).on("child_removed", function(object) {
         db.ref("users/" + getUsername()).onDisconnect().cancel();
+    })
+
+    // wipe chat check
+    db.ref(`chats/`).on("child_removed", function(object) {
+        globalMessages = [];
+        globalNodenames = [];
     })
 
     // Notification check
