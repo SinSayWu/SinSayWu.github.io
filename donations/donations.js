@@ -956,7 +956,7 @@ function setup() {
         if (document.getElementById('gambling-money')) {
             db.ref(`other/Casino/money`).once("value", function(casino_amount) {
                 document.getElementById('gambling-money').innerHTML = (amount.val() || 0);
-                document.getElementById('ultimatePercentage').innerHTML = `${amount.val() == 0 ? 0 : Math.min(6 ** ((4.9 * (amount.val() - casino_amount.val() * 1.05)) / casino_amount.val()), 0.5) * 100}% chance to win $${casino_amount.val()}`;
+                document.getElementById('ultimatePercentage').innerHTML = `Gamble all your money away to have a ${amount.val() == 0 ? 0 : Math.min(6 ** ((4.9 * (amount.val() - casino_amount.val() * 1.05)) / casino_amount.val()), 0.5) * 100}% chance to win $${casino_amount.val()}`;
             })
         }
     })
