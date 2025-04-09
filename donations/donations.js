@@ -45,51 +45,58 @@ function loadLeaderboard() {
     var leaderboard = document.getElementById('leaderboard');
 
     db.ref("users/").orderByChild("money").on("value", (object) => { // this one is a problem
-        leaderboard.innerHTML = "";
+        db.ref(`other/Casino`).once("value", function(casino_object) {
+            leaderboard.innerHTML = "";
 
-        users = [];
+            users = [];
 
-        object.forEach((object_child) => {
-            users.push(object_child.val());
-        })
+            object.forEach((object_child) => {
+                users.push(object_child.val());
+            })
 
-        users.sort((a, b) => {
-            const timeA = a.timestamp ? Number(a.timestamp) : Infinity;
-            const timeB = b.timestamp ? Number(b.timestamp) : Infinity;
-            return timeA - timeB;
-        });
+            users.sort((a, b) => {
+                const timeA = a.timestamp ? Number(a.timestamp) : Infinity;
+                const timeB = b.timestamp ? Number(b.timestamp) : Infinity;
+                return timeA - timeB;
+            });
 
-        users.reverse();
+            users.push(casino_object.val());
+            users.reverse();
 
-        users.forEach(function(username) {
-            var leader = document.createElement("div");
-            leader.setAttribute("class", "leader");
-            
-
-            var usernameElement = document.createElement("div");
-            usernameElement.setAttribute("class", "leader-header");
-            usernameElement.innerHTML = username.username + ": ";
-            
-            
-            var usernameAmount = document.createElement("span");
-            usernameAmount.setAttribute("id", "leaderNumber");
-            usernameAmount.innerHTML = username.money || 0;
-            
-            var usernameImage = document.createElement("img");
-            usernameImage.src = "../images/money.png";
-            
-            usernameElement.appendChild(usernameAmount);
-            usernameElement.appendChild(usernameImage);
-
-            
-            var contentElement = document.createElement("div");
-            contentElement.setAttribute("class", "leader-content");
-            contentElement.innerHTML = "Auto-Clickers: " + (username.autoclicker || 0) + "<br>Mult: " + (username.mult || 1) + (username.gambling ? `<br>Gambling: Unlocked` : "");
-
-            leader.appendChild(usernameElement);
-            leader.appendChild(contentElement);
-
-            leaderboard.appendChild(leader);
+            users.forEach(function(username) {
+                var leader = document.createElement("div");
+                leader.setAttribute("class", "leader");
+                
+    
+                var usernameElement = document.createElement("div");
+                usernameElement.setAttribute("class", "leader-header");
+                usernameElement.innerHTML = username.username + ": ";
+                
+                
+                var usernameAmount = document.createElement("span");
+                usernameAmount.setAttribute("id", "leaderNumber");
+                usernameAmount.innerHTML = username.money || 0;
+                
+                var usernameImage = document.createElement("img");
+                usernameImage.src = "../images/money.png";
+                
+                usernameElement.appendChild(usernameAmount);
+                usernameElement.appendChild(usernameImage);
+    
+                
+                var contentElement = document.createElement("div");
+                contentElement.setAttribute("class", "leader-content");
+                if (username.username == "Casino") {
+                    contentElement.innerHTML = `Total Earnings: $${username.money}`;
+                } else {
+                    contentElement.innerHTML = "Auto-Clickers: " + (username.autoclicker || 0) + "<br>Mult: " + (username.mult || 1) + (username.gambling ? `<br>Gambling: Unlocked` : "");
+                }
+    
+                leader.appendChild(usernameElement);
+                leader.appendChild(contentElement);
+    
+                leaderboard.appendChild(leader);
+            })
         })
     })
 }
@@ -174,7 +181,6 @@ function loadAutoclicker() {
         setTimeout(loadAutoclicker, 1000);
         db.ref(`users/${getUsername()}`).update({
             autoactive: true,
-            autosleep: Date.now(),
         })
     })
 }
@@ -208,7 +214,7 @@ function loadMain() {
 
         // check if gambling has been bought
         if (obj.gambling) {
-            document.getElementById('gambling-text').innerHTML = "Gambling";
+            document.getElementById('gambling-text').innerHTML = "Probability Sim with Cards";
         }
     })
 }
@@ -313,7 +319,7 @@ function sellMult() {
 function Gambling() {
     db.ref(`users/${getUsername()}`).once("value", function(object) {
         if (object.val().gambling) {
-            showPopUp(`Welcome to the Gambling Space! $<span id="gambling-money">${object.val().money}</span>`,`Double or Nothing<hr>$<input type="text" id="double"><br><br>Blackjack<hr>Dealer: <span id="dealer"></span><br>You: <span id="player"></span><br>$<input type="text" id="blackjack">`, [["Double-or-Nothing", () => DoubleNothing()], ["Hit", () => blackHit()], ["Stand", () => blackStand()]]);
+            showPopUp(`Welcome to the Gambling Space! $<span id="gambling-money">${object.val().money}</span>`,`Double or Nothing<hr>$<input type="text" id="double"><br><br>Blackjack<hr>Dealer: <span id="dealer"></span><br>You: <span id="player"></span><br>$<input type="text" id="blackjack"><br><br>The Ultimate Gamble<hr><button onclick="ultimateGamble()">Gamble all my money away</button><span id="ultimatePercentage"></span>`, [["Double-or-Nothing", () => DoubleNothing()], ["Hit", () => blackHit()], ["Stand", () => blackStand()]]);
         } else if (object.val().money >= 100000) {
             db.ref(`users/${getUsername()}`).update({
                 money: firebase.database.ServerValue.increment(-100000),
@@ -337,12 +343,18 @@ function DoubleNothing() {
                     db.ref(`users/${getUsername()}`).update({
                         money: firebase.database.ServerValue.increment(moneyinput),
                     })
+                    db.ref(`other/Casino/`).update({
+                        money: firebase.database.ServerValue.increment(-moneyinput),
+                    })
                 } else {
                     if (moneyinput >= 1000000) {
                         sendNotification(`${object.val().username} just lost $${moneyinput} in Double-or-Nothing!`)
                     }
                     db.ref(`users/${getUsername()}`).update({
                         money: firebase.database.ServerValue.increment(-moneyinput),
+                    })
+                    db.ref(`other/Casino/`).update({
+                        money: firebase.database.ServerValue.increment(moneyinput),
                     })
                 }
             }
@@ -439,6 +451,9 @@ function blackStand() {
                 if (moneyinput > 1000000) {
                     sendNotification(`${object.val().username} just lost $${moneyinput} in Blackjack!`)
                 }
+                db.ref(`other/Casino/`).update({
+                    money: firebase.database.ServerValue.increment(moneyinput),
+                })
             } else if (sum > 21) {
                 document.getElementById('blackjack').disabled = false;
                 document.getElementById('blackjack').value = "";
@@ -447,6 +462,9 @@ function blackStand() {
                 if (moneyinput > 1000000) {
                     sendNotification(`${object.val().username} just lost $${moneyinput} in Blackjack!`)
                 }
+                db.ref(`other/Casino/`).update({
+                    money: firebase.database.ServerValue.increment(moneyinput),
+                })
             } else if (hand == sum) {
                 document.getElementById('blackjack').disabled = false;
                 db.ref(`users/${getUsername()}`).update({
@@ -463,6 +481,9 @@ function blackStand() {
                 db.ref(`users/${getUsername()}`).update({
                     money: firebase.database.ServerValue.increment(moneyinput * 2),
                 })
+                db.ref(`other/Casino/`).update({
+                    money: firebase.database.ServerValue.increment(-moneyinput),
+                })
                 document.getElementById('blackjack').value = "";
                 document.getElementById("dealer").innerHTML += " Lost";
                 document.getElementById("player").innerHTML += " Won";
@@ -474,6 +495,9 @@ function blackStand() {
                 db.ref(`users/${getUsername()}`).update({
                     money: firebase.database.ServerValue.increment(moneyinput * 2),
                 })
+                db.ref(`other/Casino/`).update({
+                    money: firebase.database.ServerValue.increment(-moneyinput),
+                })
                 document.getElementById('blackjack').value = "";
                 document.getElementById("dealer").innerHTML += " Lost";
                 document.getElementById("player").innerHTML += " Won";
@@ -483,6 +507,33 @@ function blackStand() {
             }
         })
     }
+}
+
+function ultimateGamble() {
+    db.ref(`users/${getUsername()}`).once("value", function(user_object) {
+        db.ref(`other/Casino`).once("value", function(casino_object) {
+            if (Math.random() <= Math.min(6 ** ((4.9 * (user_object.val().money - casino_object.val().money * 1.05)) / casino_object.val().money), 0.5) && user_object.val().money > 0.0001 * casino_object.val().money) {
+                db.ref(`users/${getUsername()}`).update({
+                    money: firebase.database.ServerValue.increment(casino_object.val().money),
+                })
+                db.ref(`other/Casino/`).update({
+                    money: firebase.database.ServerValue.increment(-casino_object.val().money),
+                })
+                sendNotification(`${getUsername()} has just won the Ultimate Gamble!`);
+            } else {
+                db.ref(`users/${getUsername()}`).update({
+                    money: firebase.database.ServerValue.increment(-user_object.val().money),
+                })
+                db.ref(`other/Casino/`).update({
+                    money: firebase.database.ServerValue.increment(user_object.val().money),
+                })
+
+                if (user_object.val().money >= 1000000) {
+                    sendNotification(`${getUsername()} has just lost the Ultimate Gamble!`);
+                }
+            }
+        })
+    })
 }
 
 function minusAuto() {
@@ -674,12 +725,11 @@ function checkAutoclickerActive() {
                     )
                     db.ref(`users/${getUsername()}`).update({
                         money: firebase.database.ServerValue.increment(money),
-                        autosleep: Date.now(),
                     })
                 }
                 db.ref("users/" + getUsername()).onDisconnect().update({
                     autoactive: false,
-                    autosleep: Date.now(),
+                    autosleep: firebase.database.ServerValue.TIMESTAMP,
                 })
             }
         })
@@ -858,6 +908,13 @@ function setup() {
         music.play();
     });
 
+    // log out in another window check
+    window.addEventListener("storage", function(event) {
+        if (event.storageArea === localStorage && event.key === null) {
+            location.reload();
+        }
+    })
+
     if (getUsername() == null) {
         document.body.innerHTML = `<h1>Please Log in through Pebble because im too lazy to add the feature here</h1><button onclick="window.location.replace('../pebble/pebble.html?ignore=true')">Pebble</button>`;
         return;
@@ -897,7 +954,10 @@ function setup() {
     db.ref(`users/${getUsername()}/money`).on("value", (amount) => {
         document.getElementById('money').innerHTML = (amount.val() || 0);
         if (document.getElementById('gambling-money')) {
-            document.getElementById('gambling-money').innerHTML = (amount.val() || 0)
+            db.ref(`other/Casino/money`).once("value", function(casino_amount) {
+                document.getElementById('gambling-money').innerHTML = (amount.val() || 0);
+                document.getElementById('ultimatePercentage').innerHTML = `${amount.val() == 0 ? 0 : Math.min(6 ** ((4.9 * (amount.val() - casino_amount.val() * 1.05)) / casino_amount.val()), 0.5) * 100}% chance to win $${casino_amount.val()}`;
+            })
         }
     })
 

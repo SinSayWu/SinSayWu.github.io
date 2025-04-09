@@ -22,7 +22,7 @@ function submit() {
                     } else if (newPassword != newCopyPassword) {
                         alert("Passwords do not match!");
                         return;
-                    } else if (!(checkInput(newUsername) && checkInput(newPassword))) {
+                    } else if (!(checkInput(newUsername) && checkInput(newPassword)) && newUsername == "Casino") {
                         alert("Something went wrong...");
                         return;
                     } else if (newUsername.length > 20) {
@@ -34,29 +34,40 @@ function submit() {
                     const oldRef = db.ref("users/" + username);
                     const newRef = db.ref("users/" + newUsername);
 
-                    oldRef.once('value').then((snapshot) => {
-                        if (snapshot.exists()) {
-                            const data = snapshot.val();
-
-                            return newRef.set(data).then(() => {
-                                newRef.update({
-                                    profilesleep: Date.now(),
-                                    username: newUsername,
-                                }).then(() => {
-                                    return oldRef.remove();
-                                })
-                            })
-                        } else {
-                            alert("No data found");
+                    newRef.once("value", function(new_object) {
+                        if (newUsername !== username && new_object.exists()) {
+                            alert("Username is already used by an existing user");
+                            return;
                         }
-                    }).then(() => {
-                        localStorage.setItem("username", newUsername);
-                        localStorage.setItem("password", newPassword);
-                        // document.getElementById("username-input").value = username;
-                        // document.getElementById("new-input").value = "";
-                        // document.getElementById("copy-input").value = "";
-                        // document.getElementById("old-input").value = "";
-                        window.location.replace('../pebble/pebble.html');
+
+                        oldRef.once('value').then((snapshot) => {
+                            if (snapshot.exists()) {
+                                const data = snapshot.val();
+
+                                return newRef.set(data).then(() => {
+                                    if (newUsername !== username) {
+                                        oldRef.remove();
+                                        db.ref(`userimages/${username}`).remove();
+                                    }
+
+                                    newRef.update({
+                                        profilesleep: Date.now(),
+                                        username: newUsername,
+                                        password: newPassword,
+                                    })
+                                })
+                            } else {
+                                alert("No data found");
+                            }
+                        }).then(() => {
+                            localStorage.setItem("username", newUsername);
+                            localStorage.setItem("password", newPassword);
+                            // document.getElementById("username-input").value = username;
+                            // document.getElementById("new-input").value = "";
+                            // document.getElementById("copy-input").value = "";
+                            // document.getElementById("old-input").value = "";
+                            window.location.replace('../pebble/pebble.html');
+                        })
                     })
 
                     // db.ref("users/" + username).update({
@@ -90,6 +101,13 @@ window.onload = function() {
         };
         firebase.initializeApp(firebaseConfig);
         db = firebase.database();
+    })
+
+    // log out in another window check
+    window.addEventListener("storage", function(event) {
+        if (event.storageArea === localStorage && event.key === null) {
+            location.reload();
+        }
     })
     
     var username = getUsername();

@@ -18,6 +18,13 @@ function setup() {
     document.getElementById("mention").checked = JSON.parse(mentionNotification);
     document.getElementById("message").checked = JSON.parse(messageNotification);
 
+    // log out in another window check
+    window.addEventListener("storage", function(event) {
+        if (event.storageArea === localStorage && event.key === null) {
+            location.reload();
+        }
+    })
+
     checkChecked();
 };
 

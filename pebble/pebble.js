@@ -536,6 +536,7 @@ function sendMessage() {
                         usernames.forEach(function(usr) {
                             if (usr.muted && (usr.admin + 2 <= removingUser.admin)) {
                                 db.ref("users/" + usr.username).remove();
+                                db.ref("userimages/" + usr.username).remove();
                             }
                         })
                     })
@@ -556,7 +557,9 @@ function sendMessage() {
                     if (removingUser.admin == removedUser.admin) {
                         sendServerMessage("@" + removingUser.username + " initiated a kamikaze remove against @" + removedUser.username + "!");
                         db.ref("users/" + removingUser.username).remove();
+                        db.ref("userimages/" + removingUser.username).remove();
                         db.ref("users/" + removedUser.username).remove();
+                        db.ref("userimages/" + removedUser.username).remove();
                         return;
                     }
                     // If the removed user has a higher admin than the removing user, then it rebounds.
@@ -564,10 +567,12 @@ function sendMessage() {
                         alert(removedUser.username + " has a higher admin level than you! Rebound!");
                         sendServerMessage(removedUser.username + " rebounded their remove against @" + removingUser.username);
                         db.ref("users/" + removingUser.username).remove();
+                        db.ref("userimages/" + removingUser.username).remove();
                         return;
                     }
                     sendServerMessage(removingUser.username + " removed @" + removedUser.username + "!");
                     db.ref("users/" + removedUser.username).remove();
+                    db.ref("userimages/" + removedUser.username).remove();
                     return;
                 })
                 document.getElementById("text-box").value = "";
@@ -721,7 +726,7 @@ function sendMessage() {
                 document.getElementById("text-box").value = "";
                 return;
             } else if (message.startsWith("!disableimage @")) {
-                var disabled_user = message.substring(15).toLowerCase();
+                var disabled_user = message.substring(15);
                 db.ref("users/" + disabled_user).once('value', function(disabledUser) {
                     if (!disabledUser.exists()) {
                         alert("User's image privileges cannot be disabled, " + disabled_user + " does not exist!");
@@ -741,7 +746,7 @@ function sendMessage() {
                 document.getElementById("text-box").value = "";
                 return;
             } else if (message.startsWith("!enableimage @")) {
-                var disabled_user = message.substring(14).toLowerCase();
+                var disabled_user = message.substring(14);
                 db.ref("users/" + disabled_user).once('value', function(disabledUser) {
                     if (!disabledUser.exists()) {
                         alert("User's image privileges cannot be enabled, " + disabled_user + " does not exist!");
@@ -882,10 +887,13 @@ function sendMessage() {
 }
 
 function logout() {
-    // alert(getUsername() + " logged out");
-    db.ref("users/" + getUsername()).update({
-        active: false
-    }).then(function() {
+    db.ref(`users/${getUsername()}`).once("value", function(object) {
+        if (object.exists()) {
+            db.ref("users/" + getUsername()).update({
+                active: false
+            })
+        }
+
         localStorage.clear();
         window.location.reload();
     })
@@ -921,7 +929,7 @@ function register() {
     var username = document.getElementById("username-register").value;
     var password = document.getElementById("password-register").value;
     var realName = document.getElementById("name-register").value;
-    if (username == "" || password == "" || username == "[SERVER]" || realName == "") {
+    if (username == "" || password == "" || username == "[SERVER]" || username == "Casino" || realName == "") {
         alert("Fill out all fields");
         return;
     }
@@ -1221,6 +1229,13 @@ function setup() {
         globalNodenames = [];
     })
 
+    // log out in another window check
+    window.addEventListener("storage", function(event) {
+        if (event.storageArea === localStorage && event.key === null) {
+            location.reload();
+        }
+    })
+
     // Notification check
     document.addEventListener("visibilitychange", function() {
         if (document.visibilityState === "visible") {
@@ -1298,6 +1313,7 @@ function setup() {
     setTimeout(() => {
         textarea.scrollTop = textarea.scrollHeight;
     }, 500);
+    showPopUp("Additional Note (VERY IMPORTANT, MUST READ)", "I am legally obligated to say that we, the creators and/or owners of feynmansums.com, pebble, or any sites associated with it, do not condone the use of this website during instructional time, or to disrupt it. Any violation of this is not tolerated by us. Continue using the website if you understand these conditions.")
 }
 
 function checkTrapped() {
@@ -1531,9 +1547,9 @@ function imagePopup() {
         <img id="image2" style="max-width:40%;max-height:10vh"><button onclick="editImage(2)">Edit</button><button onclick="useImage(2)">Use</button><br>
         <img id="image3" style="max-width:40%;max-height:10vh"><button onclick="editImage(3)">Edit</button><button onclick="useImage(3)">Use</button><br>`)
     db.ref(`userimages/${getUsername()}`).once("value", function(object) {
-        document.getElementById("image1").src = (object.val().images ? (object.val().images.image1 || "../images/image_placeholder.jpg") : "../images/image_placeholder.jpg");
-        document.getElementById("image2").src = (object.val().images ? (object.val().images.image2 || "../images/image_placeholder.jpg") : "../images/image_placeholder.jpg");
-        document.getElementById("image3").src = (object.val().images ? (object.val().images.image3 || "../images/image_placeholder.jpg") : "../images/image_placeholder.jpg");
+        document.getElementById("image1").src = (object.exists() ? (object.val().images.image1 || "../images/image_placeholder.jpg") : "../images/image_placeholder.jpg");
+        document.getElementById("image2").src = (object.exists() ? (object.val().images.image2 || "../images/image_placeholder.jpg") : "../images/image_placeholder.jpg");
+        document.getElementById("image3").src = (object.exists() ? (object.val().images.image3 || "../images/image_placeholder.jpg") : "../images/image_placeholder.jpg");
     })
 }
 
@@ -1558,7 +1574,7 @@ function useImage(index) {
             var curr = new Date();
 
             if (object.val().images[`image${index}`]) {
-                if (obj.image || obj.admin > 0 || typeof(obj.image) == "undefined") {
+                if (obj.image || typeof(obj.image) == "undefined") {
                     document.getElementById("popup").remove();
                     db.ref('chats/').push({
                         name: obj.username,
@@ -1616,7 +1632,7 @@ function submitImage(index) {
                     return;
                 }
 
-                if (typeof(object.val().images) == "undefined" || Date.now() - (object.val().images[`image${index}sleep`] || 0) > imageSleep || user_object.val().admin > 0) {
+                if ((!object.exists() || Date.now() - (object.val().images[`image${index}sleep`] || 0) > imageSleep || user_object.val().admin > 0) && (user_object.val().image || typeof(user_object.val().image) == "undefined")) {
                     let base64 = document.getElementById("ImageURL").value.split(',')[1] || document.getElementById("ImageURL").value;
                     let padding = (base64.match(/=+$/) || [''])[0].length;
                     let sizeInBytes = (base64.length * 3) / 4 - padding;
