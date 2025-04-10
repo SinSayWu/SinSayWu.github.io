@@ -512,24 +512,26 @@ function blackStand() {
 function ultimateGamble() {
     db.ref(`users/${getUsername()}`).once("value", function(user_object) {
         db.ref(`other/Casino`).once("value", function(casino_object) {
-            if (Math.random() <= Math.min(6 ** ((4.9 * (user_object.val().money - casino_object.val().money * 1.05)) / casino_object.val().money), 0.5) && user_object.val().money > 0.0001 * casino_object.val().money) {
-                db.ref(`users/${getUsername()}`).update({
-                    money: firebase.database.ServerValue.increment(casino_object.val().money),
-                })
-                db.ref(`other/Casino/`).update({
-                    money: firebase.database.ServerValue.increment(-casino_object.val().money),
-                })
-                sendNotification(`${getUsername()} has just won the Ultimate Gamble!`);
-            } else {
-                db.ref(`users/${getUsername()}`).update({
-                    money: firebase.database.ServerValue.increment(-user_object.val().money),
-                })
-                db.ref(`other/Casino/`).update({
-                    money: firebase.database.ServerValue.increment(user_object.val().money),
-                })
+            if (user_object.val().money >= 0) {
+                if (Math.random() <= Math.min(6 ** ((4.9 * (user_object.val().money - casino_object.val().money * 1.05)) / casino_object.val().money), 0.5) && user_object.val().money > 0.0001 * casino_object.val().money) {
+                    db.ref(`users/${getUsername()}`).update({
+                        money: firebase.database.ServerValue.increment(casino_object.val().money),
+                    })
+                    db.ref(`other/Casino/`).update({
+                        money: firebase.database.ServerValue.increment(-casino_object.val().money),
+                    })
+                    sendNotification(`${getUsername()} has just won the Ultimate Gamble!`);
+                } else {
+                    db.ref(`users/${getUsername()}`).update({
+                        money: firebase.database.ServerValue.increment(-user_object.val().money),
+                    })
+                    db.ref(`other/Casino/`).update({
+                        money: firebase.database.ServerValue.increment(user_object.val().money),
+                    })
 
-                if (user_object.val().money >= 1000000) {
-                    sendNotification(`${getUsername()} has just lost the Ultimate Gamble!`);
+                    if (user_object.val().money >= 1000000) {
+                        sendNotification(`${getUsername()} has just lost the Ultimate Gamble!`);
+                    }
                 }
             }
         })

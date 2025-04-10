@@ -5,8 +5,6 @@ var everyoneRevealed = false;
 var joined = true;
 var messageSleep = 0;
 var imageSleep = 0;
-let globalMessages = [];
-let globalNodenames = [];
 let db;
 
 function refreshChat() {
@@ -23,45 +21,29 @@ function refreshChat() {
         }
 
         var messages = [];
-        var nodename = []; // there's probably a better way to do this
 
-        if (globalMessages.length == 0 && globalNodenames.length == 0) {
-            messages_object.forEach((messages_child) => {
-                if (messages_child.val().channel == (sessionStorage.getItem("channel") || "general") || (messages_child.val().name == "[SERVER]" && sessionStorage.getItem("channel") !== "extra")) {
-                    globalMessages.push(messages_child.val())
-                    globalNodenames.push(messages_child.key)
-                }
-            });
-        } else {
-            db.ref("chats/").limitToLast(1).once("value", function(messages_child) {
-                messages_child.forEach(function(childSnapshot) {
-                    if (childSnapshot.val().channel == (sessionStorage.getItem("channel") || "general") || (childSnapshot.val().name == "[SERVER]" && sessionStorage.getItem("channel") !== "extra")) {
-                        globalMessages.push(childSnapshot.val())
-                        globalNodenames.push(childSnapshot.key)
-                    }
-                })
-            })
-        }
-
-        messages = globalMessages;
-        nodename = globalNodenames;
+        messages_object.forEach((messages_child) => {
+            if (messages_child.val().channel == (sessionStorage.getItem("channel") || "general") || (messages_child.val().name == "[SERVER]" && sessionStorage.getItem("channel") !== "extra")) {
+                messages.push(messages_child)
+            }
+        });
 
         // Now we're done. Simply display the ordered messages
         db.ref("users/" + getUsername()).once('value', function(user_object) {
             var obj = user_object.val();
             messages.forEach(function(data, index) {
-                if (data.whisper == null || data.whisper == getUsername() || data.name == getUsername() || obj.admin > 0) {
+                if (data.val().whisper == null || data.val().whisper == getUsername() || data.val().name == getUsername() || obj.admin > 0) {
                     if (everyoneRevealed) {
-                        var username = data.real_name || "[SERVER]";
+                        var username = data.val().real_name || "[SERVER]";
                     } else {
-                        var username = data.name;
+                        var username = data.val().name;
                     }
 
                     // TODO: FIX THIS TO DO SOMETHING IDK WHAT
-                    if (data.removed) {
-                        var message = data.message;
+                    if (data.val().removed) {
+                        var message = data.val().message;
                     } else {
-                        var message = data.message;
+                        var message = data.val().message;
                     }
                     
                     let prevIndex = index - 1;
@@ -70,7 +52,7 @@ function refreshChat() {
                     var messageElement = document.createElement("div");
                     messageElement.setAttribute("class", "message");
 
-                    if (data.name == "[SERVER]") {
+                    if (data.val().name == "[SERVER]") {
                         var messageImg = document.createElement("img");
                         messageImg.src = "../images/meteorite.png";
                         messageImg.setAttribute("class", "profile-img");
@@ -79,28 +61,28 @@ function refreshChat() {
 
                     var timeElement = document.createElement("div");
                     timeElement.setAttribute("id", "time");
-                    timeElement.innerHTML = data.time;
+                    timeElement.innerHTML = data.val().time;
                     messageElement.appendChild(timeElement);
 
-                    if (data.name == "[SERVER]") {
+                    if (data.val().name == "[SERVER]") {
                         var userElement = document.createElement("div");
                         userElement.setAttribute("class", "username");
                         userElement.innerHTML = username;
                         userElement.style.fontWeight = "bold";
                         userElement.style.color = "Yellow";
                         messageElement.appendChild(userElement);
-                    } else if (prevItem == null || prevItem.name != data.name || data.edited) {
+                    } else if (prevItem == null || prevItem.name != data.val().name || data.val().edited) {
                         var userElement = document.createElement("div");
                         userElement.setAttribute("class", "username");
                         userElement.addEventListener("click", function(e) {
                             if (userElement.innerHTML.includes("@")) {
                                 userElement.innerHTML = username;
                             } else {
-                                userElement.innerHTML = username + " @(" + data.real_name + ")";
+                                userElement.innerHTML = username + " @(" + data.val().real_name + ")";
                             }
                         })
                         userElement.innerHTML = username;
-                        if (data.edited) {
+                        if (data.val().edited) {
                             userElement.innerHTML += " <span style='color: gray; font-size: 60%'>(Edited)</span>";
                         }
                         userElement.style.fontWeight = "bold";
@@ -110,69 +92,69 @@ function refreshChat() {
 
 
 
-                    // messageElement.addEventListener("mouseover", function(e) {
-                    //     messageContent.style.backgroundColor = "gray";
-                    //     if ((data.name == getUsername() || data.admin < obj.admin) && !messageElement.querySelector("#delete-button")) {
-                    //         setTimeout(() => {
-                    //             var trashButton = document.createElement("button");
-                    //             timeElement.style.visibility = "hidden";
-                    //             trashButton.innerHTML = "🗑️️";
-                    //             trashButton.setAttribute("id", "delete-button");
-                    //             trashButton.addEventListener("click", function() {
-                    //                 db.ref("chats/" + nodename[index]).update({
-                    //                     removed: true,
-                    //                     message: `<i><b>REMOVED BY ${getUsername()}</b></i><span style="display: none">@${getUsername()} @${data.name}</span>`,
-                    //                 });
-                    //             })
-                    //             messageElement.appendChild(trashButton);
-                    //         }, 100);
-                    //     }
-                    //     if (data.name == getUsername() && !messageElement.querySelector("#edit-button")) {
-                    //         db.ref("users/" + getUsername()).once('value', function(user_object) {
-                    //             var obj = user_object.val();
-                    //             var editButton = document.createElement("button");
-                    //             var textBox = document.getElementById("text-box");
-                    //             editButton.setAttribute("id", "edit-button");
-                    //             timeElement.style.visibility = "hidden";
-                    //             if (obj && "editing" in obj && obj.editing == nodename[index]) {
-                    //                 editButton.innerHTML = "🗙";
-                    //             } else {
-                    //                 editButton.innerHTML = "✏️";
-                    //             }
-                    //             editButton.addEventListener("click", function() {
-                    //                 if (obj && "editing" in obj && obj.editing == nodename[index]) {
-                    //                     editButton.innerHTML = "✏️";
-                    //                     db.ref("users/" + getUsername() + "/editing").remove()
-                    //                     textBox.value = "";
-                    //                     textBox.focus();
-                    //                 } else {
-                    //                     editButton.innerHTML = "🗙";
-                    //                     db.ref(`chats/${nodename[index]}/message`).once("value", function(edit_message) {
-                    //                         textBox.value = edit_message.val();
-                    //                     })
-                    //                     textBox.focus();
-                    //                     db.ref("users/" + getUsername()).update({
-                    //                         editing: nodename[index],
-                    //                     });
-                    //                 }
-                    //             });
+                    messageElement.addEventListener("mouseover", function(e) {
+                        messageContent.style.backgroundColor = "gray";
+                        if ((data.val().name == getUsername() || data.val().admin < obj.admin) && !messageElement.querySelector("#delete-button")) {
+                            setTimeout(() => {
+                                var trashButton = document.createElement("button");
+                                timeElement.style.visibility = "hidden";
+                                trashButton.innerHTML = "🗑️️";
+                                trashButton.setAttribute("id", "delete-button");
+                                trashButton.addEventListener("click", function() {
+                                    db.ref("chats/" + messages[index].key).update({
+                                        removed: true,
+                                        message: `<i><b>REMOVED BY ${getUsername()}</b></i><span style="display: none">@${getUsername()} @${data.val().name}</span>`,
+                                    });
+                                })
+                                messageElement.appendChild(trashButton);
+                            }, 100);
+                        }
+                        if (data.val().name == getUsername() && !messageElement.querySelector("#edit-button")) {
+                            db.ref("users/" + getUsername()).once('value', function(user_object) {
+                                var obj = user_object.val();
+                                var editButton = document.createElement("button");
+                                var textBox = document.getElementById("text-box");
+                                editButton.setAttribute("id", "edit-button");
+                                timeElement.style.visibility = "hidden";
+                                if (obj && "editing" in obj && obj.editing == messages[index].key) {
+                                    editButton.innerHTML = "🗙";
+                                } else {
+                                    editButton.innerHTML = "✏️";
+                                }
+                                editButton.addEventListener("click", function() {
+                                    if (obj && "editing" in obj && obj.editing == messages[index].key) {
+                                        editButton.innerHTML = "✏️";
+                                        db.ref("users/" + getUsername() + "/editing").remove()
+                                        textBox.value = "";
+                                        textBox.focus();
+                                    } else {
+                                        editButton.innerHTML = "🗙";
+                                        db.ref(`chats/${messages[index].key}/message`).once("value", function(edit_message) {
+                                            textBox.value = edit_message.val();
+                                        })
+                                        textBox.focus();
+                                        db.ref("users/" + getUsername()).update({
+                                            editing: messages[index].key,
+                                        });
+                                    }
+                                });
 
-                    //             messageElement.appendChild(editButton);
-                    //         })
-                    //     }
-                    // })
-                    // messageElement.addEventListener("mouseleave", function(e) {
-                    //     messageContent.style.backgroundColor = "";
-                    //     timeElement.style.visibility = "visible";
+                                messageElement.appendChild(editButton);
+                            })
+                        }
+                    })
+                    messageElement.addEventListener("mouseleave", function(e) {
+                        messageContent.style.backgroundColor = "";
+                        timeElement.style.visibility = "visible";
 
-                    //     setTimeout(() => {
-                    //         var buttons = messageElement.querySelectorAll("#delete-button, #edit-button");
-                    //         buttons.forEach(function(button) {
-                    //             button.remove();
-                    //         })
-                    //         timeElement.style.visibility = "visible";
-                    //     }, 100)
-                    // })
+                        setTimeout(() => {
+                            var buttons = messageElement.querySelectorAll("#delete-button, #edit-button");
+                            buttons.forEach(function(button) {
+                                button.remove();
+                            })
+                            timeElement.style.visibility = "visible";
+                        }, 100)
+                    })
                     
 
                     var messageContent = document.createElement("div");
@@ -180,6 +162,11 @@ function refreshChat() {
                     messageContent.innerHTML = message;
                     if (message.includes("@" + getUsername()) || message.includes("@everyone")) {
                         messageContent.setAttribute("id", "ping-text");
+                    }
+                    if (messages.at(-1).val().message == "GOD has joined the chat<span style='visibility: hidden;'>@GOD</span>" && data.key == messages.at(-1).key) {
+                        messageContent.style.animationName = "god";
+                        messageContent.style.animationDuration = "5s";
+                        messageContent.style.position = "relative";
                     }
                     messageElement.appendChild(messageContent);
 
@@ -1042,8 +1029,6 @@ function changeChannel(channel) {
         if (channel == "admin" && user_object.val().admin == 0) {
             alert("You are not an admin")
         } else if ((sessionStorage.getItem("channel") || "general") != channel) {
-            globalMessages = [];
-            globalNodenames = [];
             document.getElementById(`${channel}-notif`).innerHTML = "";
             document.getElementById((sessionStorage.getItem("channel") || "general")).style.backgroundColor = null;
             document.getElementById(channel).style.backgroundColor = "#42464d";
@@ -1060,26 +1045,12 @@ function changeChannel(channel) {
                 var messages = [];
                 var nodename = []; // there's probably a better way to do this
         
-                if (globalMessages.length == 0 && globalNodenames.length == 0) {
-                    messages_object.forEach((messages_child) => {
-                        if (messages_child.val().channel == (sessionStorage.getItem("channel") || "general") || (messages_child.val().name == "[SERVER]" && sessionStorage.getItem("channel") !== "extra")) {
-                            globalMessages.push(messages_child.val())
-                            globalNodenames.push(messages_child.key)
-                        }
-                    });
-                } else {
-                    db.ref("chats/").limitToLast(1).once("value", function(messages_child) {
-                        messages_child.forEach(function(childSnapshot) {
-                            if (childSnapshot.val().channel == (sessionStorage.getItem("channel") || "general") || (childSnapshot.val().name == "[SERVER]" && sessionStorage.getItem("channel") !== "extra")) {
-                                globalMessages.push(childSnapshot.val())
-                                globalNodenames.push(childSnapshot.key)
-                            }
-                        })
-                    })
-                }
-        
-                messages = globalMessages;
-                nodename = globalNodenames;
+                messages_object.forEach((messages_child) => {
+                    if (messages_child.val().channel == (sessionStorage.getItem("channel") || "general") || (messages_child.val().name == "[SERVER]" && sessionStorage.getItem("channel") !== "extra")) {
+                        messages.push(messages_child.val())
+                        nodename.push(messages_child.key)
+                    }
+                });
 
                 var obj = user_object.val();
                 messages.forEach(function(data, index) {
@@ -1135,69 +1106,69 @@ function changeChannel(channel) {
     
     
     
-                        // messageElement.addEventListener("mouseover", function(e) {
-                        //     messageContent.style.backgroundColor = "gray";
-                        //     if ((data.name == getUsername() || data.admin < obj.admin) && !messageElement.querySelector("#delete-button")) {
-                        //         setTimeout(() => {
-                        //             var trashButton = document.createElement("button");
-                        //             timeElement.style.visibility = "hidden";
-                        //             trashButton.innerHTML = "🗑️️";
-                        //             trashButton.setAttribute("id", "delete-button");
-                        //             trashButton.addEventListener("click", function() {
-                        //                 db.ref("chats/" + nodename[index]).update({
-                        //                     removed: true,
-                        //                     message: `<i><b>REMOVED BY ${getUsername()}</b></i><span style="display: none">@${getUsername()} @${data.name}</span>`,
-                        //                 });
-                        //             })
-                        //             messageElement.appendChild(trashButton);
-                        //         }, 100);
-                        //     }
-                        //     if (data.name == getUsername() && !messageElement.querySelector("#edit-button")) {
-                        //         db.ref("users/" + getUsername()).once('value', function(user_object) {
-                        //             var obj = user_object.val();
-                        //             var editButton = document.createElement("button");
-                        //             var textBox = document.getElementById("text-box");
-                        //             editButton.setAttribute("id", "edit-button");
-                        //             timeElement.style.visibility = "hidden";
-                        //             if (obj && "editing" in obj && obj.editing == nodename[index]) {
-                        //                 editButton.innerHTML = "🗙";
-                        //             } else {
-                        //                 editButton.innerHTML = "✏️";
-                        //             }
-                        //             editButton.addEventListener("click", function() {
-                        //                 if (obj && "editing" in obj && obj.editing == nodename[index]) {
-                        //                     editButton.innerHTML = "✏️";
-                        //                     db.ref("users/" + getUsername() + "/editing").remove()
-                        //                     textBox.value = "";
-                        //                     textBox.focus();
-                        //                 } else {
-                        //                     editButton.innerHTML = "🗙";
-                        //                     db.ref(`chats/${nodename[index]}/message`).once("value", function(edit_message) {
-                        //                         textBox.value = edit_message.val();
-                        //                     })
-                        //                     textBox.focus();
-                        //                     db.ref("users/" + getUsername()).update({
-                        //                         editing: nodename[index],
-                        //                     });
-                        //                 }
-                        //             });
+                        messageElement.addEventListener("mouseover", function(e) {
+                            messageContent.style.backgroundColor = "gray";
+                            if ((data.name == getUsername() || data.admin < obj.admin) && !messageElement.querySelector("#delete-button")) {
+                                setTimeout(() => {
+                                    var trashButton = document.createElement("button");
+                                    timeElement.style.visibility = "hidden";
+                                    trashButton.innerHTML = "🗑️️";
+                                    trashButton.setAttribute("id", "delete-button");
+                                    trashButton.addEventListener("click", function() {
+                                        db.ref("chats/" + nodename[index]).update({
+                                            removed: true,
+                                            message: `<i><b>REMOVED BY ${getUsername()}</b></i><span style="display: none">@${getUsername()} @${data.name}</span>`,
+                                        });
+                                    })
+                                    messageElement.appendChild(trashButton);
+                                }, 100);
+                            }
+                            if (data.name == getUsername() && !messageElement.querySelector("#edit-button")) {
+                                db.ref("users/" + getUsername()).once('value', function(user_object) {
+                                    var obj = user_object.val();
+                                    var editButton = document.createElement("button");
+                                    var textBox = document.getElementById("text-box");
+                                    editButton.setAttribute("id", "edit-button");
+                                    timeElement.style.visibility = "hidden";
+                                    if (obj && "editing" in obj && obj.editing == nodename[index]) {
+                                        editButton.innerHTML = "🗙";
+                                    } else {
+                                        editButton.innerHTML = "✏️";
+                                    }
+                                    editButton.addEventListener("click", function() {
+                                        if (obj && "editing" in obj && obj.editing == nodename[index]) {
+                                            editButton.innerHTML = "✏️";
+                                            db.ref("users/" + getUsername() + "/editing").remove()
+                                            textBox.value = "";
+                                            textBox.focus();
+                                        } else {
+                                            editButton.innerHTML = "🗙";
+                                            db.ref(`chats/${nodename[index]}/message`).once("value", function(edit_message) {
+                                                textBox.value = edit_message.val();
+                                            })
+                                            textBox.focus();
+                                            db.ref("users/" + getUsername()).update({
+                                                editing: nodename[index],
+                                            });
+                                        }
+                                    });
     
-                        //             messageElement.appendChild(editButton);
-                        //         })
-                        //     }
-                        // })
-                        // messageElement.addEventListener("mouseleave", function(e) {
-                        //     messageContent.style.backgroundColor = "";
-                        //     timeElement.style.visibility = "visible";
+                                    messageElement.appendChild(editButton);
+                                })
+                            }
+                        })
+                        messageElement.addEventListener("mouseleave", function(e) {
+                            messageContent.style.backgroundColor = "";
+                            timeElement.style.visibility = "visible";
     
-                        //     setTimeout(() => {
-                        //         var buttons = messageElement.querySelectorAll("#delete-button, #edit-button");
-                        //         buttons.forEach(function(button) {
-                        //             button.remove();
-                        //         })
-                        //         timeElement.style.visibility = "visible";
-                        //     }, 100)
-                        // })
+                            setTimeout(() => {
+                                var buttons = messageElement.querySelectorAll("#delete-button, #edit-button");
+                                buttons.forEach(function(button) {
+                                    button.remove();
+                                })
+                                timeElement.style.visibility = "visible";
+                            }, 100)
+                        })
                         
     
                         var messageContent = document.createElement("div");
@@ -1221,12 +1192,6 @@ function setup() {
     // deletion check
     db.ref(`users/${getUsername()}`).on("child_removed", function(object) {
         db.ref("users/" + getUsername()).onDisconnect().cancel();
-    })
-
-    // wipe chat check
-    db.ref(`chats/`).on("child_removed", function(object) {
-        globalMessages = [];
-        globalNodenames = [];
     })
 
     // log out in another window check
@@ -1313,7 +1278,11 @@ function setup() {
     setTimeout(() => {
         textarea.scrollTop = textarea.scrollHeight;
     }, 500);
-    showPopUp("Additional Note (VERY IMPORTANT, MUST READ)", "I am legally obligated to say that we, the creators and/or owners of feynmansums.com, pebble, or any sites associated with it, do not condone the use of this website during instructional time, or to disrupt it. Any violation of this is not tolerated by us. Continue using the website if you understand these conditions.")
+
+    if (localStorage.getItem("terms") == null) {
+        showPopUp("Additional Note (VERY IMPORTANT, MUST READ)", "I am legally obligated to say that we, the creators and/or owners of feynmansums.com, pebble, or any sites associated with it, do not condone the use of this website during instructional time, or to disrupt it. Any violation of this is not tolerated by us. Continue using the website if you understand these conditions.");
+        localStorage.setItem("terms", "read");
+    }
 }
 
 function checkTrapped() {
@@ -1603,19 +1572,7 @@ function useImage(index) {
 function editImage(index) {
     db.ref(`userimages/${getUsername()}/images/image${index}`).once("value", function(object) {
         document.getElementById("popupHeading").innerHTML = `Editing Image ${index}`;
-        document.getElementById("popupBody").innerHTML = `<img id="previewImage" src="${object.val() || "../images/image_placeholder.jpg"}" style="max-width:40%;max-height:30vh"><br>URL: <input id="ImageURL" type="text" style="color:white;width:100%" value="${object.val() || ""}"><br><button onclick="imagePreview()">Preview Image</button><input type="file" id="imageUpload"><button onclick="submitImage(${index})">Submit</button><br><img src="../images/image_instructions.png" style="height:30%"><br>If you are having trouble getting the file size under 5MB, refer to this instruction on how you can use URLs to upload images`;
-        document.getElementById('imageUpload').addEventListener('change', function () {
-            const file = this.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function () {
-            const base64 = reader.result;
-                document.getElementById('ImageURL').value = base64;
-                imagePreview();
-            };
-            reader.readAsDataURL(file);
-        })
+        document.getElementById("popupBody").innerHTML = `<img id="previewImage" src="${object.val() || "../images/image_placeholder.jpg"}" style="max-width:40%;max-height:30vh"><br>URL: <input id="ImageURL" type="text" style="color:white;width:100%" value="${object.val() || ""}"><br><button onclick="imagePreview()">Preview Image</button><button onclick="submitImage(${index})">Submit</button><br><img src="../images/image_instructions.png" style="height:30%">`;
     })
 }
 
@@ -1633,12 +1590,8 @@ function submitImage(index) {
                 }
 
                 if ((!object.exists() || Date.now() - (object.val().images[`image${index}sleep`] || 0) > imageSleep || user_object.val().admin > 0) && (user_object.val().image || typeof(user_object.val().image) == "undefined")) {
-                    let base64 = document.getElementById("ImageURL").value.split(',')[1] || document.getElementById("ImageURL").value;
-                    let padding = (base64.match(/=+$/) || [''])[0].length;
-                    let sizeInBytes = (base64.length * 3) / 4 - padding;
-
-                    if (sizeInBytes > 5 * 1024 * 1024) {
-                        alert("Image cannot be larger than 5 MB");
+                    if (document.getElementById("ImageURL").value.length > 1000) {
+                        alert("URL cannot be longer than 1000 characters");
                         return;
                     }
                     
