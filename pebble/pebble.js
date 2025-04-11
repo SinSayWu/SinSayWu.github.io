@@ -71,7 +71,7 @@ function refreshChat() {
                         userElement.style.fontWeight = "bold";
                         userElement.style.color = "Yellow";
                         messageElement.appendChild(userElement);
-                    } else if (prevItem == null || prevItem.name != data.val().name || data.val().edited) {
+                    } else if (prevItem == null || prevItem.val().name != data.val().name || data.val().edited) {
                         var userElement = document.createElement("div");
                         userElement.setAttribute("class", "username");
                         userElement.addEventListener("click", function(e) {
@@ -94,7 +94,7 @@ function refreshChat() {
 
                     messageElement.addEventListener("mouseover", function(e) {
                         messageContent.style.backgroundColor = "gray";
-                        if ((data.val().name == getUsername() || data.val().admin < obj.admin) && !messageElement.querySelector("#delete-button")) {
+                        if ((data.val().name == getUsername() || data.val().admin < obj.admin) && !messageElement.querySelector("#delete-button") && !messages[index].val().removed) {
                             setTimeout(() => {
                                 var trashButton = document.createElement("button");
                                 timeElement.style.visibility = "hidden";
@@ -109,7 +109,7 @@ function refreshChat() {
                                 messageElement.appendChild(trashButton);
                             }, 100);
                         }
-                        if (data.val().name == getUsername() && !messageElement.querySelector("#edit-button")) {
+                        if (data.val().name == getUsername() && !messageElement.querySelector("#edit-button") && !messages[index].val().removed) {
                             db.ref("users/" + getUsername()).once('value', function(user_object) {
                                 var obj = user_object.val();
                                 var editButton = document.createElement("button");
@@ -198,10 +198,10 @@ function refreshChat() {
                 var mentionNotification = localStorage.getItem("mentionNotification") || true;
                 var messageNotification = localStorage.getItem("messageNotification") || false;
 
-                if (!(prevMessage.channel == "admin" && obj.admin == 0)) {
-                    if (prevMessage.username == "[SERVER]" && JSON.parse(announceNotification)) {
+                if (!(prevMessage.val().channel == "admin" && obj.admin == 0)) {
+                    if (prevMessage.val().username == "[SERVER]" && JSON.parse(announceNotification)) {
                         notificationNumber += 1
-                    } else if ((prevMessage.message.includes("@" + getUsername()) || prevMessage.message.includes("@everyone")) && JSON.parse(mentionNotification)) {
+                    } else if ((prevMessage.val().message.includes("@" + getUsername()) || prevMessage.val().message.includes("@everyone")) && JSON.parse(mentionNotification)) {
                         notificationNumber += 1
                     } else if (JSON.parse(messageNotification)) {
                         notificationNumber += 1
@@ -1541,9 +1541,16 @@ function useImage(index) {
         db.ref(`users/${getUsername()}`).once("value", function(user_object) {
             var obj = user_object.val();
             var curr = new Date();
+            const lastMessageTime = obj.sleep || 0;
+            const timePassed = Date.now() - lastMessageTime;
 
             if (object.val().images[`image${index}`]) {
                 if (obj.image || typeof(obj.image) == "undefined") {
+                    if (timePassed < messageSleep || obj.muted) {
+                        alert("You cannot post images if you are muted or timed out");
+                        return;
+                    }
+
                     document.getElementById("popup").remove();
                     db.ref('chats/').push({
                         name: obj.username,
@@ -1560,10 +1567,10 @@ function useImage(index) {
                         })
                     })
                 } else {
-                    alert("You do not have image privileges")
+                    alert("You do not have image privileges");
                 }
             } else {
-                alert(`Please set an image for image ${index} before using it`)
+                alert(`Please set an image for image ${index} before using it`);
             }
         })
     })
@@ -1584,6 +1591,9 @@ function submitImage(index) {
     db.ref(`userimages/${getUsername()}`).once("value", function(object) {
         db.ref(`users/${getUsername()}`).once("value", function(user_object) {
             checkImageURL(document.getElementById("ImageURL").value, function(isValid) {
+                const lastMessageTime = user_object.val().sleep || 0;
+                const timePassed = Date.now() - lastMessageTime;
+
                 if (!isValid) {
                     alert(`Please use a valid URL for an image`);
                     return;
@@ -1592,6 +1602,9 @@ function submitImage(index) {
                 if ((!object.exists() || Date.now() - (object.val().images[`image${index}sleep`] || 0) > imageSleep || user_object.val().admin > 0) && (user_object.val().image || typeof(user_object.val().image) == "undefined")) {
                     if (document.getElementById("ImageURL").value.length > 1000) {
                         alert("URL cannot be longer than 1000 characters");
+                        return;
+                    } else if (timePassed < messageSleep || user_object.val().muted) {
+                        alert("You cannot submit images if you are muted or timed out");
                         return;
                     }
                     
