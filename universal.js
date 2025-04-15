@@ -98,6 +98,7 @@ function showPopUp(heading, content, buttonList = [], height=640, width=800) {
     })
     var closeButton = document.createElement("button");
     closeButton.setAttribute("class", "popup-button");
+    closeButton.setAttribute("id", "closePopup")
     closeButton.onclick = () => {
         var popup = document.getElementById("popup");
         popup.remove();

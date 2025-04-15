@@ -934,13 +934,13 @@ function minusMoney() {
 
             if (attacker.money >= price && attacker.username != victim.username && moneyselector.value) {
                 db.ref(`users/${getUsername()}`).update({
-                    money: attacker.money - price,
+                    money: firebase.database.ServerValue.increment(price > money ? -money : -price),
                     deeds: (attacker.deeds || 0) - Math.round(moneyinput.value * 0.001),
                 })
                 db.ref(`users/${moneyselector.value}/money`).set(
-                    money - Math.abs(Math.round(moneyinput.value))
+                    (money - Math.abs(Math.round(moneyinput.value)) < 0 ? 0 : money - Math.abs(Math.round(moneyinput.value)))
                 )
-                if (Math.abs(Math.round(moneyinput.value)) >= 5000) {
+                if (Math.abs(Math.round(moneyinput.value > money ? money : moneyinput.value())) >= 5000) {
                     sendNotification(`${attacker.username} has just removed $${Math.abs(Math.round(moneyinput.value))} from ${victim.username}!`);
                 }
             }
@@ -1045,41 +1045,43 @@ function showInstructions() {
 }
 
 function checkAutoclickerActive() {
-    db.ref(".info/connected").on("value", (snapshot) => {
-        db.ref(`users/${getUsername()}`).once("value", function(object) {
-            if (snapshot.val()) {
-                var time = Date.now() - object.val().autosleep
-                days = Math.floor(time / 86400000)
-                hours = Math.floor((time - days * 86400000) / 3600000)
-                minutes = Math.floor((time - days * 86400000 - hours * 3600000) / 60000)
-                seconds = Math.floor((time - days * 86400000 - hours * 3600000 - minutes * 60000) / 1000)
-                money = Math.floor(time / 1000) * (object.val().autoclicker * (object.val().mult || 1))
-                if (time > 600000 && object.val().autoclicker > 0) { // 10 minutes
-                    if (object.val().role && object.val().role !== "police") {
-                        showPopUp(
-                            "Welcome Back!",
-                            `While you were away for ${days} days, ${hours} hours, ${minutes} minutes, and ${seconds} seconds, you gained $${money}. However, you had to pay $${Math.round(money * 0.1)} due to taxes`
-                        )
-                        db.ref(`users/${getUsername()}`).update({
-                            money: firebase.database.ServerValue.increment(money - Math.round(money * 0.1)),
-                        })
-                    } else {
-                        showPopUp(
-                            "Welcome Back!",
-                            `While you were away for ${days} days, ${hours} hours, ${minutes} minutes, and ${seconds} seconds, you gained $${money}`
-                        )
-                        db.ref(`users/${getUsername()}`).update({
-                            money: firebase.database.ServerValue.increment(money),
-                        })
+    if (localStorage.getItem("agreement") !== null) {
+        db.ref(".info/connected").on("value", (snapshot) => {
+            db.ref(`users/${getUsername()}`).once("value", function(object) {
+                if (snapshot.val()) {
+                    var time = Date.now() - object.val().autosleep
+                    days = Math.floor(time / 86400000)
+                    hours = Math.floor((time - days * 86400000) / 3600000)
+                    minutes = Math.floor((time - days * 86400000 - hours * 3600000) / 60000)
+                    seconds = Math.floor((time - days * 86400000 - hours * 3600000 - minutes * 60000) / 1000)
+                    money = Math.floor(time / 1000) * (object.val().autoclicker * (object.val().mult || 1))
+                    if (time > 600000 && object.val().autoclicker > 0) { // 10 minutes
+                        if (object.val().role && object.val().role !== "police") {
+                            showPopUp(
+                                "Welcome Back!",
+                                `While you were away for ${days} days, ${hours} hours, ${minutes} minutes, and ${seconds} seconds, you gained $${money}. However, you had to pay $${Math.round(money * 0.1)} due to taxes`
+                            )
+                            db.ref(`users/${getUsername()}`).update({
+                                money: firebase.database.ServerValue.increment(money - Math.round(money * 0.1)),
+                            })
+                        } else {
+                            showPopUp(
+                                "Welcome Back!",
+                                `While you were away for ${days} days, ${hours} hours, ${minutes} minutes, and ${seconds} seconds, you gained $${money}`
+                            )
+                            db.ref(`users/${getUsername()}`).update({
+                                money: firebase.database.ServerValue.increment(money),
+                            })
+                        }
                     }
+                    db.ref("users/" + getUsername()).onDisconnect().update({
+                        autoactive: false,
+                        autosleep: firebase.database.ServerValue.TIMESTAMP,
+                    })
                 }
-                db.ref("users/" + getUsername()).onDisconnect().update({
-                    autoactive: false,
-                    autosleep: firebase.database.ServerValue.TIMESTAMP,
-                })
-            }
+            })
         })
-    })
+    }
 }
 
 function selectorListeners() { // these are all a problem
@@ -1315,6 +1317,26 @@ function setup() {
     setTimeout(autoclickerCheck, 2000);
     loadMain();
     loadSelectors();
+
+    if (localStorage.getItem("agreement") == null) {
+        showPopUp(`User Agreement`, `
+            If a user discovers a bug, glitch, or unintended behavior within the game that provides them with an unfair advantage over others (including but not limited to duplicating resources, bypassing restrictions, or altering game behavior in unintended ways), they are required to report the issue directly to the administrators (NaruseShiroha or GOD) immediately.<br><br>
+            Failure to report such bugs, or the intentional use of such bugs for personal gain, will be considered a violation of this agreement. In such cases, we reserve the right to take corrective action, which may include but is not limited to:
+            <ul>
+                <li>Temporary or permanent suspension of the user's account</li>
+                <li>Revocation of unfairly gained resources or progress</li>
+                <li>Complete data wipe of the user's account</li>
+            </ul>
+            By playing this game, you agree to these terms and acknowledge that integrity and fairness are core values of the community.<br>
+            Please retype this sentence to confirm your agreement to the above: <b style="user-select:none">I understand that if I find a bug that gives me an unfair advantage, I must report it to the admins, or I risk having my data wiped.</b><br>
+            <input type="text" id="agreement" style="width:100%">`, [["Close", () => {
+                if (document.getElementById("agreement").value == "I understand that if I find a bug that gives me an unfair advantage, I must report it to the admins, or I risk having my data wiped.") {
+                    document.getElementById("popup").remove();
+                    localStorage.setItem("agreement", "true")
+                }
+            }]]);
+        document.getElementById("closePopup").remove();
+    }
 
     db.ref(`users/${getUsername()}`).once("value", (amount) => {
         if ((amount.val().money || 0) <= 500 && (amount.val().autoclicker || 0) == 0) {
