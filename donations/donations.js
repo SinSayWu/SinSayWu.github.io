@@ -1223,6 +1223,11 @@ function minusAuto() {
             attacker = attacker_object.val();
             victim = victim_object.val();
 
+            if (attacker.role == "angel") {
+                alert("Angels should not sin");
+                return;
+            }
+
             var price = Math.round(1000 + (0.2 * (victim.money || 0)) + (100 * 1.2 ** (victim.autoclicker || 0)));
             var autoclicker = victim.autoclicker || 0;
 
@@ -1247,6 +1252,11 @@ function minusMult() {
         db.ref(`users/${multselector.value}`).once("value", (victim_object) => {
             attacker = attacker_object.val();
             victim = victim_object.val();
+
+            if (attacker.role == "angel") {
+                alert("Angels should not sin");
+                return;
+            }
 
             var price = Math.round(1000 + (0.2 * (victim.money || 0)) + (250 * 1.4 ** (victim.mult - 1 || 0)));
             var mult = victim.mult || 1;
@@ -1273,6 +1283,11 @@ function minusMoney() {
         db.ref(`users/${moneyselector.value}`).once("value", (victim_object) => {
             attacker = attacker_object.val();
             victim = victim_object.val();
+
+            if (attacker.role == "angel") {
+                alert("Angels should not sin");
+                return;
+            }
 
             var price = Math.abs(Math.round(moneyinput.value * 3));
             var money = victim.money || 0;
