@@ -1,6 +1,9 @@
+* {
+    font-family: "Inter", sans-serif;
+}
+
 body {
     background-color: #202225;
-    font-family: Arial;
     border-width: 0px;
     color: white;
 }

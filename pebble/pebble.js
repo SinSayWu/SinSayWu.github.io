@@ -172,6 +172,7 @@ function refreshChat() {
                         
                         messageContent.setAttribute("id", "god-text");
                         messageContent.setAttribute("class", "");
+                        messageElement.appendChild(textContent);
                     } else {
                         messageElement.appendChild(messageContent);
                     }
@@ -1278,7 +1279,7 @@ function setup() {
     db.ref("other/").on('value', (obj) => {
         obj = obj.val();
         document.getElementById("medianAdmin").innerHTML = obj.medianAdmin;
-    })    
+    })
     
     var textarea = document.getElementById("textarea");
     setTimeout(() => {
