@@ -644,7 +644,47 @@ iframe {
     margin-top: 1%;
 }
 
-@keyframes god {
-    from {transform: translateY(-100vh);}
-    to {transform: translateY(0);}
+@property --angle {
+    syntax: '<angle>';
+    initial-value: 0deg;
+    inherits: false;
+}
+
+#god-border, #god-border::before {
+    position: relative;
+    align-self: center;
+    color: white;
+    border-radius: 16px;
+    padding: 1em;
+    height: 50%;
+    width: 97%;
+    background-image: conic-gradient(from var(--angle), blue, cyan, transparent, blue);
+    animation: 3s spin linear infinite;
+}
+
+#god-border::before {
+    filter: blur(1.5rem);
+}
+
+#god-text {
+    position: absolute;
+    background-color: black;
+    border-radius: 16px;
+    height: 99%;
+    width: 99%; 
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1em;
+    font-weight: bold;
+    padding: 0.5em;
+}
+
+@keyframes spin{
+    from {
+        --angle: 0deg;
+    }
+    to {
+        --angle: 360deg;
+    }
 }

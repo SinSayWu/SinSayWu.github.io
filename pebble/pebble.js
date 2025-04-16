@@ -164,11 +164,17 @@ function refreshChat() {
                         messageContent.setAttribute("id", "ping-text");
                     }
                     if (messages.at(-1).val().message == "GOD has joined the chat<span style='visibility: hidden;'>@GOD</span>" && data.key == messages.at(-1).key) {
-                        messageContent.style.animationName = "god";
-                        messageContent.style.animationDuration = "5s";
-                        messageContent.style.position = "relative";
+                        var textContent = document.createElement("div");
+                        messageElement.appendChild(textContent);
+                        textContent.setAttribute("id", "god-border");
+                        // messageContent.innerHTML = "";
+                        textContent.appendChild(messageContent);
+                        
+                        messageContent.setAttribute("id", "god-text");
+                        messageContent.setAttribute("class", "");
+                    } else {
+                        messageElement.appendChild(messageContent);
                     }
-                    messageElement.appendChild(messageContent);
 
                     textarea.appendChild(messageElement);
                 }
