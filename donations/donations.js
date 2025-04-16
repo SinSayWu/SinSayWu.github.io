@@ -348,7 +348,7 @@ function DoubleNothing() {
         moneyinput = Math.round(Math.abs(Number(moneyinput)))
         db.ref(`users/${getUsername()}`).once("value", function(object) {
             if (moneyinput <= object.val().money) {
-                if (Math.random() < 0.5 + (object.val().role == "gambler" ? 0.05 : 0)) {
+                if (Math.random() < 0.499 + (object.val().role == "gambler" ? 0.001 : 0)) {
                     if (moneyinput >= 1000000) {
                         sendNotification(`${object.val().username} just won $${moneyinput} in Double-or-Nothing!`)
                     }
