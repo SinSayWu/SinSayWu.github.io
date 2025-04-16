@@ -650,34 +650,26 @@ iframe {
     inherits: false;
 }
 
-#god-border, #god-border::before {
-    position: relative;
-    align-self: center;
+#god-border {
+    width: 99%;
     color: white;
+    font-size: 1em;
+    font-weight: bold;
+    margin: 5 auto;
+    padding: 0.2em;
     border-radius: 16px;
-    padding: 1em;
-    height: 50%;
-    width: 97%;
-    background-image: conic-gradient(from var(--angle), blue, cyan, transparent, blue);
+    background-image: conic-gradient(from var(--angle), transparent, blue, transparent, cyan, transparent);
+    background-size: 100% 100%;
+    background-position: 50%, 50%;
     animation: 3s spin linear infinite;
 }
 
-#god-border::before {
-    filter: blur(1.5rem);
-}
-
 #god-text {
-    position: absolute;
+    margin: auto;
     background-color: black;
-    border-radius: 16px;
-    height: 99%;
-    width: 99%; 
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 1em;
-    font-weight: bold;
-    padding: 0.5em;
+    width: 97%;
+    padding: 0.8em;
+    border-radius: 12px;
 }
 
 @keyframes spin{
