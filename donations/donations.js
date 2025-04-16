@@ -602,7 +602,6 @@ function Roles() {
                 </ul>
                 Cons:<ul>
                     <li>can no longer buy, gift, or remove autos, mult, or money</li>
-                    <li>cannot go back to being a citizen</li>
                 </ul>
                 <button style="font-size:2vh" onclick="gamblerRole()">Select</button> $5,000,000
 
@@ -610,11 +609,9 @@ function Roles() {
                 Pros:<ul>
                     <li>can see the good and bad deeds of everyone</li>
                     <li>can give divine retribution to evildoers</li>
-                    <li>frenzy is always on</li>
                 </ul>
                 Cons:<ul>
                     <li>can no longer destroy auto, mult, or money (but what kind of angel would do that, right?)</li>
-                    <li>cannot gamble</li>
                 </ul>
                 <button style="font-size:2vh" onclick="angelRole()">Select</button> $20,000,000 and a good heart
 
@@ -622,9 +619,10 @@ function Roles() {
                 Pros:<ul>
                     <li>people can request for loans from you</li>
                     <li>gain the money that would be interest</li>
+                    <li>can put people into crippling debt</li>
                 </ul>
                 Cons:<ul>
-                    <li>must pay deficit if borrower cannot pay the loan + interest</li>
+                    <li>not many people make loans</li>
                 </ul>
                 <button style="font-size:2vh" onclick="bankRole()">Select</button> $15,000,000
 
@@ -632,13 +630,12 @@ function Roles() {
                 Pros:<ul>
                     <li>role will show up as citizen for everyone else</li>
                     <li>destroying auto, mult, or money is instead replaced with stealing</li>
-                    <li>stealing auto, mult, or money is not notified server-wide and is notified anonymously to the victim</li>
+                    <li>stealing auto, mult, or money is not notified server-wide</li>
                 </ul>
                 Cons:<ul>
                     <li>EVERYONE IS OUT TO GET YOU:</li>
                     <li>citizens will have a grudge against you and potentially destroy what you gained out of spite if they find out who stole from them</li>
                     <li>police officers will be on a hunt for you as they get to confiscate what you have stolen</li>
-                    <li>angels can easily spot you if you steal too much as they can see karma</li>
                     <li>cannot go back to being a citizen unless arrested</li>
                 </ul>
                 <button style="font-size:2vh"  onclick="criminalRole()">Select</button> $2,500,000`);
