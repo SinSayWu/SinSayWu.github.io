@@ -22,7 +22,7 @@ function play() {
 function addAmount(autoclicker) {
     db.ref(`users/${getUsername()}`).once("value", function(snapshot) {
         let data = snapshot.val() || {};
-        let amount = (data.mult || 1) * (autoclicker === undefined ? 1 : (data.autoclicker || 0));
+        let amount = ((data.mult || 1) + (data.stolenmult || 0)) * (autoclicker === undefined ? 1 : ((data.autoclicker || 0) + (data.stolenauto || 0)));
         if (golden_cookie) {
             amount = amount * 2
         }
@@ -198,7 +198,7 @@ function loadMain() {
 
         // clicker mult
         var clicker = document.getElementById("clicky-button")
-        clicker.innerHTML = "+" + (obj.mult || 1);
+        clicker.innerHTML = "+" + ((obj.mult || 1) + (obj.stolenmult || 0));
         var clickerimage = document.createElement("img");
         clickerimage.src = "../images/money.png";
         clicker.appendChild(clickerimage);
@@ -348,7 +348,7 @@ function DoubleNothing() {
         moneyinput = Math.round(Math.abs(Number(moneyinput)))
         db.ref(`users/${getUsername()}`).once("value", function(object) {
             if (moneyinput <= object.val().money) {
-                if (Math.random() < 0.5) {
+                if (Math.random() < 0.5 + (object.val().role == "gambler" ? 0.05 : 0)) {
                     if (moneyinput >= 1000000) {
                         sendNotification(`${object.val().username} just won $${moneyinput} in Double-or-Nothing!`)
                     }
@@ -578,10 +578,12 @@ function Roles() {
                 <h3>Citizen (${citizens})</h3><hr>
                 Pros:<ul>
                     <li>can take part in society</li>
+                    <li>can take out loans</li>
                 </ul>
                 Cons:<ul>
                     <li>pay taxes</li>
                 </ul>
+                <button style="font-size:2vh" onclick="loanRequest()">Select</button>
 
                 <h3>Police Officer (${police} / 3)</h3><hr>
                 Pros:<ul>
@@ -591,7 +593,7 @@ function Roles() {
                 Cons:<ul>
                     <li>criminals hate you</li>
                 </ul>
-                <button style="font-size:1vh" onclick="policeRole()">Select</button> $10,000,000
+                <button style="font-size:2vh" onclick="policeRole()">Select</button> $10,000,000
 
                 <h3>Gambler (${gamblers} / 5)</h3><hr>
                 Pros:<ul>
@@ -602,7 +604,7 @@ function Roles() {
                     <li>can no longer buy, gift, or remove autos, mult, or money</li>
                     <li>cannot go back to being a citizen</li>
                 </ul>
-                <button style="font-size:1vh" onclick="gamblerRole()">Select</button> $5,000,000
+                <button style="font-size:2vh" onclick="gamblerRole()">Select</button> $5,000,000
 
                 <h3>Angel (${angels} / 1)</h3><hr>
                 Pros:<ul>
@@ -614,7 +616,7 @@ function Roles() {
                     <li>can no longer destroy auto, mult, or money (but what kind of angel would do that, right?)</li>
                     <li>cannot gamble</li>
                 </ul>
-                <button style="font-size:1vh" onclick="angelRole()">Select</button> $20,000,000 and a good heart
+                <button style="font-size:2vh" onclick="angelRole()">Select</button> $20,000,000 and a good heart
 
                 <h3>Bank Teller (${tellers} / 3)</h3><hr>
                 Pros:<ul>
@@ -624,7 +626,7 @@ function Roles() {
                 Cons:<ul>
                     <li>must pay deficit if borrower cannot pay the loan + interest</li>
                 </ul>
-                <button style="font-size:1vh" onclick="bankRole()">Select</button> $15,000,000
+                <button style="font-size:2vh" onclick="bankRole()">Select</button> $15,000,000
 
                 <h3>Criminal</h3><hr>
                 Pros:<ul>
@@ -639,7 +641,7 @@ function Roles() {
                     <li>angels can easily spot you if you steal too much as they can see karma</li>
                     <li>cannot go back to being a citizen unless arrested</li>
                 </ul>
-                <button style="font-size:1vh"  onclick="criminalRole()">Select</button> $2,500,000`);
+                <button style="font-size:2vh"  onclick="criminalRole()">Select</button> $2,500,000`);
             } else if (object.val().money >= 10000000) {
                 db.ref(`users/${getUsername()}`).update({
                     money: firebase.database.ServerValue.increment(-10000000),
@@ -647,6 +649,50 @@ function Roles() {
                 })
             }
         })
+    })
+}
+
+function loanRequest() {
+    db.ref(`users/${getUsername()}`).once("value", function(object) {
+        document.getElementById("popupHeading").innerHTML = "Loan Menu";
+        document.getElementById("popupBody").innerHTML = `
+            TAKE INTO ACCOUNT THAT YOUR LOAN REQUEST MUST BE ACCEPTED BY SOMEONE SO IT MUST BE REASONABLE<br>
+            Amount of money you request to be loaned to you: $<input type="text" id="loanmoney"><br>
+            The interest that you are willing to pay at the deadline: %<input type="text" id="loaninterest"><br>
+            The loan term that you are willing to take: <input type="text" id="loantime"> hours<br>
+            <button style="font-size:2vh" onclick="takeLoan()">Request Loan</button>
+            <span id="loanstatus"></span>`
+
+        if (object.val().loan) {
+            document.getElementById("loanmoney").value = object.val().loan[0] || "";
+            document.getElementById("loaninterest").value = object.val().loan[1] || "";
+            document.getElementById("loantime").value = object.val().loan[2] || "";
+            document.getElementById("loanstatus").innerHTML = object.val().loan[4] ? `Your loan was accepted by ${object.val().loan[4]}` : `Your loan is still waiting to be accepted`;
+        }
+    })
+}
+
+function takeLoan() {
+    db.ref(`users/${getUsername()}`).once("value", function(object) {
+        var money = parseInt(document.getElementById("loanmoney").value);
+        var interest = parseInt(document.getElementById("loaninterest").value);
+        var hours = parseInt(document.getElementById("loantime").value);
+
+        if (/^[0-9]+$/.test(money) && money !== "" && /^[0-9]+$/.test(interest) && interest !== "" && /^[0-9]+$/.test(hours) && hours !== "") {
+            if (object.val().loan && Date.now() - (object.val().loan[3] || 0) < 600000) {
+                alert("You are requesting loans too quickly");
+                return;
+            } else if (object.val().loan && object.val().loan[1] < 0) {
+                alert("You cannot have a negative interest");
+                return;
+            }
+
+            db.ref(`users/${getUsername()}`).update({
+                loan: [Math.abs(money),Math.abs(interest),Math.abs(hours),Date.now(),false],
+            })
+            alert("successfully requested loan");
+            document.getElementById("popup").remove();
+        }
     })
 }
 
@@ -664,26 +710,37 @@ function policeRole() {
                 if (police >= 3) {
                     alert("Max amount of police officers");
                     return;
+                } else if (object.val().barred) {
+                    alert("They don't want to hire incompetent police officers");
+                    return;
                 }
                 if (object.val().money >= 10000000) {
                     db.ref(`users/${getUsername()}`).update({
                         role: "police",
                         money: firebase.database.ServerValue.increment(-10000000),
+                        strike: 0,
                     })
                 }
             } else if (object.val().role == "police") {
+                var date = Date.now();
+
                 document.getElementById("popupHeading").innerHTML = "Police Menu";
                 document.getElementById("popupBody").innerHTML = `
                 <h2>Investigate</h2>
                 <hr>
                 <select id="investigateselect"></select>
-                <button style="font-size:1vh" onclick="investigate()">Investigate</button>
+                <button style="font-size:2vh" onclick="investigate()">Investigate</button>
+                <span id="investigatechances">${3 - Math.ceil((((object.val().ability1sleep || date) <= date ? date : object.val().ability1sleep) - date) / 3600000)} chances available</span>
+                <span id="investigateresult"></span><br>
+                Investigate people to see if they are a criminal before arresting them. Inconclusive investigations may mean that they are a criminal, but it doesn't always mean that they are a criminal. Some investigations on citizens can be inconclusive as well.
                 <br><br>
                 
                 <h2>Arrest</h2>
                 <hr>
                 <select id="arrestselect"></select>
-                <button style="font-size:1vh">Arrest</button>`;
+                <button style="font-size:2vh" onclick="arrest()">Arrest</button>
+                <span id="strikecount">${object.val().strike} strikes out of 3</span><br>
+                If you are sure that someone is a criminal, select them here and arrest them. Be sure to not arrest an innocent accidentally, the precinct isn't lenient with incompetent police officers`;
 
                 investigateselector = document.getElementById("investigateselect");
                 investigateselector.innerHTML = `<option value="" selected disabled>Select an option</option>`;
@@ -703,6 +760,80 @@ function policeRole() {
                         arrestselector.appendChild(arrestoption);
                     })
                 });
+            }
+        })
+    })
+}
+
+function investigate() {
+    var target = document.getElementById("investigateselect").value;
+
+    db.ref(`users/${getUsername()}`).once("value", function(user_object) {
+        db.ref(`users/${target}`).once("value", function(object) {
+            if (target !== "") {
+                var date = Date.now()
+
+                if (((user_object.val().ability1sleep || date) <= date ? date : user_object.val().ability1sleep) - 7200000 >= date) {
+                    alert("Investigating is on cooldown");
+                    return;
+                }
+
+                var chance = Math.random()
+                db.ref(`users/${getUsername()}`).update({
+                    ability1sleep: (user_object.val().ability1sleep || date) + 3600000
+                })
+                document.getElementById("investigatechances").innerHTML = `${parseInt(document.getElementById("investigatechances").innerHTML.charAt(0)) - 1} chances available`;
+
+                if (object.val().role == "criminal") {
+                    document.getElementById("investigateresult").innerHTML = "Results were inconclusive";
+                } else {
+                    if (chance >= 0.5) {
+                        document.getElementById("investigateresult").innerHTML = "Results were inconclusive";
+                    } else {
+                        document.getElementById("investigateresult").innerHTML = "They are not a criminal";
+                    }
+                }
+            }
+        })
+    })
+}
+
+function arrest() {
+    var target = document.getElementById("arrestselect").value;
+
+    db.ref(`users/${getUsername()}`).once("value", function(user_object) {
+        db.ref(`users/${target}`).once("value", function(object) {
+            if (target !== "") {
+                if (object.val().role == "criminal") {
+                    db.ref(`users/${getUsername()}`).update({
+                        autoclicker: firebase.database.ServerValue.increment(object.val().stolenauto || 0),
+                        mult: firebase.database.ServerValue.increment(object.val().stolenmult || 0),
+                    })
+                    db.ref(`users/${target}`).update({
+                        stolenauto: 0,
+                        stolenmult: 0,
+                        role: "citizen",
+                    })
+                    alert(`Successfully arrested ${target}`);
+                } else {
+                    db.ref(`users/${getUsername()}`).update({
+                        strike: firebase.database.ServerValue.increment(1),
+                    })
+
+                    if (user_object.val().strike >= 2) {
+                        db.ref(`users/${getUsername()}`).update({
+                            strike: 0,
+                            role: "citizen",
+                            barred: true,
+                        })
+                        document.getElementById("popup").remove();
+                        alert("You were fired due to incompetency");
+                        return;
+                    }
+
+                    document.getElementById("strikecount").innerHTML = `${user_object.val().strike + 1} strikes out of 3`;
+                    alert("Wrong Arrest!");
+                }
             }
         })
     })
@@ -728,8 +859,9 @@ function gamblerRole() {
                         role: "gambler",
                         money: firebase.database.ServerValue.increment(-5000000),
                     })
+                    window.location.reload();
                 }
-            } else if (object.val().role == "gambler") {}
+            }
         })
     })
 }
@@ -756,12 +888,15 @@ function angelRole() {
                     })
                 }
             } else if (object.val().role == "angel") {
+                var date = Date.now();
+
                 document.getElementById("popupHeading").innerHTML = "Angel Menu";
                 document.getElementById("popupBody").innerHTML = `
                     <h2>Divine Retribution</h2>
                     <hr>
                     <select id="divineselect"></select>
-                    <button style="font-size:1vh">Punish</button>`;
+                    <button style="font-size:2vh" onclick="divinePunishment()">Punish</button>
+                    <span id="divinecooldown">${Math.ceil((((object.val().ability1sleep || date) <= date ? date : object.val().ability1sleep) - date) / 86400000) == 1 ? "Divine retribution is on cooldown" : ""}</span>`;
 
                 divineselector = document.getElementById("divineselect");
                 divineselector.innerHTML = `<option value="" selected disabled>Select an option</option>`;
@@ -777,6 +912,35 @@ function angelRole() {
                     })
                 });
             }
+        })
+    })
+}
+
+function divinePunishment() {
+    var divineselector = document.getElementById("divineselect");
+    var roulette = ["autoclicker", "mult", "money"];
+    roulette = roulette[Math.floor(Math.random() * roulette.length)]
+
+    db.ref(`users/${getUsername()}`).once("value", function(user_object) {
+        db.ref(`users/${divineselector.value}`).once("value", function(sinner) {
+            var date = Date.now();
+
+            if (sinner.val().deeds >= 0) {
+                alert("The target is not a sinner");
+                return;
+            } else if (((user_object.val().ability1sleep || date) <= date ? date : user_object.val().ability1sleep) > date) {
+                alert("Divine retribution is on cooldown");
+                return;
+            }
+
+            document.getElementById("divinecooldown").innerHTML = "Divine retribution is on cooldown";
+            db.ref(`users/${getUsername()}`).update({
+                ability1sleep: (user_object.val().ability1sleep || date) + 86400000
+            })
+            db.ref(`users/${divineselector.value}`).update({
+                [roulette]: Math.round(sinner.val()[roulette] * 0.5)
+            })
+            alert(`Punished ${divineselector.value}'s ${roulette}`)
         })
     })
 }
@@ -808,20 +972,105 @@ function bankRole() {
                     <h2>Available Loan Requests</h2>
                     <hr>
                     <select id="bankselect"></select>
-                    <button style="font-size:1vh">Accept</button>`;
+                    <button style="font-size:2vh" onclick="acceptLoan()">Accept</button>
+                    <span id="currentcust"></span>
+                    
+                    <h2>Currently Accepted Loans</h2>
+                    <hr>
+                    <select id="bankaccept"></select>
+                    <button style="font-size:2vh" onclick="collectLoan()">Collect Loan</button>
+                    <span id="currentloan"></span>`;
 
-                bankselector = document.getElementById("bankselect");
+                var bankselector = document.getElementById("bankselect");
                 bankselector.innerHTML = `<option value="" selected disabled>Select an option</option>`;
+                bankselector.addEventListener("change", function(event) {
+                    db.ref(`users/${bankselector.value}`).once("value", function(cust_object) {
+                        document.getElementById("currentcust").innerHTML = `
+                            ${bankselector.value} is requesting $${cust_object.val().loan[0]} with a ${cust_object.val().loan[1]}% interest after ${cust_object.val().loan[2]} hours`;
+                    })
+                })
+
+                var loanselector = document.getElementById("bankaccept");
+                loanselector.innerHTML = `<option value="" selected disabled>Select an option</option>`;
+                loanselector.addEventListener("change", function(event) {
+                    db.ref(`users/${loanselector.value}`).once("value", function(cust_object) {
+                        document.getElementById("currentloan").innerHTML = `
+                            ${loanselector.value} requested $${cust_object.val().loan[0]} with a ${cust_object.val().loan[1]}% interest.
+                            ${cust_object.val().loan[2] < Date.now() ? `${loanselector.value}'s loan is ready to be collected` : `${loanselector.value}'s loan cannot be collected yet, but can be in ${Math.round((cust_object.val().loan[2] - Date.now()) / 3600000)} hours`}`;
+                    })
+                })
 
                 db.ref("users/").once("value", function(user_objects) {
                     user_objects.forEach(function(username) {
-                        bankoption = document.createElement("option");
-                        bankoption.value = username.key;
-                        bankoption.innerHTML = username.val().username;
-                        bankselector.appendChild(bankoption);
+                        if (username.val().loan && !username.val().loan[4]) {
+                            var bankoption = document.createElement("option");
+                            bankoption.value = username.key;
+                            bankoption.innerHTML = username.val().username;
+                            bankselector.appendChild(bankoption);
+                        }
+
+                        if (username.val().loan && username.val().loan[4] == getUsername()) {
+                            var bankoption = document.createElement("option");
+                            bankoption.value = username.key;
+                            bankoption.innerHTML = username.val().username;
+                            loanselector.appendChild(bankoption);
+                        }
                     })
                 });
             }
+        })
+    })
+}
+
+function acceptLoan() {
+    var bankselector = document.getElementById("bankselect");
+
+    db.ref(`users/${bankselector.value}`).once("value", function(customer) {
+        db.ref(`users/${getUsername()}`).once("value", function(object) {
+            if (customer.val().loan[0] > object.val().money) {
+                alert("You do not have the money to take on this loan");
+                return;
+            } else if (customer.val().loan[4]) {
+                alert("This loan has already been accepted");
+                return;
+            }
+
+            db.ref(`users/${bankselector.value}/loan`).update({
+                2: customer.val().loan[2] * 3600000 + Date.now(),
+                4: getUsername(),
+            })
+            db.ref(`users/${bankselector.value}`).update({
+                money: firebase.database.ServerValue.increment(customer.val().loan[0]),
+            })
+            db.ref(`users/${getUsername()}`).update({
+                money: firebase.database.ServerValue.increment(-customer.val().loan[0]),
+            })
+            alert("Successfully accepted the loan")
+        })
+    })
+}
+
+function collectLoan() {
+    var loanselector = document.getElementById("bankaccept");
+
+    db.ref(`users/${loanselector.value}`).once("value", function(customer) {
+        db.ref(`users/${getUsername()}`).once("value", function(object) {
+            if (customer.val().loan[2] > Date.now()) {
+                alert(`${loanselector.value}'s loan is not ready to be collected yet`);
+                return;
+            } else if (customer.val().loan[4] !== getUsername()) {
+                alert("You are not the one that accepted this loan");
+                return;
+            }
+
+            db.ref(`users/${loanselector.value}/loan`).remove()
+            db.ref(`users/${getUsername()}`).update({
+                money: firebase.database.ServerValue.increment(customer.val().loan[0] * (customer.val().loan[1] / 100 + 1)),
+            })
+            db.ref(`users/${loanselector.value}`).update({
+                money: firebase.database.ServerValue.increment(-customer.val().loan[0] * (customer.val().loan[1] / 100 + 1)),
+            })
+            alert("Successfully collected the loan")
         })
     })
 }
@@ -836,17 +1085,24 @@ function criminalRole() {
                 })
             }
         } else if (object.val().role == "criminal") {
+            var date = Date.now();
+
             document.getElementById("popupHeading").innerHTML = "Criminal Menu";
             document.getElementById("popupBody").innerHTML = `
-            <h2>Steal Autoclickers | <span id="autochances"></span> chances left</h2>
+            Stolen autoclickers: <span id="stolenauto">${object.val().stolenauto || 0}</span><br>
+            Stolen mult: <span id="stolenmult">${object.val().stolenmult || 0}</span><br>
+            Note: autos and mult stolen after 3 will be forever in your posession
+            <h2>Steal Autoclickers</h2>
             <hr>
             <select id="autostealselect"></select>
-            <button style="font-size:1vh">Steal</button>
+            <button style="font-size:2vh" onclick="stealAuto()">Steal</button>
+            <span id="autostealchances">${3 - Math.ceil((((object.val().ability1sleep || date) <= date ? date : object.val().ability1sleep) - date) / 3600000)} chances available</span>
             
-            <h2>Steal Mult | <span id="multchances"></span> chances left</h2>
+            <h2>Steal Mult</h2>
             <hr>
             <select id="multstealselect"></select>
-            <button style="font-size:1vh">Steal</button>`;
+            <button style="font-size:2vh" onclick="stealMult()">Steal</button>
+            <span id="multstealchances">${3 - Math.ceil((((object.val().ability2sleep || date) <= date ? date : object.val().ability2sleep) - date) / 3600000)} chances available</span>`;
 
             autostealselector = document.getElementById("autostealselect");
             autostealselector.innerHTML = `<option value="" selected disabled>Select an option</option>`
@@ -867,6 +1123,98 @@ function criminalRole() {
                 })
             });
         }
+    })
+}
+
+function stealAuto() {
+    var target = document.getElementById("autostealselect").value;
+
+    db.ref(`users/${target}`).once("value", function(user_target) {
+        db.ref(`users/${getUsername()}`).once("value", function(object) {
+            if (target !== "") {
+                var date = Date.now();
+
+                if (((object.val().ability1sleep || date) <= date ? date : object.val().ability1sleep) - 7200000 >= date) {
+                    alert("Stealing autoclickers is on cooldown");
+                    return;
+                } else if (user_target.val().autoclicker <= 0) {
+                    alert("You cannot steal from the poor");
+                    return;
+                }
+
+                var chances = Math.random();
+
+                db.ref(`users/${getUsername()}`).update({
+                    ability1sleep: (object.val().ability1sleep || Date.now()) + 3600000
+                })
+                document.getElementById("autostealchances").innerHTML = `${parseInt(document.getElementById("autostealchances").innerHTML.charAt(0)) - 1} chances available`;
+
+                if (chances <= 0.33) {
+                    if (object.val().stolenauto >= 3) {
+                        db.ref(`users/${getUsername()}`).update({
+                            autoclicker: firebase.database.ServerValue.increment(1),
+                        })
+                    } else {
+                        db.ref(`users/${getUsername()}`).update({
+                            stolenauto: ((object.val().stolenauto || 0) + 1)
+                        })
+                    }
+                    db.ref(`users/${target}`).update({
+                        autoclicker: firebase.database.ServerValue.increment(-1),
+                    })
+                    document.getElementById("stolenauto").innerHTML = parseInt(document.getElementById("stolenauto").innerHTML) + 1;
+                    alert(`Successfully stole an autoclicker from ${target}`);
+                } else {
+                    alert(`Failed to steal an autoclicker from ${target}`);
+                }
+            }
+        })
+    })
+}
+
+function stealMult() {
+    var target = document.getElementById("multstealselect").value;
+
+    db.ref(`users/${target}`).once("value", function(user_target) {
+        db.ref(`users/${getUsername()}`).once("value", function(object) {
+            if (target !== "") {
+                var date = Date.now();
+
+                if (((object.val().ability2sleep || date) <= date ? date : object.val().ability2sleep) - 7200000 >= date) {
+                    alert("Stealing mult is on cooldown");
+                    return;
+                } else if (user_target.val().mult <= 1) {
+                    alert("You cannot steal from the poor");
+                    return;
+                }
+
+                var chances = Math.random();
+
+                db.ref(`users/${getUsername()}`).update({
+                    ability2sleep: (object.val().ability2sleep || Date.now()) + 3600000
+                })
+                document.getElementById("multstealchances").innerHTML = `${parseInt(document.getElementById("multstealchances").innerHTML.charAt(0)) - 1} chances available`;
+
+                if (chances <= 0.2) {
+                    if (object.val().stolenmult >= 3) {
+                        db.ref(`users/${getUsername()}`).update({
+                            mult: firebase.database.ServerValue.increment(1),
+                        })
+                    } else {
+                        db.ref(`users/${getUsername()}`).update({
+                            stolenmult: ((object.val().stolenmult || 0) + 1)
+                        })
+                    }
+                    db.ref(`users/${target}`).update({
+                        mult: firebase.database.ServerValue.increment(-1),
+                    })
+                    document.getElementById("stolenmult").innerHTML = parseInt(document.getElementById("stolenmult").innerHTML) + 1;
+                    alert(`Successfully stole mult from ${target}`);
+                } else {
+                    alert(`Failed to steal mult from ${target}`);
+                }
+            }
+        })
     })
 }
 
@@ -1045,43 +1393,48 @@ function showInstructions() {
 }
 
 function checkAutoclickerActive() {
-    if (localStorage.getItem("agreement") !== null) {
-        db.ref(".info/connected").on("value", (snapshot) => {
-            db.ref(`users/${getUsername()}`).once("value", function(object) {
-                if (snapshot.val()) {
-                    var time = Date.now() - object.val().autosleep
-                    days = Math.floor(time / 86400000)
-                    hours = Math.floor((time - days * 86400000) / 3600000)
-                    minutes = Math.floor((time - days * 86400000 - hours * 3600000) / 60000)
-                    seconds = Math.floor((time - days * 86400000 - hours * 3600000 - minutes * 60000) / 1000)
-                    money = Math.floor(time / 1000) * (object.val().autoclicker * (object.val().mult || 1))
-                    if (time > 600000 && object.val().autoclicker > 0) { // 10 minutes
-                        if (object.val().role && object.val().role !== "police") {
+    db.ref(".info/connected").on("value", (snapshot) => {
+        db.ref(`users/${getUsername()}`).once("value", function(object) {
+            if (snapshot.val()) {
+                var time = Date.now() - object.val().autosleep
+                days = Math.floor(time / 86400000)
+                hours = Math.floor((time - days * 86400000) / 3600000)
+                minutes = Math.floor((time - days * 86400000 - hours * 3600000) / 60000)
+                seconds = Math.floor((time - days * 86400000 - hours * 3600000 - minutes * 60000) / 1000)
+                money = Math.floor(time / 1000) * (object.val().autoclicker * (object.val().mult || 1))
+                if (time > 600000 && object.val().autoclicker > 0) { // 10 minutes
+                    if (object.val().role && object.val().role !== "police") {
+                        if (localStorage.getItem("agreement") !== null && object.val().role !== "gambler") {
                             showPopUp(
                                 "Welcome Back!",
                                 `While you were away for ${days} days, ${hours} hours, ${minutes} minutes, and ${seconds} seconds, you gained $${money}. However, you had to pay $${Math.round(money * 0.1)} due to taxes`
                             )
-                            db.ref(`users/${getUsername()}`).update({
-                                money: firebase.database.ServerValue.increment(money - Math.round(money * 0.1)),
-                            })
-                        } else {
+                        }
+                        db.ref(`users/${getUsername()}`).update({
+                            money: firebase.database.ServerValue.increment(money - Math.round(money * 0.1)),
+                        })
+                        db.ref(`other/Casino/`).update({
+                            money: firebase.database.ServerValue.increment(Math.round(money * 0.1)),
+                        })
+                    } else {
+                        if (localStorage.getItem("agreement") !== null && object.val().role !== "gambler") {
                             showPopUp(
                                 "Welcome Back!",
                                 `While you were away for ${days} days, ${hours} hours, ${minutes} minutes, and ${seconds} seconds, you gained $${money}`
                             )
-                            db.ref(`users/${getUsername()}`).update({
-                                money: firebase.database.ServerValue.increment(money),
-                            })
                         }
+                        db.ref(`users/${getUsername()}`).update({
+                            money: firebase.database.ServerValue.increment(money),
+                        })
                     }
-                    db.ref("users/" + getUsername()).onDisconnect().update({
-                        autoactive: false,
-                        autosleep: firebase.database.ServerValue.TIMESTAMP,
-                    })
                 }
-            })
+                db.ref("users/" + getUsername()).onDisconnect().update({
+                    autoactive: false,
+                    autosleep: firebase.database.ServerValue.TIMESTAMP,
+                })
+            }
         })
-    }
+    })
 }
 
 function selectorListeners() { // these are all a problem
@@ -1318,25 +1671,77 @@ function setup() {
     loadMain();
     loadSelectors();
 
-    if (localStorage.getItem("agreement") == null) {
-        showPopUp(`User Agreement`, `
-            If a user discovers a bug, glitch, or unintended behavior within the game that provides them with an unfair advantage over others (including but not limited to duplicating resources, bypassing restrictions, or altering game behavior in unintended ways), they are required to report the issue directly to the administrators (NaruseShiroha or GOD) immediately.<br><br>
-            Failure to report such bugs, or the intentional use of such bugs for personal gain, will be considered a violation of this agreement. In such cases, we reserve the right to take corrective action, which may include but is not limited to:
-            <ul>
-                <li>Temporary or permanent suspension of the user's account</li>
-                <li>Revocation of unfairly gained resources or progress</li>
-                <li>Complete data wipe of the user's account</li>
-            </ul>
-            By playing this game, you agree to these terms and acknowledge that integrity and fairness are core values of the community.<br>
-            Please retype this sentence to confirm your agreement to the above: <b style="user-select:none">I understand that if I find a bug that gives me an unfair advantage, I must report it to the admins, or I risk having my data wiped.</b><br>
-            <input type="text" id="agreement" style="width:100%">`, [["Close", () => {
-                if (document.getElementById("agreement").value == "I understand that if I find a bug that gives me an unfair advantage, I must report it to the admins, or I risk having my data wiped.") {
-                    document.getElementById("popup").remove();
-                    localStorage.setItem("agreement", "true")
-                }
+    db.ref(`users/${getUsername()}`).once("value", function(object) {
+        if (localStorage.getItem("agreement") == null && object.val().role !== "gambler") {
+            showPopUp(`User Agreement`, `
+                If a user discovers a bug, glitch, or unintended behavior within the game that provides them with an unfair advantage over others (including but not limited to duplicating resources, bypassing restrictions, or altering game behavior in unintended ways), they are required to report the issue directly to the administrators (NaruseShiroha or GOD) immediately.<br><br>
+                Failure to report such bugs, or the intentional use of such bugs for personal gain, will be considered a violation of this agreement. In such cases, we reserve the right to take corrective action, which may include but is not limited to:
+                <ul>
+                    <li>Temporary or permanent suspension of the user's account</li>
+                    <li>Revocation of unfairly gained resources or progress</li>
+                    <li>Complete data wipe of the user's account</li>
+                </ul>
+                By playing this game, you agree to these terms and acknowledge that integrity and fairness are core values of the community.<br>
+                Please retype this sentence to confirm your agreement to the above: <b style="user-select:none">I understand that if I find a bug that gives me an unfair advantage, I must report it to the admins, or I risk having my data wiped.</b><br>
+                <input type="text" id="agreement" style="width:100%">`, [["Close", () => {
+                    if (document.getElementById("agreement").value == "I understand that if I find a bug that gives me an unfair advantage, I must report it to the admins, or I risk having my data wiped.") {
+                        document.getElementById("popup").remove();
+                        localStorage.setItem("agreement", "true")
+                    }
+                }]]);
+            document.getElementById("closePopup").remove();
+        }
+        if (object.val().role == "gambler") {
+            showPopUp(`Welcome to the Gambling Space! $<span id="gambling-money">${object.val().money}</span>`,`
+            Double or Nothing<hr>
+            $<input type="text" id="double">
+            <button style="font-size:2vh" onclick="DoubleNothing()">Double-or-Nothing</button><br><br>
+
+            Blackjack<hr>
+            Dealer: <span id="dealer"></span><br>
+            You: <span id="player"></span><br>
+            $<input type="text" id="blackjack">
+            <button style="font-size:2vh" onclick="blackHit()">Hit</button>
+            <button style="font-size:2vh" onclick="blackStand()">Stand</button><br><br>
+
+            The Ultimate Gamble<hr>
+            <button style="font-size:2vh" onclick="ultimateGamble()">Gamble all my money away</button>
+            <span id="ultimatePercentage"></span>`, [["Navigate to Loans", () => {
+                db.ref(`users/${getUsername()}`).once("value", function(object) {
+                    document.getElementById("popupHeading").innerHTML = "Loan Menu";
+                    document.getElementById("popupBody").innerHTML = `
+                        TAKE INTO ACCOUNT THAT YOUR LOAN REQUEST MUST BE ACCEPTED BY SOMEONE SO IT MUST BE REASONABLE<br>
+                        Amount of money you request to be loaned to you: $<input type="text" id="loanmoney"><br>
+                        The interest that you are willing to pay at the deadline: %<input type="text" id="loaninterest"><br>
+                        The loan term that you are willing to take: <input type="text" id="loantime"> hours<br>
+                        <button style="font-size:2vh" onclick="takeLoan()">Request Loan</button>`
+                    document.getElementById("loanmoney").value = object.val().loan[0] || "";
+                    document.getElementById("loaninterest").value = object.val().loan[1] || "";
+                    document.getElementById("loantime").value = object.val().loan[2] || "";
+                })
+            }], ["Navigate to Gambling", () => {
+                db.ref(`users/${getUsername()}`).once("value", function(object) {
+                    document.getElementById("popupHeading").innerHTML = `Welcome to the Gambling Space! $<span id="gambling-money">${object.val().money}</span>`;
+                    document.getElementById("popupBody").innerHTML = `
+                        Double or Nothing<hr>
+                        $<input type="text" id="double">
+                        <button style="font-size:2vh" onclick="DoubleNothing()">Double-or-Nothing</button><br><br>
+
+                        Blackjack<hr>
+                        Dealer: <span id="dealer"></span><br>
+                        You: <span id="player"></span><br>
+                        $<input type="text" id="blackjack">
+                        <button style="font-size:2vh" onclick="blackHit()">Hit</button>
+                        <button style="font-size:2vh" onclick="blackStand()">Stand</button><br><br>
+
+                        The Ultimate Gamble<hr>
+                        <button style="font-size:2vh" onclick="ultimateGamble()">Gamble all my money away</button>
+                        <span id="ultimatePercentage"></span>`
+                })
             }]]);
-        document.getElementById("closePopup").remove();
-    }
+            document.getElementById("closePopup").remove();
+        }
+    })
 
     db.ref(`users/${getUsername()}`).once("value", (amount) => {
         if ((amount.val().money || 0) <= 500 && (amount.val().autoclicker || 0) == 0) {
