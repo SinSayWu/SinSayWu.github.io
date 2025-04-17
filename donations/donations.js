@@ -1155,12 +1155,12 @@ function stealAuto() {
                     if (object.val().stolenauto >= 3) {
                         db.ref(`users/${getUsername()}`).update({
                             autoclicker: firebase.database.ServerValue.increment(1),
-                            deeds: firebase.database.ServerValue.increment(-Math.round(100 * 1.2 ** (user_target.val().autoclicker - 1))),
+                            deeds: firebase.database.ServerValue.increment(-Math.round(100 * 1.2 ** (user_target.val().autoclicker - 1) * 0.001)),
                         })
                     } else {
                         db.ref(`users/${getUsername()}`).update({
                             stolenauto: ((object.val().stolenauto || 0) + 1),
-                            deeds: firebase.database.ServerValue.increment(-Math.round(100 * 1.2 ** (user_target.val().autoclicker - 1))),
+                            deeds: firebase.database.ServerValue.increment(-Math.round(100 * 1.2 ** (user_target.val().autoclicker - 1) * 0.001)),
                         })
                     }
                     db.ref(`users/${target}`).update({
@@ -1203,12 +1203,12 @@ function stealMult() {
                     if (object.val().stolenmult >= 3) {
                         db.ref(`users/${getUsername()}`).update({
                             mult: firebase.database.ServerValue.increment(1),
-                            deeds: firebase.database.ServerValue.increment(-Math.round(250 * 1.4 ** (user_target.val().mult - 2))),
+                            deeds: firebase.database.ServerValue.increment(-Math.round(250 * 1.4 ** (user_target.val().mult - 2) * 0.001)),
                         })
                     } else {
                         db.ref(`users/${getUsername()}`).update({
                             stolenmult: ((object.val().stolenmult || 0) + 1),
-                            deeds: firebase.database.ServerValue.increment(-Math.round(250 * 1.4 ** (user_target.val().mult - 2))),
+                            deeds: firebase.database.ServerValue.increment(-Math.round(250 * 1.4 ** (user_target.val().mult - 2) * 0.001)),
                         })
                     }
                     db.ref(`users/${target}`).update({
