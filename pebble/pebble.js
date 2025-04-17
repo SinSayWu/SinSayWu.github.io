@@ -239,7 +239,7 @@ function displayMembers() {
     var members = document.getElementById('members');
 
     // Get the users from firebase
-    db.ref('users/').once('value', function(membersList) {
+    db.ref('users/').on('value', function(membersList) {
         members.innerHTML = '';
         if(membersList.numChildren() == 0) {
             return
