@@ -1139,7 +1139,7 @@ function stealAuto() {
                 if (((object.val().ability1sleep || date) <= date ? date : object.val().ability1sleep) - 7200000 >= date) {
                     alert("Stealing autoclickers is on cooldown");
                     return;
-                } else if (user_target.val().autoclicker <= 0) {
+                } else if (!user_target.val().autoclicker || user_target.val().autoclicker <= 0) {
                     alert("You cannot steal from the poor");
                     return;
                 }
@@ -1155,10 +1155,12 @@ function stealAuto() {
                     if (object.val().stolenauto >= 3) {
                         db.ref(`users/${getUsername()}`).update({
                             autoclicker: firebase.database.ServerValue.increment(1),
+                            deeds: firebase.database.ServerValue.increment(-Math.round(100 * 1.2 ** (user_target.val().autoclicker - 1))),
                         })
                     } else {
                         db.ref(`users/${getUsername()}`).update({
-                            stolenauto: ((object.val().stolenauto || 0) + 1)
+                            stolenauto: ((object.val().stolenauto || 0) + 1),
+                            deeds: firebase.database.ServerValue.increment(-Math.round(100 * 1.2 ** (user_target.val().autoclicker - 1))),
                         })
                     }
                     db.ref(`users/${target}`).update({
@@ -1185,7 +1187,7 @@ function stealMult() {
                 if (((object.val().ability2sleep || date) <= date ? date : object.val().ability2sleep) - 7200000 >= date) {
                     alert("Stealing mult is on cooldown");
                     return;
-                } else if (user_target.val().mult <= 1) {
+                } else if (!user_target.val().mult || user_target.val().mult <= 1) {
                     alert("You cannot steal from the poor");
                     return;
                 }
@@ -1201,10 +1203,12 @@ function stealMult() {
                     if (object.val().stolenmult >= 3) {
                         db.ref(`users/${getUsername()}`).update({
                             mult: firebase.database.ServerValue.increment(1),
+                            deeds: firebase.database.ServerValue.increment(-Math.round(250 * 1.4 ** (user_target.val().mult - 2))),
                         })
                     } else {
                         db.ref(`users/${getUsername()}`).update({
-                            stolenmult: ((object.val().stolenmult || 0) + 1)
+                            stolenmult: ((object.val().stolenmult || 0) + 1),
+                            deeds: firebase.database.ServerValue.increment(-Math.round(250 * 1.4 ** (user_target.val().mult - 2))),
                         })
                     }
                     db.ref(`users/${target}`).update({
