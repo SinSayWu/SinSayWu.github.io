@@ -163,7 +163,7 @@ function autoclickerCheck() {
 function loadAutoclicker() {
     db.ref("users/" + getUsername()).once("value", (object) => {
         obj = object.val();
-        if (Math.min((0.004 * Math.log((obj.deeds * 10000) / obj.money) / Math.log(Math.E)), 0.005) >= Math.random() && !golden_cookie) {
+        if ((obj.role == "angel" ? 0.01 : Math.min((0.004 * Math.log((obj.deeds * 10000) / obj.money) / Math.log(Math.E)), 0.005)) >= Math.random() && !golden_cookie) {
             let overlay = document.createElement("div");
             overlay.setAttribute("id", "overlay");
 
@@ -609,6 +609,7 @@ function Roles() {
                 Pros:<ul>
                     <li>can see the good and bad deeds of everyone</li>
                     <li>can give divine retribution to evildoers</li>
+                    <li>has a fixed higher chance of getting frenzy every second</li>
                 </ul>
                 Cons:<ul>
                     <li>can no longer destroy auto, mult, or money (but what kind of angel would do that, right?)</li>
@@ -811,6 +812,7 @@ function arrest() {
                         stolenmult: 0,
                         role: "citizen",
                     })
+                    sendNotification(`${getUsername()} arrested ${target} and confiscated ${object.val().stolenauto || 0} autoclicker(s) and ${object.val().stolenmult} mult`);
                     alert(`Successfully arrested ${target}`);
                 } else {
                     db.ref(`users/${getUsername()}`).update({
@@ -824,11 +826,13 @@ function arrest() {
                             barred: true,
                         })
                         document.getElementById("popup").remove();
+                        sendNotification(`${getUsername()} was fired as a police officer due to incompetency`);
                         alert("You were fired due to incompetency");
                         return;
                     }
 
                     document.getElementById("strikecount").innerHTML = `${user_object.val().strike + 1} strikes out of 3`;
+                    sendNotification(`${getUsername()} incorrectly arrested ${target}`);
                     alert("Wrong Arrest!");
                 }
             }
@@ -937,6 +941,7 @@ function divinePunishment() {
             db.ref(`users/${divineselector.value}`).update({
                 [roulette]: Math.round(sinner.val()[roulette] * 0.5)
             })
+            sendNotification(`${getUsername()} used Divine Retribution on ${target} and halved their ${roulette}!`);
             alert(`Punished ${divineselector.value}'s ${roulette}`)
         })
     })
