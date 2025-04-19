@@ -124,3 +124,36 @@ function showPopUp(heading, content, buttonList = [], height=640, width=800) {
     header.innerHTML = heading;
     body.innerHTML = content;
 }
+
+const prefixes = ["", "K", "M", "B", "T", "Qu", "Qi"]
+
+function shortenNumber(x) {
+    var digits;
+    var neg = (x < 0);
+    x = Math.abs(x)
+    if (x === 0) {
+        digits = 1;
+    } else {
+        // digits = x.toString().length - 1;
+        digits = Math.floor(Math.log10(x));
+    }
+    // console.log(digits);
+    
+    var threes = Math.floor(digits / 3);
+    
+    if (threes >= prefixes.length) {
+        if (neg) {
+            return -x;
+        }
+        return x;
+    }
+    x /= (10**(threes * 3));
+    if (threes > 0) {
+        x = x.toFixed(2);
+    }
+    
+    if (neg) {
+        return (-x) + prefixes[threes];
+    }
+    return x + prefixes[threes];
+}

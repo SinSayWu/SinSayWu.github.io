@@ -81,7 +81,7 @@ function loadLeaderboard() {
                     
                     var usernameAmount = document.createElement("span");
                     usernameAmount.setAttribute("id", "leaderNumber");
-                    usernameAmount.innerHTML = username.money || 0;
+                    usernameAmount.innerHTML = shortenNumber(username.money || 0);
                     
                     var usernameImage = document.createElement("img");
                     usernameImage.src = "../images/money.png";
@@ -93,9 +93,9 @@ function loadLeaderboard() {
                     var contentElement = document.createElement("div");
                     contentElement.setAttribute("class", "leader-content");
                     if (username.username == "Casino") {
-                        contentElement.innerHTML = `Total Earnings: $${username.money}`;
+                        contentElement.innerHTML = `Total Earnings: $${shortenNumber(username.money)}`;
                     } else {
-                        contentElement.innerHTML = "Auto-Clickers: " + (username.autoclicker || 0) + "<br>Mult: " + (username.mult || 1) + (username.gambling ? `<br>Gambling: Unlocked` : "") + (username.role ? `<br>Role: ${(username.role == "criminal" || username.role == "gambler") ? "citizen" : username.role}` : "") + (user_object.val().role == "angel" ? `<br>Deeds: ${username.deeds || 0}` : "");
+                        contentElement.innerHTML = "Auto-Clickers: " + (username.autoclicker || 0) + "<br>Mult: " + (username.mult || 1) + (username.gambling ? `<br>Gambling: Unlocked` : "") + (username.role ? `<br>Role: ${(username.role == "criminal" || username.role == "gambler") ? "citizen" : username.role}` : "") + (user_object.val().role == "angel" ? `<br>Deeds: ${shortenNumber(username.deeds || 0)}` : "");
                     }
         
                     leader.appendChild(usernameElement);
@@ -205,7 +205,7 @@ function loadMain() {
 
         // auto clicker prices
         var autocost = document.getElementById("autoCost");
-        autocost.innerHTML = Math.round(100 * 1.2 ** (obj.autoclicker || 0));
+        autocost.innerHTML = shortenNumber(Math.round(100 * 1.2 ** (obj.autoclicker || 0)));
 
         // number of current auto clickers
         var autonum = document.getElementById("autoDescription");
@@ -213,7 +213,7 @@ function loadMain() {
 
         // mult prices
         var multcost = document.getElementById("multCost");
-        multcost.innerHTML = Math.round(250 * 1.4 ** (obj.mult - 1 || 0));
+        multcost.innerHTML = shortenNumber(Math.round(250 * 1.4 ** (obj.mult - 1 || 0)));
 
         // number of current mults
         var multnum = document.getElementById("multDescription");
@@ -1468,7 +1468,7 @@ function selectorListeners() { // these are all a problem
         previousautoListener = db.ref(`users/${autoselector.value}`).on("value", function(object) {
             var obj = object.val();
             var cost = document.getElementById("autominusCost");
-            cost.innerHTML = Math.round(1000 + (0.2 * (obj.money || 0)) + (100 * 1.2 ** (obj.autoclicker || 0)))
+            cost.innerHTML = shortenNumber(Math.round(1000 + (0.2 * (obj.money || 0)) + (100 * 1.2 ** (obj.autoclicker || 0))));
         });
 
         previousautoValue = autoselector.value;
@@ -1483,7 +1483,7 @@ function selectorListeners() { // these are all a problem
         previousmultListener = db.ref(`users/${multselector.value}`).on("value", function(object) {
             var obj = object.val();
             var cost = document.getElementById("multminusCost");
-            cost.innerHTML = Math.round(1000 + (0.2 * (obj.money || 0)) + (250 * 1.4 ** (obj.mult - 1 || 0)))
+            cost.innerHTML = shortenNumber(Math.round(1000 + (0.2 * (obj.money || 0)) + (250 * 1.4 ** (obj.mult - 1 || 0))));
         });
 
         previousmultValue = multselector.value;
@@ -1496,13 +1496,13 @@ function selectorListeners() { // these are all a problem
         if (typeof previousmoneyValue !== 'undefined') {
             moneyinput.removeEventListener("input", function(object) {
                 var cost = document.getElementById("moneyminusCost");
-                cost.innerHTML = Math.abs(Math.round(previousmoneyValue * 3));
+                cost.innerHTML = shortenNumber(Math.abs(Math.round(previousmoneyValue * 3)));
                 previousmoneyValue = previousmoneyValue;
             })
         }
         moneyinput.addEventListener("input", function(object) {
             var cost = document.getElementById("moneyminusCost");
-            cost.innerHTML = Math.abs(Math.round(object.target.value * 3));
+            cost.innerHTML = shortenNumber(Math.abs(Math.round(object.target.value * 3)));
             previousmoneyValue = object.target.value;
         });
     })
@@ -1516,7 +1516,7 @@ function selectorListeners() { // these are all a problem
         previousautogiftListener = db.ref(`users/${autogiftselector.value}`).on("value", function(object) {
             var obj = object.val();
             var cost = document.getElementById("autogiftCost");
-            cost.innerHTML = Math.round(100 * 1.2 ** (obj.autoclicker || 0));
+            cost.innerHTML = shortenNumber(Math.round(100 * 1.2 ** (obj.autoclicker || 0)));
         });
 
         previousautogiftValue = autogiftselector.value;
@@ -1531,7 +1531,7 @@ function selectorListeners() { // these are all a problem
         previousmultgiftListener = db.ref(`users/${multgiftselector.value}`).on("value", function(object) {
             var obj = object.val();
             var cost = document.getElementById("multgiftCost");
-            cost.innerHTML = Math.round(250 * 1.4 ** (obj.mult - 1 || 0));
+            cost.innerHTML = shortenNumber(Math.round(250 * 1.4 ** (obj.mult - 1 || 0)));
         });
 
         previousmultgiftValue = multgiftselector.value;
@@ -1544,13 +1544,13 @@ function selectorListeners() { // these are all a problem
         if (typeof previousmoneyValue !== 'undefined') {
             moneygiftinput.removeEventListener("input", function(object) {
                 var cost = document.getElementById("moneygiftCost");
-                cost.innerHTML = Math.abs(Math.round(previousmoneyValue));
+                cost.innerHTML = shortenNumber(Math.abs(Math.round(previousmoneyValue)));
                 previousmoneyValue = previousmoneyValue;
             })
         }
         moneygiftinput.addEventListener("input", function(object) {
             var cost = document.getElementById("moneygiftCost");
-            cost.innerHTML = Math.abs(Math.round(object.target.value));
+            cost.innerHTML = shortenNumber(Math.abs(Math.round(object.target.value)));
             previousmoneyValue = object.target.value;
         });
     })
@@ -1674,11 +1674,11 @@ function setup() {
     })
 
     db.ref(`users/${getUsername()}/money`).on("value", (amount) => {
-        document.getElementById('money').innerHTML = (amount.val() || 0);
+        document.getElementById('money').innerHTML = shortenNumber(amount.val() || 0);
         if (document.getElementById('gambling-money')) {
             db.ref(`other/Casino/money`).once("value", function(casino_amount) {
                 document.getElementById('gambling-money').innerHTML = (amount.val() || 0);
-                document.getElementById('ultimatePercentage').innerHTML = `Gamble all your money away to have a ${amount.val() == 0 ? 0 : Math.min(6 ** ((4.9 * (amount.val() - casino_amount.val() * 1.05)) / casino_amount.val()), 0.5) * 100}% chance to win $${casino_amount.val()}`;
+                document.getElementById('ultimatePercentage').innerHTML = `Gamble all your money away to have a ${amount.val() == 0 ? 0 : Math.min(6 ** ((4.9 * (amount.val() - casino_amount.val() * 1.05)) / casino_amount.val()), 0.5) * 100}% chance to win $${shortenNumber(casino_amount.val())}`;
             })
         }
     })
