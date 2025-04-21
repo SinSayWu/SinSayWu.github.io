@@ -200,39 +200,51 @@ function loadAutoclicker() {
 }
 
 function loadMain() {
-    db.ref("users/" + getUsername()).once("value", (object) => { // this one is a problem
-        obj = object.val();
+    db.ref(`users/${getUsername()}/mult`).on("value", function(mult_object) {
+        db.ref(`users/${getUsername()}/mult`).once("value", function(stolenmult_object) {
+            // clicker mult
+            var clicker = document.getElementById("clicky-button")
+            clicker.innerHTML = "+" + ((mult_object.val() || 1) + (stolenmult_object.val() || 0));
+            var clickerimage = document.createElement("img");
+            clickerimage.src = "../images/money.png";
+            clicker.appendChild(clickerimage);
+        })
+    })
 
-        // clicker mult
-        var clicker = document.getElementById("clicky-button")
-        clicker.innerHTML = "+" + ((obj.mult || 1) + (obj.stolenmult || 0));
-        var clickerimage = document.createElement("img");
-        clickerimage.src = "../images/money.png";
-        clicker.appendChild(clickerimage);
-
-        // auto clicker prices
+    // auto clicker prices
+    db.ref(`users/${getUsername()}/autoclicker`).on("value", function(auto_object) {
+        var obj = auto_object.val();
         var autocost = document.getElementById("autoCost");
-        autocost.innerHTML = shortenNumber(Math.round(100 * 1.2 ** (obj.autoclicker || 0)));
+        autocost.innerHTML = shortenNumber(Math.round(100 * 1.2 ** (obj || 0)));
 
         // number of current auto clickers
         var autonum = document.getElementById("autoDescription");
-        autonum.innerHTML = `Current auto-clickers: ${obj.autoclicker || 0}<br><hr>"It just plays itself!"<br>(NOTE: Refresh your page if your auto-clickers are not auto-clicking)<br><button class="sell" id="auto-sell" onclick="autoSell()">Sell</button>`;
+        autonum.innerHTML = `Current auto-clickers: ${obj || 0}<br><hr>"It just plays itself!"<br>(NOTE: Refresh your page if your auto-clickers are not auto-clicking)<br><button class="sell" id="auto-sell" onclick="autoSell()">Sell</button>`;
+    })
 
+    db.ref(`users/${getUsername()}/mult`).on("value", function(mult_object) {
+        var obj = mult_object.val();
         // mult prices
         var multcost = document.getElementById("multCost");
-        multcost.innerHTML = shortenNumber(Math.round(250 * 1.4 ** (obj.mult - 1 || 0)));
+        multcost.innerHTML = shortenNumber(Math.round(250 * 1.4 ** ((obj || 1) - 1)));
 
         // number of current mults
         var multnum = document.getElementById("multDescription");
-        multnum.innerHTML = `Current mult: ${obj.mult || 1}<br><hr>"Yo Dawg, we heard you like to click, so we put more clicks in your click so you can click more while you click"<br><button class="sell" id="mult-sell" onclick="multSell()">Sell</button>`;
+        multnum.innerHTML = `Current mult: ${obj || 1}<br><hr>"Yo Dawg, we heard you like to click, so we put more clicks in your click so you can click more while you click"<br><button class="sell" id="mult-sell" onclick="multSell()">Sell</button>`;
+    })
 
+    db.ref(`users/${getUsername()}`).on("child_added", function(gambling_object) {
+        var obj = gambling_object.val();
         // check if gambling has been bought
-        if (obj.gambling) {
+        if (obj) {
             document.getElementById('gambling-text').innerHTML = "Probability Sim with Cards";
         }
+    })
 
+    db.ref(`users/${getUsername()}`).on("child_added", function(role_object) {
+        var obj = role_object.val();
         // check if roles have been bought
-        if (obj.role) {
+        if (obj) {
             document.getElementById('roles-text').innerHTML = "Roles";
         }
     })
