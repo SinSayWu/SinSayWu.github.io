@@ -1,0 +1,61 @@
+<html>
+    <head>
+        <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-database.js"></script>
+        <link href="https://fonts.googleapis.com/css2?family=Comic+Neue&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet">
+
+        <script src="../config.js"></script>
+
+        <script src="../universal.js"></script>
+        <script src="credits.js"></script>
+        <link rel="stylesheet" href="../universal.css">
+        <script src="pebble2.js"></script>
+        <link rel="stylesheet" href="pebble2.css">
+
+        <link rel="shortcut icon" href="../images/pebblePic.png" type="image/">
+        <title>
+            Pebble
+        </title>
+    </head>
+
+    <body>
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-buttons">
+                <img src="../images/logo.png" class="sidebar-logo sidebar-main-logo" title="Home" onclick="window.location.replace('../index.html');"/>
+                <hr class="sidebar-line">
+                <img src="../images/money.png" class="sidebar-logo" title="PvP Donations" onclick="window.location.replace('../donations/donations123.html');"/>
+                <img src="../images/money.png" class="sidebar-logo" title="PvP Donations" onclick="window.location.replace('../donations/donations123.html');"/>
+            </div>
+            <div class="sidebar-expand" id="expand">
+                <span style="margin-left: 17px; font-size: 1.5em">|</span>
+                <span>|</span>
+            </div>
+        </div>
+        <div class="everything">
+            <div class="expand-cover"></div>
+            <div class="wrapper" id="main">
+                asdkjfhlkajsdhfglkjahsdfkljh
+            </div>
+        </div>
+        
+        <script>
+            let sidebar = document.getElementById('sidebar');
+            let expand = document.getElementById('expand');
+
+            document.addEventListener('mousemove', (e) => {
+            if (e.clientX <= 20) { // Mouse is within 10px of the left edge
+                sidebar.classList.add('visible');
+                expand.classList.add('expand-visible');
+                expand.innerHTML = "";
+            } else if (e.clientX > 100) {
+                sidebar.classList.remove('visible');
+                expand.classList.remove('expand-visible');
+                expand.innerHTML = `<span style="margin-left: 20px; font-size: 1.5em">|</span>
+                <span>|</span>`
+            }
+            });
+        </script>
+    </body>
+</html>
