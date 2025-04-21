@@ -39,7 +39,6 @@ function addAmount(autoclicker) {
         if (results.money && Number.isInteger(results.money)) {
             if (autoclicker) {
                 loadLeaderboard();
-                loadMain();
             }
 
             db.ref(`users/${getUsername()}`).update({
@@ -201,9 +200,9 @@ function loadAutoclicker() {
 
 function loadMain() {
     db.ref(`users/${getUsername()}/mult`).on("value", function(mult_object) {
-        db.ref(`users/${getUsername()}/mult`).once("value", function(stolenmult_object) {
+        db.ref(`users/${getUsername()}/stolenmult`).once("value", function(stolenmult_object) {
             // clicker mult
-            var clicker = document.getElementById("clicky-button")
+            var clicker = document.getElementById("clicky-button");
             clicker.innerHTML = "+" + ((mult_object.val() || 1) + (stolenmult_object.val() || 0));
             var clickerimage = document.createElement("img");
             clickerimage.src = "../images/money.png";
