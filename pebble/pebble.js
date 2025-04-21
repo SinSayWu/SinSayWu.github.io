@@ -5,6 +5,8 @@ var everyoneRevealed = false;
 var joined = true;
 var messageSleep = 0;
 var imageSleep = 0;
+let active_users;
+let inactive_users;
 let db;
 
 function refreshChat() {
@@ -235,83 +237,179 @@ function refreshChat() {
 }
 
 function displayMembers() {
-    // alert("Display Members");
+    db.ref('users/').once('value', function(membersList) {
+        active_users = [];
+        inactive_users = [];
+
+        membersList.forEach((member_child) => {
+            if (member_child.val().active) {
+                active_users.push(member_child.val());
+            } else {
+                inactive_users.push(member_child.val());
+            }
+
+            db.ref(`users/${member_child.val().username}/active`).on("value", function(active_object) {
+                if (active_users.some(obj => obj.username === member_child.val().username) && !active_object.val()) {
+                    const index = active_users.findIndex(obj => obj.username === member_child.val().username);
+                    if (index !== -1) {
+                        inactive_users.push(active_users.splice(index, 1)[0]);
+                        redisplayMembers();
+                    }
+                } else if (inactive_users.some(obj => obj.username === member_child.val().username) && active_object.val()) {
+                    const index = inactive_users.findIndex(obj => obj.username === member_child.val().username);
+                    if (index !== -1) {
+                        active_users.push(inactive_users.splice(index, 1)[0]);
+                        redisplayMembers();
+                    }
+                }
+            })
+        })
+
+        redisplayMembers();
+    })
+}
+
+function redisplayMembers() {
+    active_users.sort((a, b) => b.admin - a.admin);
+    inactive_users.sort((a, b) => b.admin - a.admin);
+
     var members = document.getElementById('members');
+    members.innerHTML = "";
 
-    // Get the users from firebase
-    db.ref('users/').on('value', function(membersList) {
-        members.innerHTML = '';
-        if(membersList.numChildren() == 0) {
-            return
+    active_users.forEach((username) => {
+        var mainElement = document.createElement("div");
+        var memberElement = document.createElement("div");
+        memberElement.setAttribute("class", "member");
+        var inner = "";
+        if (everyoneRevealed) {
+            inner += username.name;
+        } else {
+            inner += username.username;
         }
-        var usernames = Object.values(membersList.val());
-        var ordered = [];
+        memberElement.innerHTML = inner;
 
-        for (var i, i = 0; i < usernames.length; i++) {
-            ordered.push([usernames[i].username, usernames[i].muted, usernames[i].active, usernames[i].admin, usernames[i].trapped, usernames[i].sleep, usernames[i].name]);
+        mainElement.appendChild(memberElement);
+
+        if (username.admin > 0) {
+            memberElement.style.color = "SkyBlue";
+        } else {
+            memberElement.style.color = "White";
         }
-        // alert(ordered);
-        ordered.sort((a, b) => b[3]-a[3]);
-        ordered.sort((a, b) => b[2]-a[2]);
-        var isActive = true;
-        ordered.forEach(function(properties) {
-            var mainElement = document.createElement("div");
-            var memberElement = document.createElement("div");
-            memberElement.setAttribute("class", "member");
-            var inner = "";
-            if (everyoneRevealed) {
-                inner += properties[6];
-            } else {
-                inner += properties[0];
-            }
-            memberElement.innerHTML = inner;
-            if (properties[2]) {
-                if (properties[3] > 0) {
-                    memberElement.style.color = "SkyBlue";
-                } else {
-                    memberElement.style.color = "White";
-                }
-            } else {
-                memberElement.style.color = "gray";
-                if (isActive) {
-                    var hr = document.createElement("hr");
-                    hr.style.borderColor = "rgb(0, 0, 0)";
-                    mainElement.appendChild(hr);
-                    isActive = false;
-                }
-            }
 
-            mainElement.append(memberElement);
+        var adminLevel = document.createElement("div");
 
-            var adminLevel = document.createElement("div");
+        db.ref(`users/${username.username}/admin`).on("value", function(admin_object) {
             adminLevel.setAttribute("id", "admin-level");
             adminLevel.setAttribute("class", "member");
-            adminLevel.innerHTML = ` (${properties[3]})`;
+            adminLevel.innerHTML = `(${admin_object.val()})`;
+        })
 
+        mainElement.appendChild(adminLevel);
 
-            if (properties[1]) {
-                var mutedElement = document.createElement("span");
+        var mutedElement = document.createElement("span");
+        var timedElement = document.createElement("span");
+        var trappedElement = document.createElement("span");
+
+        db.ref(`users/${username.username}/muted`).on("value", function(muted_object) {
+            if (muted_object.val()) {
                 mutedElement.style.color = "Red";
                 mutedElement.innerHTML = "&nbsp;[Muted]";
-                memberElement.appendChild(mutedElement);
-            } else if (properties[4]) {
-                var mutedElement = document.createElement("span");
-                    mutedElement.style.color = "rgb(145, 83, 196)";
-                    mutedElement.innerHTML = "&nbsp;[Trapped]";
-                    memberElement.appendChild(mutedElement);
-            } else if ((Date.now() - (properties[5] || 0) + messageSleep + 200 < 0) && properties[4] == 0) {
-                var mutedElement = document.createElement("span");
-                    mutedElement.style.color = "rgb(145, 83, 196)";
-                    mutedElement.innerHTML = "&nbsp;[Timed Out]";
-                    memberElement.appendChild(mutedElement);
+            } else {
+                mutedElement.innerHTML = "";
             }
+        })
 
-            mainElement.append(adminLevel);
-            members.appendChild(mainElement);
-        });
-        // members.scrollTop = members.scrollHeight;
+        db.ref(`users/${username.username}/trapped`).on("value", function(trapped_object) {
+            if (trapped_object.val()) {
+                trappedElement.style.color = "rgb(145, 83, 196)";
+                trappedElement.innerHTML = "&nbsp;[Trapped]";
+            } else {
+                trappedElement.innerHTML = "";
+            }
+        })
+
+        db.ref(`users/${username.username}/sleep`).on("value", function(timed_object) {
+            if ((Date.now() - (timed_object.val() || 0) + messageSleep + 200 < 0) && username.admin == 0) {
+                timedElement.style.color = "rgb(145, 83, 196)";
+                timedElement.innerHTML = "&nbsp;[Timed Out]";
+            } else {
+                timedElement.innerHTML = "";
+            }
+        })
+
+        memberElement.appendChild(mutedElement);
+        memberElement.appendChild(timedElement);
+        memberElement.appendChild(trappedElement);
+
+        members.appendChild(mainElement);
     })
-    // alert("Displayed members");
+
+    var hr = document.createElement("hr");
+    hr.style.borderColor = "rgb(0, 0, 0)";
+    members.appendChild(hr);
+
+    inactive_users.forEach((username) => {
+        var mainElement = document.createElement("div");
+        var memberElement = document.createElement("div");
+        memberElement.setAttribute("class", "member");
+        var inner = "";
+        if (everyoneRevealed) {
+            inner += username.name;
+        } else {
+            inner += username.username;
+        }
+        memberElement.innerHTML = inner;
+        memberElement.style.color = "gray";
+
+        mainElement.appendChild(memberElement);
+
+        var adminLevel = document.createElement("div");
+
+        db.ref(`users/${username.username}/admin`).on("value", function(admin_object) {
+            adminLevel.setAttribute("id", "admin-level");
+            adminLevel.setAttribute("class", "member");
+            adminLevel.innerHTML = `(${admin_object.val()})`;
+        })
+
+        mainElement.appendChild(adminLevel);
+
+        var mutedElement = document.createElement("span");
+        var timedElement = document.createElement("span");
+        var trappedElement = document.createElement("span");
+
+        db.ref(`users/${username.username}/muted`).on("value", function(muted_object) {
+            if (muted_object.val()) {
+                mutedElement.style.color = "Red";
+                mutedElement.innerHTML = "&nbsp;[Muted]";
+            } else {
+                mutedElement.innerHTML = "";
+            }
+        })
+
+        db.ref(`users/${username.username}/trapped`).on("value", function(trapped_object) {
+            if (trapped_object.val()) {
+                trappedElement.style.color = "rgb(145, 83, 196)";
+                trappedElement.innerHTML = "&nbsp;[Trapped]";
+            } else {
+                trappedElement.innerHTML = "";
+            }
+        })
+
+        db.ref(`users/${username.username}/sleep`).on("value", function(timed_object) {
+            if ((Date.now() - (timed_object.val() || 0) + messageSleep + 200 < 0) && username.admin == 0) {
+                timedElement.style.color = "rgb(145, 83, 196)";
+                timedElement.innerHTML = "&nbsp;[Timed Out]";
+            } else {
+                timedElement.innerHTML = "";
+            }
+        })
+
+        memberElement.appendChild(mutedElement);
+        memberElement.appendChild(timedElement);
+        memberElement.appendChild(trappedElement);
+
+        members.appendChild(mainElement);
+    })
 }
 
 function sendServerMessage(message) {

@@ -592,7 +592,7 @@ function Roles() {
                 </ul>
                 <button style="font-size:2vh" onclick="loanRequest()">Select</button>
 
-                <h3>Police Officer (${police} / 3)</h3><hr>
+                <h3>Police Officer (${police} / 5)</h3><hr>
                 Pros:<ul>
                     <li>dont have to pay taxes</li>
                     <li>confiscate what criminals have stolen</li>
@@ -631,13 +631,14 @@ function Roles() {
                 </ul>
                 Cons:<ul>
                     <li>not many people make loans</li>
+                    <li>your wage is dependent on the interest that the loaner is acceptable with</li>
                 </ul>
                 <button style="font-size:2vh" onclick="bankRole()">Select</button> $15,000,000
 
                 <h3>Criminal</h3><hr>
                 Pros:<ul>
                     <li>role will show up as citizen for everyone else</li>
-                    <li>destroying auto, mult, or money is instead replaced with stealing</li>
+                    <li>can steal autoclickers or mult on a cooldown</li>
                     <li>stealing auto, mult, or money is not notified server-wide</li>
                 </ul>
                 Cons:<ul>
@@ -645,6 +646,7 @@ function Roles() {
                     <li>citizens will have a grudge against you and potentially destroy what you gained out of spite if they find out who stole from them</li>
                     <li>police officers will be on a hunt for you as they get to confiscate what you have stolen</li>
                     <li>cannot go back to being a citizen unless arrested</li>
+                    <li>your autoclickers, mult, and money will all get halved when you get arrested</li>
                 </ul>
                 <button style="font-size:2vh"  onclick="criminalRole()">Select</button> $2,500,000`);
             } else if (object.val().money >= 10000000) {
@@ -715,7 +717,7 @@ function policeRole() {
                 }
             })
             if (object.val().role == "citizen") {
-                if (police >= 3) {
+                if (police >= 5) {
                     alert("Max amount of police officers");
                     return;
                 } else if (object.val().barred) {
@@ -798,7 +800,7 @@ function investigate() {
                     if (chance >= 0.5) {
                         document.getElementById("investigateresult").innerHTML = "Results were inconclusive";
                     } else {
-                        document.getElementById("investigateresult").innerHTML = "They are not a criminal";
+                        document.getElementById("investigateresult").innerHTML = "They were not a criminal";
                     }
                 }
             }
@@ -821,6 +823,9 @@ function arrest() {
                         stolenauto: 0,
                         stolenmult: 0,
                         role: "citizen",
+                        autoclicker: Math.round(object.val().autoclicker * 0.5),
+                        mult: Math.round(object.val().mult * 0.5),
+                        money: Math.round(object.val().money * 0.5),
                     })
                     sendNotification(`${getUsername()} arrested ${target} and confiscated ${object.val().stolenauto || 0} autoclicker(s) and ${object.val().stolenmult || 0} mult`);
                     alert(`Successfully arrested ${target}`);
@@ -1447,7 +1452,7 @@ function checkAutoclickerActive() {
                 money = Math.floor(time / 1000) * (object.val().autoclicker * (object.val().mult || 1))
                 if (time > 600000 && object.val().autoclicker > 0) { // 10 minutes
                     if (object.val().role && object.val().role !== "police") {
-                        if (localStorage.getItem("agreement") !== null && object.val().role !== "gambler") {
+                        if (object.val().role !== "gambler") {
                             showPopUp(
                                 "Welcome Back!",
                                 `While you were away for ${days} days, ${hours} hours, ${minutes} minutes, and ${seconds} seconds, you gained $${money}. However, you had to pay $${Math.round(money * 0.1)} due to taxes`
@@ -1460,12 +1465,10 @@ function checkAutoclickerActive() {
                             money: firebase.database.ServerValue.increment(Math.round(money * 0.1)),
                         })
                     } else {
-                        if (localStorage.getItem("agreement") !== null && object.val().role !== "gambler") {
-                            showPopUp(
-                                "Welcome Back!",
-                                `While you were away for ${days} days, ${hours} hours, ${minutes} minutes, and ${seconds} seconds, you gained $${money}`
-                            )
-                        }
+                        showPopUp(
+                            "Welcome Back!",
+                            `While you were away for ${days} days, ${hours} hours, ${minutes} minutes, and ${seconds} seconds, you gained $${money}`
+                        )
                         db.ref(`users/${getUsername()}`).update({
                             money: firebase.database.ServerValue.increment(money),
                         })
@@ -1715,25 +1718,6 @@ function setup() {
     loadSelectors();
 
     db.ref(`users/${getUsername()}`).once("value", function(object) {
-        if (localStorage.getItem("agreement") == null && object.val().role !== "gambler") {
-            showPopUp(`User Agreement`, `
-                If a user discovers a bug, glitch, or unintended behavior within the game that provides them with an unfair advantage over others (including but not limited to duplicating resources, bypassing restrictions, or altering game behavior in unintended ways), they are required to report the issue directly to the administrators (NaruseShiroha or GOD) immediately.<br><br>
-                Failure to report such bugs, or the intentional use of such bugs for personal gain, will be considered a violation of this agreement. In such cases, we reserve the right to take corrective action, which may include but is not limited to:
-                <ul>
-                    <li>Temporary or permanent suspension of the user's account</li>
-                    <li>Revocation of unfairly gained resources or progress</li>
-                    <li>Complete data wipe of the user's account</li>
-                </ul>
-                By playing this game, you agree to these terms and acknowledge that integrity and fairness are core values of the community.<br>
-                Please retype this sentence to confirm your agreement to the above: <b style="user-select:none">I understand that if I find a bug that gives me an unfair advantage, I must report it to the admins, or I risk having my data wiped.</b><br>
-                <input type="text" id="agreement" style="width:100%">`, [["Close", () => {
-                    if (document.getElementById("agreement").value == "I understand that if I find a bug that gives me an unfair advantage, I must report it to the admins, or I risk having my data wiped.") {
-                        document.getElementById("popup").remove();
-                        localStorage.setItem("agreement", "true")
-                    }
-                }]]);
-            document.getElementById("closePopup").remove();
-        }
         if (object.val().role == "gambler") {
             showPopUp(`Welcome to the Gambling Space! $<span id="gambling-money">${object.val().money}</span>`,`
             Double or Nothing<hr>
