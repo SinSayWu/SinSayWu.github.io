@@ -237,7 +237,9 @@ function refreshChat() {
 }
 
 function displayMembers() {
-    db.ref('users/').once('value', function(membersList) {
+    var members = document.getElementById('members');
+
+    db.ref('users/').orderByChild("admin").once('value', function(membersList) {
         active_users = [];
         inactive_users = [];
 
@@ -265,7 +267,143 @@ function displayMembers() {
             })
         })
 
-        redisplayMembers();
+        active_users.reverse();
+        inactive_users.reverse();
+
+        active_users.forEach((username) => {
+            var mainElement = document.createElement("div");
+            var memberElement = document.createElement("div");
+            memberElement.setAttribute("class", "member");
+            var inner = "";
+            if (everyoneRevealed) {
+                inner += username.name;
+            } else {
+                inner += username.username;
+            }
+            memberElement.innerHTML = inner;
+
+            mainElement.appendChild(memberElement);
+
+            if (username.admin > 0) {
+                memberElement.style.color = "SkyBlue";
+            } else {
+                memberElement.style.color = "White";
+            }
+
+            var adminLevel = document.createElement("div");
+
+            db.ref(`users/${username.username}/admin`).on("value", function(admin_object) {
+                adminLevel.setAttribute("id", "admin-level");
+                adminLevel.setAttribute("class", "member");
+                adminLevel.innerHTML = `(${admin_object.val()})`;
+            })
+
+            mainElement.appendChild(adminLevel);
+
+            var mutedElement = document.createElement("span");
+            var timedElement = document.createElement("span");
+            var trappedElement = document.createElement("span");
+
+            db.ref(`users/${username.username}/muted`).on("value", function(muted_object) {
+                if (muted_object.val()) {
+                    mutedElement.style.color = "Red";
+                    mutedElement.innerHTML = "&nbsp;[Muted]";
+                } else {
+                    mutedElement.innerHTML = "";
+                }
+            })
+
+            db.ref(`users/${username.username}/trapped`).on("value", function(trapped_object) {
+                if (trapped_object.val()) {
+                    trappedElement.style.color = "rgb(145, 83, 196)";
+                    trappedElement.innerHTML = "&nbsp;[Trapped]";
+                } else {
+                    trappedElement.innerHTML = "";
+                }
+            })
+
+            db.ref(`users/${username.username}/sleep`).on("value", function(timed_object) {
+                if ((Date.now() - (timed_object.val() || 0) + messageSleep + 200 < 0) && username.admin == 0) {
+                    timedElement.style.color = "rgb(145, 83, 196)";
+                    timedElement.innerHTML = "&nbsp;[Timed Out]";
+                } else {
+                    timedElement.innerHTML = "";
+                }
+            })
+
+            memberElement.appendChild(mutedElement);
+            memberElement.appendChild(timedElement);
+            memberElement.appendChild(trappedElement);
+
+            members.appendChild(mainElement);
+        })
+
+        var hr = document.createElement("hr");
+        hr.style.borderColor = "rgb(0, 0, 0)";
+        members.appendChild(hr);
+
+        inactive_users.forEach((username) => {
+            var mainElement = document.createElement("div");
+            var memberElement = document.createElement("div");
+            memberElement.setAttribute("class", "member");
+            var inner = "";
+            if (everyoneRevealed) {
+                inner += username.name;
+            } else {
+                inner += username.username;
+            }
+            memberElement.innerHTML = inner;
+            memberElement.style.color = "gray";
+
+            mainElement.appendChild(memberElement);
+
+            var adminLevel = document.createElement("div");
+
+            db.ref(`users/${username.username}/admin`).on("value", function(admin_object) {
+                adminLevel.setAttribute("id", "admin-level");
+                adminLevel.setAttribute("class", "member");
+                adminLevel.innerHTML = `(${admin_object.val()})`;
+            })
+
+            mainElement.appendChild(adminLevel);
+
+            var mutedElement = document.createElement("span");
+            var timedElement = document.createElement("span");
+            var trappedElement = document.createElement("span");
+
+            db.ref(`users/${username.username}/muted`).on("value", function(muted_object) {
+                if (muted_object.val()) {
+                    mutedElement.style.color = "Red";
+                    mutedElement.innerHTML = "&nbsp;[Muted]";
+                } else {
+                    mutedElement.innerHTML = "";
+                }
+            })
+
+            db.ref(`users/${username.username}/trapped`).on("value", function(trapped_object) {
+                if (trapped_object.val()) {
+                    trappedElement.style.color = "rgb(145, 83, 196)";
+                    trappedElement.innerHTML = "&nbsp;[Trapped]";
+                } else {
+                    trappedElement.innerHTML = "";
+                }
+            })
+
+            db.ref(`users/${username.username}/sleep`).on("value", function(timed_object) {
+                if ((Date.now() - (timed_object.val() || 0) + messageSleep + 200 < 0) && username.admin == 0) {
+                    timedElement.style.color = "rgb(145, 83, 196)";
+                    timedElement.innerHTML = "&nbsp;[Timed Out]";
+                } else {
+                    timedElement.innerHTML = "";
+                }
+            })
+
+            memberElement.appendChild(mutedElement);
+            memberElement.appendChild(timedElement);
+            memberElement.appendChild(trappedElement);
+
+            members.appendChild(mainElement);
+        })
     })
 }
 
@@ -298,7 +436,7 @@ function redisplayMembers() {
 
         var adminLevel = document.createElement("div");
 
-        db.ref(`users/${username.username}/admin`).on("value", function(admin_object) {
+        db.ref(`users/${username.username}/admin`).once("value", function(admin_object) {
             adminLevel.setAttribute("id", "admin-level");
             adminLevel.setAttribute("class", "member");
             adminLevel.innerHTML = `(${admin_object.val()})`;
@@ -310,7 +448,7 @@ function redisplayMembers() {
         var timedElement = document.createElement("span");
         var trappedElement = document.createElement("span");
 
-        db.ref(`users/${username.username}/muted`).on("value", function(muted_object) {
+        db.ref(`users/${username.username}/muted`).once("value", function(muted_object) {
             if (muted_object.val()) {
                 mutedElement.style.color = "Red";
                 mutedElement.innerHTML = "&nbsp;[Muted]";
@@ -319,7 +457,7 @@ function redisplayMembers() {
             }
         })
 
-        db.ref(`users/${username.username}/trapped`).on("value", function(trapped_object) {
+        db.ref(`users/${username.username}/trapped`).once("value", function(trapped_object) {
             if (trapped_object.val()) {
                 trappedElement.style.color = "rgb(145, 83, 196)";
                 trappedElement.innerHTML = "&nbsp;[Trapped]";
@@ -328,7 +466,7 @@ function redisplayMembers() {
             }
         })
 
-        db.ref(`users/${username.username}/sleep`).on("value", function(timed_object) {
+        db.ref(`users/${username.username}/sleep`).once("value", function(timed_object) {
             if ((Date.now() - (timed_object.val() || 0) + messageSleep + 200 < 0) && username.admin == 0) {
                 timedElement.style.color = "rgb(145, 83, 196)";
                 timedElement.innerHTML = "&nbsp;[Timed Out]";
@@ -365,7 +503,7 @@ function redisplayMembers() {
 
         var adminLevel = document.createElement("div");
 
-        db.ref(`users/${username.username}/admin`).on("value", function(admin_object) {
+        db.ref(`users/${username.username}/admin`).once("value", function(admin_object) {
             adminLevel.setAttribute("id", "admin-level");
             adminLevel.setAttribute("class", "member");
             adminLevel.innerHTML = `(${admin_object.val()})`;
@@ -377,7 +515,7 @@ function redisplayMembers() {
         var timedElement = document.createElement("span");
         var trappedElement = document.createElement("span");
 
-        db.ref(`users/${username.username}/muted`).on("value", function(muted_object) {
+        db.ref(`users/${username.username}/muted`).once("value", function(muted_object) {
             if (muted_object.val()) {
                 mutedElement.style.color = "Red";
                 mutedElement.innerHTML = "&nbsp;[Muted]";
@@ -386,7 +524,7 @@ function redisplayMembers() {
             }
         })
 
-        db.ref(`users/${username.username}/trapped`).on("value", function(trapped_object) {
+        db.ref(`users/${username.username}/trapped`).once("value", function(trapped_object) {
             if (trapped_object.val()) {
                 trappedElement.style.color = "rgb(145, 83, 196)";
                 trappedElement.innerHTML = "&nbsp;[Trapped]";
@@ -395,7 +533,7 @@ function redisplayMembers() {
             }
         })
 
-        db.ref(`users/${username.username}/sleep`).on("value", function(timed_object) {
+        db.ref(`users/${username.username}/sleep`).once("value", function(timed_object) {
             if ((Date.now() - (timed_object.val() || 0) + messageSleep + 200 < 0) && username.admin == 0) {
                 timedElement.style.color = "rgb(145, 83, 196)";
                 timedElement.innerHTML = "&nbsp;[Timed Out]";
@@ -934,6 +1072,11 @@ function sendMessage() {
                     var set_user = message.split(" ")[1].substring(1);
                     var key = message.split(" ")[2]
                     var value = message.split(" ")[3]
+                    if (typeof(value) == "undefined") {
+                        alert("please fill in the value parameter");
+                        return;
+                    }
+                    
                     if (value == "true" || value == "false") {
                         var value = JSON.parse(value)
                     } else if (/^[0-9]+$/.test(value)) {
@@ -1370,8 +1513,7 @@ function setup() {
     checkActive();
     reloadTrapped();
     refreshChat();
-    displayMembers()
-    checkMute()
+    checkMute();
     setInterval(globalUpdate, 1000);
 
     db.ref("other/medianAdmin").on('value', (obj) => {
@@ -1594,7 +1736,9 @@ function checkActive() {
             if (snapshot.val() && object.exists()) {
                 db.ref("users/" + getUsername()).update({
                     active: true,
-                })
+                }).then(
+                    displayMembers()
+                )
                 db.ref("users/" + getUsername()).onDisconnect().update({
                     active: false,
                 })
