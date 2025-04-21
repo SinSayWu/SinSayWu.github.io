@@ -1374,9 +1374,9 @@ function setup() {
     checkMute()
     setInterval(globalUpdate, 1000);
 
-    db.ref("other/").on('value', (obj) => {
+    db.ref("other/medianAdmin").on('value', (obj) => {
         obj = obj.val();
-        document.getElementById("medianAdmin").innerHTML = obj.medianAdmin;
+        document.getElementById("medianAdmin").innerHTML = obj;
     })
     
     var textarea = document.getElementById("textarea");
@@ -1478,9 +1478,8 @@ function brainRotToggle() {
 }
 
 function slowmodeToggle() {
-    db.ref("other/").once("value", function(obj) {
-        var obj = obj.val();
-        var slowmode = obj.slowmode;
+    db.ref("other/slowmode").once("value", function(obj) {
+        var slowmode = obj.val();
         slowmode = !slowmode;
         db.ref("other/").update({
             slowmode: slowmode
@@ -1507,9 +1506,9 @@ function slowMode() {
 }
 
 function imageSleepCheck() {
-    db.ref("other/").on("value", function(obj) {
+    db.ref("other/imageSleep").on("value", function(obj) {
         var obj = obj.val();
-        imageSleep = obj.imageSleep
+        imageSleep = parseInt(obj);
     })
 }
 
