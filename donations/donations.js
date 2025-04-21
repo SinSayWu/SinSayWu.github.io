@@ -1,6 +1,7 @@
 var playing = false;
 var golden_cookie = false;
 var gambled_money = 0;
+const channel = new BroadcastChannel('tab-check');
 let db;
 
 function play() {
@@ -968,7 +969,7 @@ function divinePunishment() {
                 [roulette]: Math.round(sinner.val()[roulette] * 0.5)
             })
             sendNotification(`${getUsername()} used Divine Retribution on ${target} and halved their ${roulette}!`);
-            alert(`Punished ${divineselector.value}'s ${roulette}`)
+            alert(`Punished ${divineselector.value}'s ${roulette}`);
         })
     })
 }
@@ -1659,6 +1660,13 @@ function clickExclusion() {
 }
 
 function setup() {
+    channel.onmessage = () => {
+        document.body.innerHTML = `<h1>Duplicate tabs are not allowed</h1><button onclick="window.location.replace('../pebble/pebble.html?ignore=true')">Pebble</button>`;
+        checkAutoclickerActive = function() {};
+        loadAutoclicker = function() {};
+    };
+    channel.postMessage('call');
+    
     const music = document.getElementById("bg-music");
     const playlist = ["../images/secret_files/irisu_01.mp3", "../images/secret_files/irisu_02.mp3", "../images/secret_files/irisu_03.mp3", "../images/secret_files/irisu_04.mp3", "../images/secret_files/irisu_05.mp3", "../images/secret_files/irisu_06.mp3", ]
     music.addEventListener("ended", function () {
@@ -1723,7 +1731,7 @@ function setup() {
     clickExclusion();
     loadNotifications();
     loadLeaderboard();
-    checkAutoclickerActive();
+    setTimeout(checkAutoclickerActive, 3000);
     setTimeout(autoclickerCheck, 2000);
     loadMain();
     loadSelectors();

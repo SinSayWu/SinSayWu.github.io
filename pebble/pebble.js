@@ -1251,8 +1251,8 @@ function back() {
 
 function globalUpdate() {
     checkMute();
-    db.ref(`users/${getUsername()}`).once("value", function(user_object) {
-        if (!user_object.val().active) {
+    db.ref(`users/${getUsername()}/active`).once("value", function(user_object) {
+        if (!user_object.val()) {
             db.ref(`users/${getUsername()}`).update({
                 active: true,
             })
