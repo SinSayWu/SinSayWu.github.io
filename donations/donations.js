@@ -1664,6 +1664,7 @@ function setup() {
         document.body.innerHTML = `<h1>Duplicate tabs are not allowed</h1><button onclick="window.location.replace('../pebble/pebble.html?ignore=true')">Pebble</button>`;
         checkAutoclickerActive = function() {};
         loadAutoclicker = function() {};
+        db.goOffline();
     };
     channel.postMessage('call');
     
@@ -1683,12 +1684,14 @@ function setup() {
 
     if (getUsername() == null) {
         document.body.innerHTML = `<h1>Please Log in through Pebble because im too lazy to add the feature here</h1><button onclick="window.location.replace('../pebble/pebble.html?ignore=true')">Pebble</button>`;
+        db.goOffline();
         return;
     }
 
     db.ref(`users/${getUsername()}`).once('value', function(object) {
         if (!object.exists() || object.val().password !== getPassword() || (object.val().muted || false) || (object.val().trapped || false) || Date.now() - (object.val().sleep || 0) < 0) {
             document.body.innerHTML = `<h1>Unknown error occurred. Either you are removed, muted, trapped, timed out, etc</h1><button onclick="window.location.replace('../pebble/pebble.html?ignore=true')">Pebble</button>`;
+            db.goOffline();
             return;
         }
     })
@@ -1702,6 +1705,7 @@ function setup() {
 
                 document.body.innerHTML = `<h1>This week's donation campaign has ended with the winner being ${topUser.username} at $${topUser.money}, please participate again in next week's campaign as well</h1><button onclick="window.location.replace('../pebble/pebble.html?ignore=true')">Pebble</button>`;
                 loadAutoclicker = function() {};
+                db.goOffline();
                 return;
             })
         }
