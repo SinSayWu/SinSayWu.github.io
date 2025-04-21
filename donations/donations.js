@@ -20,28 +20,35 @@ function play() {
 }
 
 function addAmount(autoclicker) {
-    db.ref(`users/${getUsername()}`).once("value", function(snapshot) {
-        let data = snapshot.val() || {};
-        let amount = ((data.mult || 1) + (data.stolenmult || 0)) * (autoclicker === undefined ? 1 : ((data.autoclicker || 0) + (data.stolenauto || 0)));
+    const keys = ["mult", "autoclicker", "stolenauto", "stolenmult", "money"];
+    const promises = keys.map((key) =>
+        db.ref(`users/${getUsername()}/${key}`).once("value")
+    );
+
+    Promise.all(promises).then((snapshots) => {
+        const results = {};
+        keys.forEach((key, i) => {
+            results[key] = snapshots[i].val();
+        });
+
+        let amount = ((results.mult || 1) + (results.stolenmult || 0)) * (autoclicker === undefined ? 1 : ((results.autoclicker || 0) + (results.stolenauto || 0)));
         if (golden_cookie) {
-            amount = amount * 2
+            amount *= 2;
         }
 
-        if (snapshot.exists()) {
-            if (data.money !== undefined && data.money !== null && Number.isInteger(data.money)) {
-                if (autoclicker) {
-                    loadLeaderboard();
-                    loadMain();
-                }
-
-                db.ref(`users/${getUsername()}`).update({
-                    money: firebase.database.ServerValue.increment(amount)
-                });
-            } else {
-                db.ref(`users/${getUsername()}`).update({
-                    money: amount
-                });
+        if (results.money && Number.isInteger(results.money)) {
+            if (autoclicker) {
+                loadLeaderboard();
+                loadMain();
             }
+
+            db.ref(`users/${getUsername()}`).update({
+                money: firebase.database.ServerValue.increment(amount)
+            });
+        } else {
+            db.ref(`users/${getUsername()}`).update({
+                money: amount
+            });
         }
     });
 }
@@ -349,7 +356,7 @@ function DoubleNothing() {
         db.ref(`users/${getUsername()}`).once("value", function(object) {
             if (moneyinput <= object.val().money) {
                 if (Math.random() < 0.499 + (object.val().role == "gambler" ? 0.001 : 0)) {
-                    if (moneyinput >= 1000000) {
+                    if (moneyinput >= object.val().money * 0.5) {
                         sendNotification(`${object.val().username} just won $${moneyinput} in Double-or-Nothing!`)
                     }
                     db.ref(`users/${getUsername()}`).update({
@@ -359,7 +366,7 @@ function DoubleNothing() {
                         money: firebase.database.ServerValue.increment(-moneyinput),
                     })
                 } else {
-                    if (moneyinput >= 1000000) {
+                    if (moneyinput >= object.val().money * 0.5) {
                         sendNotification(`${object.val().username} just lost $${moneyinput} in Double-or-Nothing!`)
                     }
                     db.ref(`users/${getUsername()}`).update({
@@ -460,7 +467,7 @@ function blackStand() {
                 document.getElementById('blackjack').value = "";
                 document.getElementById("dealer").innerHTML += " Won";
                 document.getElementById("player").innerHTML += " Lost";
-                if (moneyinput > 1000000) {
+                if (moneyinput > object.val().money * 0.5) {
                     sendNotification(`${object.val().username} just lost $${moneyinput} in Blackjack!`)
                 }
                 db.ref(`other/Casino/`).update({
@@ -471,7 +478,7 @@ function blackStand() {
                 document.getElementById('blackjack').value = "";
                 document.getElementById("dealer").innerHTML += " Won";
                 document.getElementById("player").innerHTML += " Lost";
-                if (moneyinput > 1000000) {
+                if (moneyinput > object.val().money * 0.5) {
                     sendNotification(`${object.val().username} just lost $${moneyinput} in Blackjack!`)
                 }
                 db.ref(`other/Casino/`).update({
@@ -485,7 +492,7 @@ function blackStand() {
                 document.getElementById('blackjack').value = "";
                 document.getElementById("dealer").innerHTML += " Tied";
                 document.getElementById("player").innerHTML += " Tied";
-                if (moneyinput > 1000000) {
+                if (moneyinput > object.val().money * 0.5) {
                     sendNotification(`${object.val().username} just tied with $${moneyinput} in Blackjack!`)
                 }
             } else if (hand <= 21 && sum > hand) {
@@ -499,7 +506,7 @@ function blackStand() {
                 document.getElementById('blackjack').value = "";
                 document.getElementById("dealer").innerHTML += " Lost";
                 document.getElementById("player").innerHTML += " Won";
-                if (moneyinput > 1000000) {
+                if (moneyinput > object.val().money * 0.5) {
                     sendNotification(`${object.val().username} just won $${moneyinput} in Blackjack!`)
                 }
             } else if (hand > 21) {
@@ -513,7 +520,7 @@ function blackStand() {
                 document.getElementById('blackjack').value = "";
                 document.getElementById("dealer").innerHTML += " Lost";
                 document.getElementById("player").innerHTML += " Won";
-                if (moneyinput > 1000000) {
+                if (moneyinput > object.val().money * 0.5) {
                     sendNotification(`${object.val().username} just won $${moneyinput} in Blackjack!`)
                 }
             }
@@ -541,7 +548,7 @@ function ultimateGamble() {
                         money: firebase.database.ServerValue.increment(user_object.val().money),
                     })
 
-                    if (user_object.val().money >= 1000000) {
+                    if (user_object.val().money >= 100000000) {
                         sendNotification(`${getUsername()} has just lost the Ultimate Gamble!`);
                     }
                 }
@@ -689,7 +696,10 @@ function takeLoan() {
                 loan: [Math.abs(money),Math.abs(interest),Math.abs(hours),Date.now(),false],
             })
             alert("successfully requested loan");
-            document.getElementById("popup").remove();
+            
+            if (object.val().role !== "gambler") {
+                document.getElementById("popup").remove();
+            }
         }
     })
 }
@@ -812,7 +822,7 @@ function arrest() {
                         stolenmult: 0,
                         role: "citizen",
                     })
-                    sendNotification(`${getUsername()} arrested ${target} and confiscated ${object.val().stolenauto || 0} autoclicker(s) and ${object.val().stolenmult} mult`);
+                    sendNotification(`${getUsername()} arrested ${target} and confiscated ${object.val().stolenauto || 0} autoclicker(s) and ${object.val().stolenmult || 0} mult`);
                     alert(`Successfully arrested ${target}`);
                 } else {
                     db.ref(`users/${getUsername()}`).update({
@@ -1248,7 +1258,10 @@ function minusAuto() {
                 db.ref(`users/${autoselector.value}`).update({
                     autoclicker: victim.autoclicker - 1,
                 })
-                sendNotification(`${attacker.username} has just removed an Auto-Clicker from ${victim.username}!`);
+
+                if (price >= attacker.money * 0.5) {
+                    sendNotification(`${attacker.username} has just removed an Auto-Clicker from ${victim.username}!`);
+                }
             }
         })
     })
@@ -1278,7 +1291,10 @@ function minusMult() {
                 db.ref(`users/${multselector.value}`).update({
                     mult: victim.mult - 1,
                 })
-                sendNotification(`${attacker.username} has just removed one Mult from ${victim.username}!`);
+
+                if (price >= attacker.money * 0.5) {
+                    sendNotification(`${attacker.username} has just removed one Mult from ${victim.username}!`);
+                }
             }
         })
     })
@@ -1309,7 +1325,7 @@ function minusMoney() {
                 db.ref(`users/${moneyselector.value}/money`).set(
                     (money - Math.abs(Math.round(moneyinput.value)) < 0 ? 0 : money - Math.abs(Math.round(moneyinput.value)))
                 )
-                if (Math.abs(Math.round(moneyinput.value > money ? money : moneyinput.value())) >= 5000) {
+                if (price >= attacker.money * 0.5) {
                     sendNotification(`${attacker.username} has just removed $${Math.abs(Math.round(moneyinput.value))} from ${victim.username}!`);
                 }
             }
@@ -1335,7 +1351,10 @@ function giftAuto() {
                 db.ref(`users/${autoselector.value}/autoclicker`).set(
                     (victim.autoclicker || 0) + 1,
                 )
-                sendNotification(`${attacker.username} has just gifted an Auto-Clicker to ${victim.username}!`);
+
+                if (price >= attacker.money * 0.5) {
+                    sendNotification(`${attacker.username} has just gifted an Auto-Clicker to ${victim.username}!`);
+                }
             }
         })
     })
@@ -1359,7 +1378,10 @@ function giftMult() {
                 db.ref(`users/${multselector.value}/mult`).set(
                     (victim.mult || 1) + 1
                 )
-                sendNotification(`${attacker.username} has just gifted one Mult to ${victim.username}!`);
+
+                if (price >= attacker.money * 0.5) {
+                    sendNotification(`${attacker.username} has just gifted one Mult to ${victim.username}!`);
+                }
             }
         })
     })
@@ -1385,7 +1407,7 @@ function giftMoney() {
                 db.ref(`users/${moneyselector.value}/money`).set(
                     money + price,
                 )
-                if (price >= 5000) {
+                if (price >= attacker.money * 0.5) {
                     sendNotification(`${attacker.username} has just gifted $${price} to ${victim.username}!`);
                 }
             }
@@ -1774,17 +1796,7 @@ function setup() {
 window.onload = function() {
     try {
         getApiKey().then(apiKey => {
-            const firebaseConfig = {
-                apiKey: apiKey,
-                authDomain: "chatter-97e8c.firebaseapp.com",
-                databaseURL: "https://chatter-97e8c-default-rtdb.firebaseio.com",
-                projectId: "chatter-97e8c",
-                storageBucket: "chatter-97e8c.firebasestorage.app",
-                messagingSenderId: "281722915171",
-                appId: "1:281722915171:web:3b136d8a0b79389f2f6b56",
-                measurementId: "G-4CGJ1JFX58"
-            };     
-            firebase.initializeApp(firebaseConfig);
+            firebase.initializeApp(apiKey);
             db = firebase.database();
 
             setup();

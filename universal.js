@@ -2,12 +2,12 @@ async function getApiKey() {
     const script = document.createElement('script');
     script.src = 'config.js';
     if (typeof(window.CONFIG) !== "undefined") {
-        return window.CONFIG.API_KEY
+        return window.CONFIG
     } else {
-        const response = await fetch("https://us-central1-pebble-rocks.cloudfunctions.net/api/getApiKey");
+        const response = await fetch("https://us-central1-pebble-rocks.cloudfunctions.net/api/getFirebaseConfig");
         const data = await response.json();
-        if (data.apiKey) {
-            return data.apiKey;
+        if (data) {
+            return data;
         } else {
             alert("Failed to retrieve API Key");
         }
