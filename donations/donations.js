@@ -64,7 +64,9 @@ function loadLeaderboard() {
                 users = [];
 
                 object.forEach((object_child) => {
-                    users.push(object_child.val());
+                    if (user_object.val().role !== "pacifist" || user_object.val().username == object_child.val().username) {
+                        users.push(object_child.val());
+                    }
                 })
 
                 users.sort((a, b) => {
@@ -266,35 +268,37 @@ function loadSelectors() {
         moneygiftselector.innerHTML = `<option value="" selected disabled>Select an option</option>`;
 
         object.forEach(function(username) {
-            autooption = document.createElement("option");
-            autooption.value = username.key;
-            autooption.innerHTML = username.val().username;
-            autoselector.appendChild(autooption);
+            if (username.val().role !== "pacifist") {
+                autooption = document.createElement("option");
+                autooption.value = username.key;
+                autooption.innerHTML = username.val().username;
+                autoselector.appendChild(autooption);
 
-            multoption = document.createElement("option");
-            multoption.value = username.key;
-            multoption.innerHTML = username.val().username;
-            multselector.appendChild(multoption);
+                multoption = document.createElement("option");
+                multoption.value = username.key;
+                multoption.innerHTML = username.val().username;
+                multselector.appendChild(multoption);
 
-            moneyoption = document.createElement("option");
-            moneyoption.value = username.key;
-            moneyoption.innerHTML = username.val().username;
-            moneyselector.appendChild(moneyoption)
+                moneyoption = document.createElement("option");
+                moneyoption.value = username.key;
+                moneyoption.innerHTML = username.val().username;
+                moneyselector.appendChild(moneyoption)
 
-            autogiftoption = document.createElement("option");
-            autogiftoption.value = username.key;
-            autogiftoption.innerHTML = username.val().username;
-            autogiftselector.appendChild(autogiftoption);
+                autogiftoption = document.createElement("option");
+                autogiftoption.value = username.key;
+                autogiftoption.innerHTML = username.val().username;
+                autogiftselector.appendChild(autogiftoption);
 
-            multgiftoption = document.createElement("option");
-            multgiftoption.value = username.key;
-            multgiftoption.innerHTML = username.val().username;
-            multgiftselector.appendChild(multgiftoption);
+                multgiftoption = document.createElement("option");
+                multgiftoption.value = username.key;
+                multgiftoption.innerHTML = username.val().username;
+                multgiftselector.appendChild(multgiftoption);
 
-            moneygiftoption = document.createElement("option");
-            moneygiftoption.value = username.key;
-            moneygiftoption.innerHTML = username.val().username;
-            moneygiftselector.appendChild(moneygiftoption);
+                moneygiftoption = document.createElement("option");
+                moneygiftoption.value = username.key;
+                moneygiftoption.innerHTML = username.val().username;
+                moneygiftselector.appendChild(moneygiftoption);
+            }
         })
     })
 }
@@ -578,6 +582,7 @@ function Roles() {
                 var gamblers = 0;
                 var angels = 0;
                 var tellers = 0;
+                var pacifists = 0;
                 user_objects.forEach(function(username) {
                     var role = username.val().role;
                     if (role === "citizen") {
@@ -590,6 +595,8 @@ function Roles() {
                         angels++;
                     } else if (role === "bank") {
                         tellers++;
+                    } else if (role === "pacifist") {
+                        pacifists++;
                     }
                 })
 
@@ -660,7 +667,20 @@ function Roles() {
                     <li>cannot go back to being a citizen unless arrested</li>
                     <li>your autoclickers, mult, and money will all get halved when you get arrested</li>
                 </ul>
-                <button style="font-size:2vh"  onclick="criminalRole()">Select</button> $2,500,000`);
+                <button style="font-size:2vh"  onclick="criminalRole()">Select</button> $2,500,000
+                
+                <h3>Pacifist (${pacifists} / 1)</h3><hr>
+                Pros:<ul>
+                    <li>other users cannot destroy, steal, or divine retribute you</li>
+                    <li>don't have to pay taxes</li>
+                </ul>
+                Cons:<ul>
+                    <li>other users cannot gift mult, autos, or money to you</li>
+                    <li>you cannot gift mult, autos, or money to other users</li>
+                    <li>you cannot destroy mult, auto, or money from other users</li>
+                    <li>you can no longer take out loans</li>
+                </ul>
+                <button style="font-size:2vh"  onclick="pacifistRole()">Select</button> $10,000,000 and a pacifist mindset`);
             } else if (object.val().money >= 10000000) {
                 db.ref(`users/${getUsername()}`).update({
                     money: firebase.database.ServerValue.increment(-10000000),
@@ -771,15 +791,17 @@ function policeRole() {
 
                 db.ref("users/").once("value", function(user_objects) {
                     user_objects.forEach(function(username) {
-                        investigateoption = document.createElement("option");
-                        investigateoption.value = username.key;
-                        investigateoption.innerHTML = username.val().username;
-                        investigateselector.appendChild(investigateoption);
+                        if (username.val().role !== "pacifist") {
+                            investigateoption = document.createElement("option");
+                            investigateoption.value = username.key;
+                            investigateoption.innerHTML = username.val().username;
+                            investigateselector.appendChild(investigateoption);
 
-                        arrestoption = document.createElement("option");
-                        arrestoption.value = username.key;
-                        arrestoption.innerHTML = username.val().username;
-                        arrestselector.appendChild(arrestoption);
+                            arrestoption = document.createElement("option");
+                            arrestoption.value = username.key;
+                            arrestoption.innerHTML = username.val().username;
+                            arrestselector.appendChild(arrestoption);
+                        }
                     })
                 });
             }
@@ -886,8 +908,9 @@ function gamblerRole() {
                     db.ref(`users/${getUsername()}`).update({
                         role: "gambler",
                         money: firebase.database.ServerValue.increment(-5000000),
+                    }).then(() => {
+                        window.location.reload();
                     })
-                    window.location.reload();
                 }
             }
         })
@@ -931,7 +954,7 @@ function angelRole() {
 
                 db.ref("users/").once("value", function(user_objects) {
                     user_objects.forEach(function(username) {
-                        if (username.val().deeds < 0) {
+                        if (username.val().deeds < 0 && username.val().role !== "pacifist") {
                             divineoption = document.createElement("option");
                             divineoption.value = username.key;
                             divineoption.innerHTML = username.val().username;
@@ -1140,15 +1163,17 @@ function criminalRole() {
 
             db.ref("users/").once("value", function(user_objects) {
                 user_objects.forEach(function(username) {
-                    autostealoption = document.createElement("option");
-                    autostealoption.value = username.key;
-                    autostealoption.innerHTML = username.val().username;
-                    autostealselector.appendChild(autostealoption);
+                    if (username.val().role !== "pacifist") {
+                        autostealoption = document.createElement("option");
+                        autostealoption.value = username.key;
+                        autostealoption.innerHTML = username.val().username;
+                        autostealselector.appendChild(autostealoption);
 
-                    multstealoption = document.createElement("option");
-                    multstealoption.value = username.key;
-                    multstealoption.innerHTML = username.val().username;
-                    multstealselector.appendChild(multstealoption);
+                        multstealoption = document.createElement("option");
+                        multstealoption.value = username.key;
+                        multstealoption.innerHTML = username.val().username;
+                        multstealselector.appendChild(multstealoption);
+                    }
                 })
             });
         }
@@ -1249,6 +1274,41 @@ function stealMult() {
             }
         })
     })
+}
+
+function pacifistRole() {
+    db.ref("users/").once("value", function(user_objects) {
+        db.ref(`users/${getUsername()}`).once("value", function(object) {
+            var pacifist = 0;
+            user_objects.forEach(function(username) {
+                var role = username.val().role;
+                if (role === "pacifist") {
+                    pacifist++;
+                }
+            })
+            if (object.val().role == "citizen") {
+                if (pacifist >= 5) {
+                    alert("Max amount of pacifists");
+                    return;
+                }
+                if (object.val().money >= 10000000 && typeof(object.val().deeds) == "undefined") {
+                    db.ref(`users/${getUsername()}`).update({
+                        role: "pacifist",
+                        money: firebase.database.ServerValue.increment(-10000000),
+                    }).then(() => {
+                        window.location.reload();
+                    })
+                }
+            }
+        })
+    })
+}
+
+function pacifistLoader() {
+    document.getElementById("roles").remove();
+    document.getElementById("notifications").remove();
+    document.getElementById("attacking").remove();
+    document.getElementById("gifting").remove();
 }
 
 function minusAuto() {
@@ -1790,6 +1850,8 @@ function setup() {
                 })
             }]]);
             document.getElementById("closePopup").remove();
+        } else if (object.val().role == "pacifist") {
+            pacifistLoader();
         }
     })
 
