@@ -1287,7 +1287,7 @@ function pacifistRole() {
                 }
             })
             if (object.val().role == "citizen") {
-                if (pacifist >= 5) {
+                if (pacifist >= 1) {
                     alert("Max amount of pacifists");
                     return;
                 }
