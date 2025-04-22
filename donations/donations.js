@@ -64,7 +64,7 @@ function loadLeaderboard() {
                 users = [];
 
                 object.forEach((object_child) => {
-                    if (user_object.val().role !== "pacifist" || user_object.val().username == object_child.val().username) {
+                    if (object_child.val().role !== "pacifist" || user_object.val().username == object_child.val().username) {
                         users.push(object_child.val());
                     }
                 })
@@ -1523,7 +1523,7 @@ function checkAutoclickerActive() {
                 seconds = Math.floor((time - days * 86400000 - hours * 3600000 - minutes * 60000) / 1000)
                 money = Math.floor(time / 1000) * (object.val().autoclicker * (object.val().mult || 1))
                 if (time > 600000 && object.val().autoclicker > 0) { // 10 minutes
-                    if (object.val().role && (object.val().role !== "police" || object.val().role !== "pacifist")) {
+                    if (object.val().role && (object.val().role !== "police" && object.val().role !== "pacifist")) {
                         if (object.val().role !== "gambler") {
                             showPopUp(
                                 "Welcome Back!",
@@ -1532,6 +1532,7 @@ function checkAutoclickerActive() {
                         }
                         db.ref(`users/${getUsername()}`).update({
                             money: firebase.database.ServerValue.increment(money - Math.round(money * 0.1)),
+                            autosleep: firebase.database.ServerValue.TIMESTAMP,
                         })
                         db.ref(`other/Casino/`).update({
                             money: firebase.database.ServerValue.increment(Math.round(money * 0.1)),
@@ -1543,6 +1544,7 @@ function checkAutoclickerActive() {
                         )
                         db.ref(`users/${getUsername()}`).update({
                             money: firebase.database.ServerValue.increment(money),
+                            autosleep: firebase.database.ServerValue.TIMESTAMP,
                         })
                     }
                 }
