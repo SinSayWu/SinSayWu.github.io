@@ -1523,7 +1523,7 @@ function checkAutoclickerActive() {
                 seconds = Math.floor((time - days * 86400000 - hours * 3600000 - minutes * 60000) / 1000)
                 money = Math.floor(time / 1000) * (object.val().autoclicker * (object.val().mult || 1))
                 if (time > 600000 && object.val().autoclicker > 0) { // 10 minutes
-                    if (object.val().role && object.val().role !== "police") {
+                    if (object.val().role && (object.val().role !== "police" || object.val().role !== "pacifist")) {
                         if (object.val().role !== "gambler") {
                             showPopUp(
                                 "Welcome Back!",
