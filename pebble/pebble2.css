@@ -4,16 +4,15 @@
 }
 
 body {
-    background: #282828;
+    background: #11151a;
 }
 
 #sidebar {
     position: fixed;
-    top: 0;
     left: -60px;
     width: 80px;
-    height: 100%;
-    background-color: #434750;
+    height: 98%;
+    background-color: #68748f;
     color: white;
     transition: all 0.3s ease;
     z-index: 999;
@@ -24,12 +23,14 @@ body {
     flex-direction: row;
     align-items: normal;
     opacity: 1;
+    top: 50%;
+    transform: translateY(-50%);
 }
 
 #sidebar.visible {
     left: 0;
     opacity: 1;
-    box-shadow: 10px 0 3px  #17181b;
+    box-shadow: 3px 0 0px #68748f;
 }
 
 .sidebar-buttons {
@@ -41,11 +42,11 @@ body {
     margin-top: 10px;
     margin-bottom: 20px;
     width: 100%;
-    border: 1px solid gray;
+    border: 1px solid rgb(43, 42, 42);
 }
 
 .sidebar-logo {
-    background-color: #434750;
+    background-color: #576074;
     max-width: 70%;
     display: block;
     text-align: center;
@@ -54,7 +55,7 @@ body {
     cursor: pointer;
     transition: all 0.5s ease;
     border-radius: 10%;
-    border: 1px solid #434750;
+    border: 1px solid #68748f;
     padding: 10%;
 }
 
@@ -81,12 +82,7 @@ body {
 .sidebar-logo:active {
     display: block;
     text-align: center;
-    margin-top: 15px;
-    margin-bottom: 10px;
-    margin-left: 3px;
-    cursor: pointer;
     transition: all 0.5s ease;
-    border-radius: 10%;
     box-shadow: none;
     transform: none;
     border: 1px solid #434750;
@@ -101,7 +97,7 @@ body {
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    color: gray;
+    color: rgb(20, 16, 34);
 }
 
 .expand-visible {
@@ -111,13 +107,19 @@ body {
 
 .everything {
     display: grid;
-    grid-template-columns: 20px auto;
+    grid-template-columns: 25px auto 5px;
+    grid-template-rows: auto 98% auto;
     height: 100%;
     width: 100%;
 }
 
 .wrapper {
     /* background: black; */
-    height: 100%;
-    width: 100%;
+    grid-column: 2 / 3;
+    grid-row: 2 / 3;
+    max-height: 100%;
+    max-width: 100%;
+    background-color: #222836;
+    padding: 50px;
+    border-radius: 16px;
 }
