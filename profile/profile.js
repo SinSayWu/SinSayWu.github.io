@@ -91,6 +91,15 @@ window.onload = function() {
     getApiKey().then(apiKey => {
         firebase.initializeApp(apiKey);
         db = firebase.database();
+
+        const script = document.createElement('script');
+            script.src = '../config.js';
+            if (typeof(window.APPCHECK) !== "undefined") {
+                self.FIREBASE_APPCHECK_DEBUG_TOKEN = window.APPCHECK;
+            }
+
+            const appCheck = firebase.appCheck();
+            appCheck.activate('6LfM-SUrAAAAAOOkSTBb-tHBQ7BKabRa55bGBWH3', true, { provider: firebase.appCheck.ReCaptchaV3Provider });
     })
 
     // log out in another window check
