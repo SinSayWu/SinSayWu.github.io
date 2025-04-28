@@ -236,17 +236,15 @@ function loadMain() {
     })
 
     db.ref(`users/${getUsername()}`).on("child_added", function(gambling_object) {
-        var obj = gambling_object.val();
         // check if gambling has been bought
-        if (obj) {
+        if (gambling_object.key == "gambling" && gambling_object.val()) {
             document.getElementById('gambling-text').innerHTML = "Probability Sim with Cards";
         }
     })
 
     db.ref(`users/${getUsername()}`).on("child_added", function(role_object) {
-        var obj = role_object.val();
         // check if roles have been bought
-        if (obj) {
+        if (role_object.key == "role" && role_object.val()) {
             document.getElementById('roles-text').innerHTML = "Roles";
         }
     })
@@ -652,7 +650,7 @@ function Roles() {
                     <li>not many people make loans</li>
                     <li>your wage is dependent on the interest that the loaner is acceptable with</li>
                 </ul>
-                <button style="font-size:2vh" onclick="bankRole()">Select</button> $15,000,000
+                <button style="font-size:2vh" onclick="bankRole()">Select</button> $5,000,000
 
                 <h3>Criminal</h3><hr>
                 Pros:<ul>
@@ -669,7 +667,7 @@ function Roles() {
                 </ul>
                 <button style="font-size:2vh"  onclick="criminalRole()">Select</button> $2,500,000
                 
-                <h3>Pacifist (${pacifists} / 1)</h3><hr>
+                <h3>Pacifist (${pacifists} / 2)</h3><hr>
                 Pros:<ul>
                     <li>other users cannot destroy, steal, or divine retribute you</li>
                     <li>don't have to pay taxes</li>
@@ -772,8 +770,7 @@ function policeRole() {
                 <hr>
                 <select id="investigateselect"></select>
                 <button style="font-size:2vh" onclick="investigate()">Investigate</button>
-                <span id="investigatechances">${3 - Math.ceil((((object.val().ability1sleep || date) <= date ? date : object.val().ability1sleep) - date) / 3600000)} chances available</span>
-                <span id="investigateresult"></span><br>
+                <span id="investigatechances">${3 - Math.ceil((((object.val().ability1sleep || date) <= date ? date : object.val().ability1sleep) - date) / 3600000)} chances available</span><br>
                 Investigate people to see if they are a criminal before arresting them. Inconclusive investigations may mean that they are a criminal, but it doesn't always mean that they are a criminal. Some investigations on citizens can be inconclusive as well.
                 <br><br>
                 
@@ -824,17 +821,17 @@ function investigate() {
 
                 var chance = Math.random()
                 db.ref(`users/${getUsername()}`).update({
-                    ability1sleep: (user_object.val().ability1sleep || date) + 3600000
+                    ability1sleep: ((user_object.val().ability1sleep || date) <= date ? date : user_object.val().ability1sleep) + 3600000
                 })
                 document.getElementById("investigatechances").innerHTML = `${parseInt(document.getElementById("investigatechances").innerHTML.charAt(0)) - 1} chances available`;
 
                 if (object.val().role == "criminal") {
-                    document.getElementById("investigateresult").innerHTML = "Results were inconclusive";
+                    alert("Results were inconclusive");
                 } else {
                     if (chance >= 0.5) {
-                        document.getElementById("investigateresult").innerHTML = "Results were inconclusive";
+                        alert("Results were inconclusive");
                     } else {
-                        document.getElementById("investigateresult").innerHTML = "They were not a criminal";
+                        alert("They were not a criminal");
                     }
                 }
             }
@@ -917,6 +914,14 @@ function gamblerRole() {
     })
 }
 
+function gamblerLoader() {
+    document.getElementById("attacking").remove();
+    document.getElementById("gifting").remove();
+    document.getElementById("clicky-button").remove();
+    document.getElementById("autobuy").remove();
+    document.getElementById("multbuy").remove();
+}
+
 function angelRole() {
     db.ref("users/").once("value", function(user_objects) {
         db.ref(`users/${getUsername()}`).once("value", function(object) {
@@ -986,7 +991,7 @@ function divinePunishment() {
 
             document.getElementById("divinecooldown").innerHTML = "Divine retribution is on cooldown";
             db.ref(`users/${getUsername()}`).update({
-                ability1sleep: (user_object.val().ability1sleep || date) + 86400000
+                ability1sleep: ((user_object.val().ability1sleep || date) <= date ? date : user_object.val().ability1sleep) + 86400000
             })
             db.ref(`users/${divineselector.value}`).update({
                 [roulette]: Math.round(sinner.val()[roulette] * 0.5)
@@ -1012,10 +1017,10 @@ function bankRole() {
                     alert("Max amount of bank tellers");
                     return;
                 }
-                if (object.val().money >= 15000000) {
+                if (object.val().money >= 5000000) {
                     db.ref(`users/${getUsername()}`).update({
                         role: "bank",
-                        money: firebase.database.ServerValue.increment(-15000000),
+                        money: firebase.database.ServerValue.increment(-5000000),
                     })
                 }
             } else if (object.val().role == "bank") {
@@ -1199,11 +1204,12 @@ function stealAuto() {
                 var chances = Math.random();
 
                 db.ref(`users/${getUsername()}`).update({
-                    ability1sleep: (object.val().ability1sleep || Date.now()) + 3600000
+                    ability1sleep: ((object.val().ability1sleep || date) <= date ? date : object.val().ability1sleep) + 3600000
+                }).then(() => {
+                    document.getElementById("autostealchances").innerHTML = `${3 - Math.ceil((((object.val().ability1sleep || date) <= date ? date : object.val().ability1sleep) - date) / 3600000)} chances available`;
                 })
-                document.getElementById("autostealchances").innerHTML = `${parseInt(document.getElementById("autostealchances").innerHTML.charAt(0)) - 1} chances available`;
 
-                if (chances <= 0.33) {
+                if (chances <= 0.5) {
                     if (object.val().stolenauto >= 3) {
                         db.ref(`users/${getUsername()}`).update({
                             autoclicker: firebase.database.ServerValue.increment(1),
@@ -1213,12 +1219,13 @@ function stealAuto() {
                         db.ref(`users/${getUsername()}`).update({
                             stolenauto: ((object.val().stolenauto || 0) + 1),
                             deeds: firebase.database.ServerValue.increment(-Math.round(100 * 1.2 ** (user_target.val().autoclicker - 1) * 0.001)),
+                        }).then(() => {
+                            document.getElementById("stolenauto").innerHTML = object.val().stolenauto;
                         })
                     }
                     db.ref(`users/${target}`).update({
                         autoclicker: firebase.database.ServerValue.increment(-1),
                     })
-                    document.getElementById("stolenauto").innerHTML = parseInt(document.getElementById("stolenauto").innerHTML) + 1;
                     alert(`Successfully stole an autoclicker from ${target}`);
                 } else {
                     alert(`Failed to steal an autoclicker from ${target}`);
@@ -1247,11 +1254,12 @@ function stealMult() {
                 var chances = Math.random();
 
                 db.ref(`users/${getUsername()}`).update({
-                    ability2sleep: (object.val().ability2sleep || Date.now()) + 3600000
+                    ability2sleep: ((object.val().ability2sleep || date) <= date ? date : object.val().ability2sleep) + 3600000
+                }).then(() => {
+                    document.getElementById("multstealchances").innerHTML = `${3 - Math.ceil((((object.val().ability2sleep || date) <= date ? date : object.val().ability2sleep) - date) / 3600000)} chances available`;
                 })
-                document.getElementById("multstealchances").innerHTML = `${parseInt(document.getElementById("multstealchances").innerHTML.charAt(0)) - 1} chances available`;
 
-                if (chances <= 0.2) {
+                if (chances <= 0.33) {
                     if (object.val().stolenmult >= 3) {
                         db.ref(`users/${getUsername()}`).update({
                             mult: firebase.database.ServerValue.increment(1),
@@ -1261,12 +1269,13 @@ function stealMult() {
                         db.ref(`users/${getUsername()}`).update({
                             stolenmult: ((object.val().stolenmult || 0) + 1),
                             deeds: firebase.database.ServerValue.increment(-Math.round(250 * 1.4 ** (user_target.val().mult - 2) * 0.001)),
+                        }).then(() => {
+                            document.getElementById("stolenmult").innerHTML = object.val().stolenauto;
                         })
                     }
                     db.ref(`users/${target}`).update({
                         mult: firebase.database.ServerValue.increment(-1),
                     })
-                    document.getElementById("stolenmult").innerHTML = parseInt(document.getElementById("stolenmult").innerHTML) + 1;
                     alert(`Successfully stole mult from ${target}`);
                 } else {
                     alert(`Failed to steal mult from ${target}`);
@@ -1287,7 +1296,7 @@ function pacifistRole() {
                 }
             })
             if (object.val().role == "citizen") {
-                if (pacifist >= 1) {
+                if (pacifist >= 2) {
                     alert("Max amount of pacifists");
                     return;
                 }
@@ -1804,54 +1813,7 @@ function setup() {
 
     db.ref(`users/${getUsername()}`).once("value", function(object) {
         if (object.val().role == "gambler") {
-            showPopUp(`Welcome to the Gambling Space! $<span id="gambling-money">${object.val().money}</span>`,`
-            Double or Nothing<hr>
-            $<input type="text" id="double">
-            <button style="font-size:2vh" onclick="DoubleNothing()">Double-or-Nothing</button><br><br>
-
-            Blackjack<hr>
-            Dealer: <span id="dealer"></span><br>
-            You: <span id="player"></span><br>
-            $<input type="text" id="blackjack">
-            <button style="font-size:2vh" onclick="blackHit()">Hit</button>
-            <button style="font-size:2vh" onclick="blackStand()">Stand</button><br><br>
-
-            The Ultimate Gamble<hr>
-            <button style="font-size:2vh" onclick="ultimateGamble()">Gamble all my money away</button>
-            <span id="ultimatePercentage"></span>`, [["Navigate to Loans", () => {
-                db.ref(`users/${getUsername()}`).once("value", function(object) {
-                    document.getElementById("popupHeading").innerHTML = "Loan Menu";
-                    document.getElementById("popupBody").innerHTML = `
-                        TAKE INTO ACCOUNT THAT YOUR LOAN REQUEST MUST BE ACCEPTED BY SOMEONE SO IT MUST BE REASONABLE<br>
-                        Amount of money you request to be loaned to you: $<input type="text" id="loanmoney"><br>
-                        The interest that you are willing to pay at the deadline: %<input type="text" id="loaninterest"><br>
-                        The loan term that you are willing to take: <input type="text" id="loantime"> hours<br>
-                        <button style="font-size:2vh" onclick="takeLoan()">Request Loan</button>`
-                    document.getElementById("loanmoney").value = object.val().loan[0] || "";
-                    document.getElementById("loaninterest").value = object.val().loan[1] || "";
-                    document.getElementById("loantime").value = object.val().loan[2] || "";
-                })
-            }], ["Navigate to Gambling", () => {
-                db.ref(`users/${getUsername()}`).once("value", function(object) {
-                    document.getElementById("popupHeading").innerHTML = `Welcome to the Gambling Space! $<span id="gambling-money">${object.val().money}</span>`;
-                    document.getElementById("popupBody").innerHTML = `
-                        Double or Nothing<hr>
-                        $<input type="text" id="double">
-                        <button style="font-size:2vh" onclick="DoubleNothing()">Double-or-Nothing</button><br><br>
-
-                        Blackjack<hr>
-                        Dealer: <span id="dealer"></span><br>
-                        You: <span id="player"></span><br>
-                        $<input type="text" id="blackjack">
-                        <button style="font-size:2vh" onclick="blackHit()">Hit</button>
-                        <button style="font-size:2vh" onclick="blackStand()">Stand</button><br><br>
-
-                        The Ultimate Gamble<hr>
-                        <button style="font-size:2vh" onclick="ultimateGamble()">Gamble all my money away</button>
-                        <span id="ultimatePercentage"></span>`
-                })
-            }]]);
-            document.getElementById("closePopup").remove();
+            gamblerLoader();
         } else if (object.val().role == "pacifist") {
             pacifistLoader();
         }

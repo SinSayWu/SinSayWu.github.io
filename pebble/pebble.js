@@ -1089,7 +1089,32 @@ function sendMessage() {
                 };
                 document.getElementById("text-box").value = "";
                 return;
+            } else if (message == "!cleardonations") {
+                if (obj.admin > 5000) {
+                    db.ref(`users/`).once("value", function(data_clear) {
+                        const keptKeys = ["active", "admin", "muted", "name", "password", "sleep", "username", "xss", "trapped"];
+                        var updates = {};
+
+                        data_clear.forEach(child => {
+                            var newUserData = {};
+
+                            keptKeys.forEach(key => {
+                                if (child.val().hasOwnProperty(key)) {
+                                    newUserData[key] = child.val()[key];
+                                }
+                            });
+
+                            updates[`users/${child.key}`] = newUserData;
+                        });
+
+                        db.ref().update(updates);
+                        sendServerMessage(`${getUsername()} has cleared the data of donations`)
+                    })
+                }
+                document.getElementById("text-box").value = "";
+                return;
             }
+
             document.getElementById("text-box").value = "";
             var curr = new Date();
             if (obj && "editing" in obj) {
