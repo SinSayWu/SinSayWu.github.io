@@ -822,8 +822,9 @@ function investigate() {
                 var chance = Math.random()
                 db.ref(`users/${getUsername()}`).update({
                     ability1sleep: ((user_object.val().ability1sleep || date) <= date ? date : user_object.val().ability1sleep) + 3600000
+                }).then(() => {
+                    document.getElementById("investigatechances").innerHTML = `${3 - Math.ceil((((object.val().ability1sleep || date) <= date ? date : object.val().ability1sleep) - date) / 3600000)} chances available`;
                 })
-                document.getElementById("investigatechances").innerHTML = `${parseInt(document.getElementById("investigatechances").innerHTML.charAt(0)) - 1} chances available`;
 
                 if (object.val().role == "criminal") {
                     alert("Results were inconclusive");
