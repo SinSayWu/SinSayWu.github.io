@@ -132,7 +132,7 @@ function refreshChat() {
                                     } else {
                                         editButton.innerHTML = "🗙";
                                         db.ref(`chats/${messages[index].key}/message`).once("value", function(edit_message) {
-                                            textBox.value = edit_message.val();
+                                            textBox.value = unsanitize(edit_message.val());
                                         })
                                         textBox.focus();
                                         db.ref("users/" + getUsername()).update({
@@ -1125,20 +1125,18 @@ function sendMessage() {
                     db.ref("users/" + username + "/editing").remove()
                 })
             } else {
-                db.ref('chats/').once('value', function(message_object) {
-                    db.ref('chats/').push({
-                        name: username,
-                        message: message,
-                        real_name: obj.name,
-                        admin: obj.admin,
-                        removed: false,
-                        channel: (sessionStorage.getItem("channel") || "general"),
-                        edited: false,
-                        time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
-                    }).then(function() {
-                        db.ref("users/" + username).update({
-                            sleep: Date.now(),
-                        })
+                db.ref('chats/').push({
+                    name: username,
+                    message: message,
+                    real_name: obj.name,
+                    admin: obj.admin,
+                    removed: false,
+                    channel: (sessionStorage.getItem("channel") || "general"),
+                    edited: false,
+                    time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
+                }).then(function() {
+                    db.ref("users/" + username).update({
+                        sleep: Date.now(),
                     })
                 })
             }
@@ -1417,7 +1415,7 @@ function changeChannel(channel) {
                                         } else {
                                             editButton.innerHTML = "🗙";
                                             db.ref(`chats/${nodename[index]}/message`).once("value", function(edit_message) {
-                                                textBox.value = edit_message.val();
+                                                textBox.value = unsanitize(edit_message.val());
                                             })
                                             textBox.focus();
                                             db.ref("users/" + getUsername()).update({
@@ -1896,21 +1894,29 @@ function submitImage(index) {
 
 window.onload = function() {
     try {
-        getApiKey().then(apiKey => {
-            firebase.initializeApp(apiKey);
-            db = firebase.database();
+        const config = {
+            apiKey: "AIzaSyCE9mOZD-GqrDYSeVO_olhyEx8m233iU0s",
+            authDomain: "chatter-v2-8616b.firebaseapp.com",
+            databaseURL: "https://chatter-v2-8616b-default-rtdb.firebaseio.com",
+            projectId: "chatter-v2-8616b",
+            storageBucket: "chatter-v2-8616b.firebasestorage.app",
+            messagingSenderId: "459315641865",
+            appId: "1:459315641865:web:3a6527087666fbc66c82d8",
+            measurementId: "G-7YX3NN3SBV"
+        };          
+        firebase.initializeApp(config);
+        db = firebase.database();
 
-            const script = document.createElement('script');
-            script.src = '../config.js';
-            if (typeof(window.APPCHECK) !== "undefined") {
-                self.FIREBASE_APPCHECK_DEBUG_TOKEN = window.APPCHECK;
-            }
+        const script = document.createElement('script');
+        script.src = '../config.js';
+        if (typeof(window.APPCHECK) !== "undefined") {
+            self.FIREBASE_APPCHECK_DEBUG_TOKEN = window.APPCHECK;
+        }
 
-            const appCheck = firebase.appCheck();
-            appCheck.activate('6LfM-SUrAAAAAOOkSTBb-tHBQ7BKabRa55bGBWH3', true, { provider: firebase.appCheck.ReCaptchaV3Provider });
+        const appCheck = firebase.appCheck();
+        appCheck.activate('6LfM-SUrAAAAAOOkSTBb-tHBQ7BKabRa55bGBWH3', true, { provider: firebase.appCheck.ReCaptchaV3Provider });
 
-            setup();
-        });
+        setup();
     } catch(err) {
         alert(err);
     }

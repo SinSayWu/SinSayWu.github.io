@@ -1,19 +1,3 @@
-async function getApiKey() {
-    const script = document.createElement('script');
-    script.src = 'config.js';
-    if (typeof(window.CONFIG) !== "undefined") {
-        return window.CONFIG
-    } else {
-        const response = await fetch("https://us-central1-pebble-rocks.cloudfunctions.net/api/getFirebaseConfig");
-        const data = await response.json();
-        if (data) {
-            return data;
-        } else {
-            alert("Failed to retrieve API Key");
-        }
-    }
-}
-
 function getUsername() {
     return localStorage.getItem("username");
 }
@@ -53,6 +37,19 @@ function sanitize(string) {
     };
     const reg = /[&<>"'/]/ig;
     return string.replace(reg, (match)=>(map[match]));
+}
+
+function unsanitize(string) {
+    const map = {
+        '&amp;': '&',
+        '&lt;': '<',
+        '&gt;': '>',
+        '&quot;': '"',
+        '&#x27;': "'",
+        '&#x2F;': '/',
+    };
+    const reg = /&amp;|&lt;|&gt;|&quot;|&#x27;|&#x2F;/ig;
+    return string.replace(reg, (match) => map[match]);
 }
 
 /**

@@ -88,19 +88,27 @@ function submit() {
 }
 
 window.onload = function() {
-    getApiKey().then(apiKey => {
-        firebase.initializeApp(apiKey);
-        db = firebase.database();
+    const config = {
+        apiKey: "AIzaSyCE9mOZD-GqrDYSeVO_olhyEx8m233iU0s",
+        authDomain: "chatter-v2-8616b.firebaseapp.com",
+        databaseURL: "https://chatter-v2-8616b-default-rtdb.firebaseio.com",
+        projectId: "chatter-v2-8616b",
+        storageBucket: "chatter-v2-8616b.firebasestorage.app",
+        messagingSenderId: "459315641865",
+        appId: "1:459315641865:web:3a6527087666fbc66c82d8",
+        measurementId: "G-7YX3NN3SBV"
+    };          
+    firebase.initializeApp(config);
+    db = firebase.database();
 
-        const script = document.createElement('script');
-            script.src = '../config.js';
-            if (typeof(window.APPCHECK) !== "undefined") {
-                self.FIREBASE_APPCHECK_DEBUG_TOKEN = window.APPCHECK;
-            }
+    const script = document.createElement('script');
+    script.src = '../config.js';
+    if (typeof(window.APPCHECK) !== "undefined") {
+        self.FIREBASE_APPCHECK_DEBUG_TOKEN = window.APPCHECK;
+    }
 
-            const appCheck = firebase.appCheck();
-            appCheck.activate('6LfM-SUrAAAAAOOkSTBb-tHBQ7BKabRa55bGBWH3', true, { provider: firebase.appCheck.ReCaptchaV3Provider });
-    })
+    const appCheck = firebase.appCheck();
+    appCheck.activate('6LfM-SUrAAAAAOOkSTBb-tHBQ7BKabRa55bGBWH3', true, { provider: firebase.appCheck.ReCaptchaV3Provider });
 
     // log out in another window check
     window.addEventListener("storage", function(event) {

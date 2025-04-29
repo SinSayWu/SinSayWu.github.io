@@ -1506,16 +1506,12 @@ function showInstructions() {
     showPopUp(
         "Welcome to PvP Donations!",
         `
-            <h2><b>ROLES</b></h2>that are in progress...
+            <h2><b>Update Log</b></h2>
             <ul>
-            <li>Police Officers: can arrest criminals</li>
-            <li>Gamblers: have higher luck in gambling</li>
-            <li>Bank Tellers: can give loans to people</li>
-            <li>Angel: can give divine retribution</li>
+            <li>Buffed criminal's chances to steal autos and mult</li>
+            <li>Lowered the price to get bank teller</li>
+            <li>Fixed the bug that backed up more than 3 chances</li>
             </ul>
-            Currently, roles are only here because there is a limited amount of people that can be in one role so get the one you want quick!!
-            <b>ROLES CURRENTLY ARE NOT FUNCTIONAL. THEY WILL PROBABLY ALL BE DONE TOMORROW.</b>
-            <h3>Also congratulations to last week's winner, bobmcboberstein who won with around $2,000,000,000!</h3>
             <h2>Warning: Do not try to HACK</h2>
             It ruins the game for everyone
         `,
@@ -1807,7 +1803,7 @@ function setup() {
     clickExclusion();
     loadNotifications();
     loadLeaderboard();
-    setTimeout(checkAutoclickerActive, 3000);
+    setTimeout(checkAutoclickerActive, 1000);
     setTimeout(autoclickerCheck, 2000);
     loadMain();
     loadSelectors();
@@ -1829,21 +1825,29 @@ function setup() {
 
 window.onload = function() {
     try {
-        getApiKey().then(apiKey => {
-            firebase.initializeApp(apiKey);
-            db = firebase.database();
+        const config = {
+            apiKey: "AIzaSyCE9mOZD-GqrDYSeVO_olhyEx8m233iU0s",
+            authDomain: "chatter-v2-8616b.firebaseapp.com",
+            databaseURL: "https://chatter-v2-8616b-default-rtdb.firebaseio.com",
+            projectId: "chatter-v2-8616b",
+            storageBucket: "chatter-v2-8616b.firebasestorage.app",
+            messagingSenderId: "459315641865",
+            appId: "1:459315641865:web:3a6527087666fbc66c82d8",
+            measurementId: "G-7YX3NN3SBV"
+        };          
+        firebase.initializeApp(config);
+        db = firebase.database();
 
-            const script = document.createElement('script');
-            script.src = '../config.js';
-            if (typeof(window.APPCHECK) !== "undefined") {
-                self.FIREBASE_APPCHECK_DEBUG_TOKEN = window.APPCHECK;
-            }
+        const script = document.createElement('script');
+        script.src = '../config.js';
+        if (typeof(window.APPCHECK) !== "undefined") {
+            self.FIREBASE_APPCHECK_DEBUG_TOKEN = window.APPCHECK;
+        }
 
-            const appCheck = firebase.appCheck();
-            appCheck.activate('6LfM-SUrAAAAAOOkSTBb-tHBQ7BKabRa55bGBWH3', true, { provider: firebase.appCheck.ReCaptchaV3Provider });
+        const appCheck = firebase.appCheck();
+        appCheck.activate('6LfM-SUrAAAAAOOkSTBb-tHBQ7BKabRa55bGBWH3', true, { provider: firebase.appCheck.ReCaptchaV3Provider });
 
-            setup();
-        });
+        setup();
     } catch(err) {
         alert(err);
     }
