@@ -64,7 +64,7 @@ function loadLeaderboard() {
                 users = [];
 
                 object.forEach((object_child) => {
-                    if (object_child.val().role !== "pacifist" || user_object.val().username == object_child.val().username) {
+                    if ((object_child.val().role !== "pacifist" && user_object.val().role !== "pacifist") || user_object.val().username == object_child.val().username) {
                         users.push(object_child.val());
                     }
                 })
@@ -581,6 +581,7 @@ function Roles() {
                 var angels = 0;
                 var tellers = 0;
                 var pacifists = 0;
+                var jesters = 0;
                 user_objects.forEach(function(username) {
                     var role = username.val().role;
                     if (role === "citizen") {
@@ -595,6 +596,8 @@ function Roles() {
                         tellers++;
                     } else if (role === "pacifist") {
                         pacifists++;
+                    } else if (role === "jester") {
+                        jesters++;
                     }
                 })
 
@@ -611,11 +614,11 @@ function Roles() {
 
                 <h3>Police Officer (${police} / 5)</h3><hr>
                 Pros:<ul>
-                    <li>dont have to pay taxes</li>
                     <li>confiscate what criminals have stolen</li>
                 </ul>
                 Cons:<ul>
                     <li>criminals hate you</li>
+                    <li>arresting the jester will cause you to reset back to complete 0</li>
                 </ul>
                 <button style="font-size:2vh" onclick="policeRole()">Select</button> $10,000,000
 
@@ -642,9 +645,10 @@ function Roles() {
 
                 <h3>Bank Teller (${tellers} / 3)</h3><hr>
                 Pros:<ul>
-                    <li>people can request for loans from you</li>
+                    <li>you can accept loans that people request</li>
                     <li>gain the money that would be interest</li>
                     <li>can put people into crippling debt</li>
+                    <li>dont have to pay taxes</li>
                 </ul>
                 Cons:<ul>
                     <li>not many people make loans</li>
@@ -678,7 +682,18 @@ function Roles() {
                     <li>you cannot destroy mult, auto, or money from other users</li>
                     <li>you can no longer take out loans</li>
                 </ul>
-                <button style="font-size:2vh"  onclick="pacifistRole()">Select</button> $10,000,000 and a pacifist mindset`);
+                <button style="font-size:2vh"  onclick="pacifistRole()">Select</button> $10,000,000 and a pacifist mindset
+                
+                <h3>Jester (${jesters} / 1)</h3><hr>
+                Pros:<ul>
+                    <li>role will show up as either citizen for everyone else</li>
+                    <li>can send custom notifications</li>
+                    <li>can edit the money, auto, mult, gambling, and role of yourself on the leaderboard</li>
+                </ul>
+                Cons:<ul>
+                    <li>no one takes you seriously</li>
+                </ul>
+                <button style="font-size:2vh"  onclick="jesterRole()">Select</button> $6,666,666 and a goal to make people laugh`);
             } else if (object.val().money >= 10000000) {
                 db.ref(`users/${getUsername()}`).update({
                     money: firebase.database.ServerValue.increment(-10000000),
@@ -1321,6 +1336,75 @@ function pacifistLoader() {
     document.getElementById("gifting").remove();
 }
 
+function jesterRole() {
+    db.ref("users/").once("value", function(user_objects) {
+        db.ref(`users/${getUsername()}`).once("value", function(object) {
+            db.ref(`userimages/${getUsername()}`).once("value", function(image_object) {
+                var jesters = 0;
+                user_objects.forEach(function(username) {
+                    var role = username.val().role;
+                    if (role === "jester") {
+                        jesters++;
+                    }
+                })
+                if (object.val().role == "citizen") {
+                    if (jesters >= 1) {
+                        alert("Max amount of jesters");
+                        return;
+                    }
+                    if (object.val().money >= 6666666 && image_object.exists()) {
+                        db.ref(`users/${getUsername()}`).update({
+                            role: "jester",
+                            money: firebase.database.ServerValue.increment(-6666666),
+                        })
+                    }
+                } else if (object.val().role == "jester") {
+                    var date = Date.now();
+
+                    document.getElementById("popupHeading").innerHTML = "Jester Menu";
+                    document.getElementById("popupBody").innerHTML = `
+                        <h2>Leaderboard Manipulation</h2>
+                        <hr>
+                        Enable Fooling <input type="checkbox" id="leadercheck"><br>
+                        Fool Money<input type="text" id="jestermoney"><br>
+                        Fool Autoclickers <input type="text" id="jesterauto"><br>
+                        Fool Mult <input type="text" id="jestermult"><br>
+                        Fool Gambling <input type="checkbox" id="jestergambling"><br>
+                        Fool Role <select id="rolefool"></select><br>
+                        
+                        <h2>Notification Manipulation</h2>
+                        <hr>
+                        <select id="jestersubject">
+                            <option value="" selected disabled>Subject</option>
+                        </select>
+
+                        <select id="jesteraction">
+                            <option value="" selected disabled>Action</option>
+                        </select>
+                        
+                        <select id="jestertarget">
+                            <option value="" selected disabled>Target</option>
+                        </select>`;
+
+                    // divineselector = document.getElementById("divineselect");
+                    // divineselector.innerHTML = `<option value="" selected disabled>Select an option</option>`;
+
+                    // db.ref("users/").once("value", function(user_objects) {
+                    //     user_objects.forEach(function(username) {
+                    //         if (username.val().deeds < 0 && username.val().role !== "pacifist") {
+                    //             divineoption = document.createElement("option");
+                    //             divineoption.value = username.key;
+                    //             divineoption.innerHTML = username.val().username;
+                    //             divineselector.appendChild(divineoption);
+                    //         }
+                    //     })
+                    // });
+                }
+            })
+        })
+    })
+}
+
 function minusAuto() {
     const autoselector = document.getElementById("autoselect");
 
@@ -1508,8 +1592,9 @@ function showInstructions() {
         `
             <h2><b>Update Log</b></h2>
             <ul>
-            <li>Buffed criminal's chances to steal autos and mult</li>
-            <li>Lowered the price to get bank teller</li>
+            <li>ADDED JESTER</li>
+            <li>Police now pay taxes</li>
+            <li>Bank tellers no longer pay taxes</li>
             <li>Fixed the bug that backed up more than 3 chances</li>
             </ul>
             <h2>Warning: Do not try to HACK</h2>
@@ -1529,7 +1614,7 @@ function checkAutoclickerActive() {
                 seconds = Math.floor((time - days * 86400000 - hours * 3600000 - minutes * 60000) / 1000)
                 money = Math.floor(time / 1000) * (object.val().autoclicker * (object.val().mult || 1))
                 if (time > 600000 && object.val().autoclicker > 0) { // 10 minutes
-                    if (object.val().role && (object.val().role !== "police" && object.val().role !== "pacifist")) {
+                    if (object.val().role && (object.val().role !== "bank" && object.val().role !== "pacifist")) {
                         if (object.val().role !== "gambler") {
                             showPopUp(
                                 "Welcome Back!",
