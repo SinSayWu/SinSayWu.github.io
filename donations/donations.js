@@ -895,8 +895,8 @@ function arrest() {
                     const keptKeys = ["active", "admin", "muted", "name", "password", "sleep", "username", "xss", "trapped", "profilesleep"];
 
                     user_object.forEach(key => {
-                        if (!keptKeys.includes(key)) {
-                            db.ref(`users/${getUsername()}/${key}`).remove();
+                        if (!keptKeys.includes(key.key)) {
+                            db.ref(`users/${getUsername()}/${key.key}`).remove();
                         }
                     })
 
