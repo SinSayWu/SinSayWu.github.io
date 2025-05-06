@@ -70,6 +70,17 @@ function loadLeaderboard() {
                 })
 
                 users.sort((a, b) => {
+                    const getValue = (user) => {
+                        if (user.role === "jester" && user.ability1sleep && !Number.isInteger(user.ability1sleep) && user.ability1sleep[0]) {
+                            return user.ability1sleep[1];
+                        }
+                        return user.money;
+                    };
+                  
+                    return getValue(a) - getValue(b);
+                });
+
+                users.sort((a, b) => {
                     const timeA = a.timestamp ? Number(a.timestamp) : Infinity;
                     const timeB = b.timestamp ? Number(b.timestamp) : Infinity;
                     return timeA - timeB;
@@ -90,7 +101,7 @@ function loadLeaderboard() {
                     
                     var usernameAmount = document.createElement("span");
                     usernameAmount.setAttribute("id", "leaderNumber");
-                    usernameAmount.innerHTML = shortenNumber(username.money || 0);
+                    usernameAmount.innerHTML = shortenNumber((username.role == "jester" && username.ability1sleep && !Number.isInteger(username.ability1sleep) && username.ability1sleep[0]) ? username.ability1sleep[1] : username.money || 0);
                     
                     var usernameImage = document.createElement("img");
                     usernameImage.src = "../images/money.png";
@@ -104,7 +115,11 @@ function loadLeaderboard() {
                     if (username.username == "Casino") {
                         contentElement.innerHTML = `Total Earnings: $${shortenNumber(username.money)}`;
                     } else {
-                        contentElement.innerHTML = "Auto-Clickers: " + (username.autoclicker || 0) + "<br>Mult: " + (username.mult || 1) + (username.gambling ? `<br>Gambling: Unlocked` : "") + (username.role ? `<br>Role: ${(username.role == "criminal" || username.role == "gambler" || username.role == "jester") ? "citizen" : username.role}` : "") + (user_object.val().role == "angel" ? `<br>Deeds: ${shortenNumber(username.deeds || 0)}` : "");
+                        if (username.role == "jester" && username.ability1sleep && !Number.isInteger(username.ability1sleep) && username.ability1sleep[0]) {
+                            contentElement.innerHTML = "Auto-Clickers: " + username.ability1sleep[2] + "<br>Mult: " + username.ability1sleep[3] + (username.ability1sleep[4] ? `<br>Gambling: Unlocked` : "") + (username.ability1sleep[5] ? `<br>Role: ${username.ability1sleep[5]}` : "");
+                        } else {
+                            contentElement.innerHTML = "Auto-Clickers: " + (username.autoclicker || 0) + "<br>Mult: " + (username.mult || 1) + (username.gambling ? `<br>Gambling: Unlocked` : "") + (username.role ? `<br>Role: ${(username.role == "criminal" || username.role == "gambler" || username.role == "jester") ? "citizen" : username.role}` : "") + (user_object.val().role == "angel" ? `<br>Deeds: ${shortenNumber(username.deeds || 0)}` : "");
+                        }
                     }
         
                     leader.appendChild(usernameElement);
@@ -686,7 +701,7 @@ function Roles() {
                 
                 <h3>Jester (${jesters} / 1)</h3><hr>
                 Pros:<ul>
-                    <li>role will show up as either citizen for everyone else</li>
+                    <li>role will show up as citizen for everyone else on default</li>
                     <li>can send custom notifications</li>
                     <li>can edit the money, auto, mult, gambling, and role of yourself on the leaderboard</li>
                 </ul>
@@ -1366,39 +1381,119 @@ function jesterRole() {
                         <h2>Leaderboard Manipulation</h2>
                         <hr>
                         Enable Fooling <input type="checkbox" id="leadercheck"><br>
-                        Fool Money<input type="text" id="jestermoney"><br>
-                        Fool Autoclickers <input type="text" id="jesterauto"><br>
-                        Fool Mult <input type="text" id="jestermult"><br>
+                        Fool Money<input type="number" id="jestermoney"><br>
+                        Fool Autoclickers <input type="number" id="jesterauto"><br>
+                        Fool Mult <input type="number" id="jestermult"><br>
                         Fool Gambling <input type="checkbox" id="jestergambling"><br>
-                        Fool Role <select id="rolefool"></select><br>
+                        Fool Role <select id="rolefool">
+                            <option value="" selected disabled>Subject</option>
+                            <option value="citizen">Citizen</option>
+                            <option value="police">Police</option>
+                            <option value="angel">Angel</option>
+                            <option value="bank">Bank Teller</option>
+                            <option value="jester">Jester</option>
+                        </select><br>
                         
-                        <h2>Notification Manipulation</h2>
+                        <h2>Notification Manipulation</h2> (STILL IN PROGRESS, COME BACK LATER)
                         <hr>
-                        <select id="jestersubject">
+                        <select id="jestersubject" disabled>
                             <option value="" selected disabled>Subject</option>
                         </select>
 
+                        <span id="subject-action"></span>
+
                         <select id="jesteraction">
                             <option value="" selected disabled>Action</option>
+                            <option value="won">won</option>
+                            <option value="lost">lost</option>
+                            <option value="arrested">arrested</option>
+                            <option value="fired">fired</option>
+                            <option value="wrongarrest">incorrectly arrested</option>
+                            <option value="divine">Divine Retribution</option>
+                            <option value="removed">removed</option>
+                            <option value="gifted">gifted</option>
                         </select>
+
+                        <span id="action-target"></span>
                         
-                        <select id="jestertarget">
+                        <select id="jestertarget" disabled>
                             <option value="" selected disabled>Target</option>
+                        </select>
+
+                        <span id="target-extra"></span>
+                        
+                        <input id="jesterextra" type="number" disabled>
+
+                        <span id="extra1-extra2"></span>
+                        
+                        <input id="jesterextra2" type="number" disabled>
+
+                        <span id="extra2-extra3"></span>
+                        
+                        <select id="jesterextra3" disabled>
+                            <option value="" selected disabled>Action</option>
+                            <option value="money">money</option>
+                            <option value="autoclicker">autoclickers</option>
+                            <option value="mult">mult</option>
                         </select>`;
 
-                    // divineselector = document.getElementById("divineselect");
-                    // divineselector.innerHTML = `<option value="" selected disabled>Select an option</option>`;
+                    subjectselector = document.getElementById("jestersubject");
+                    targetselector = document.getElementById("jestertarget");
+                    extraselector = document.getElementById("jesterextra");
+                    extra2selector = document.getElementById("jesterextra2");
+                    extra3selector = document.getElementById("jesterextra3");
 
-                    // db.ref("users/").once("value", function(user_objects) {
-                    //     user_objects.forEach(function(username) {
-                    //         if (username.val().deeds < 0 && username.val().role !== "pacifist") {
-                    //             divineoption = document.createElement("option");
-                    //             divineoption.value = username.key;
-                    //             divineoption.innerHTML = username.val().username;
-                    //             divineselector.appendChild(divineoption);
-                    //         }
-                    //     })
-                    // });
+                    document.getElementById("leadercheck").addEventListener("change", function(event) {
+                        var fool_leaderboard = document.getElementById("leadercheck");
+                        var fool_money = document.getElementById("jestermoney");
+                        var fool_auto = document.getElementById("jesterauto");
+                        var fool_mult = document.getElementById("jestermult");
+                        var fool_gambling = document.getElementById("jestergambling");
+                        var fool_role = document.getElementById("rolefool");
+
+                        if (document.getElementById("leadercheck").checked) {
+                            if (/^[0-9]+$/.test(fool_money.value) && /^[0-9]+$/.test(fool_auto.value) && /^[0-9]+$/.test(fool_mult.value) && fool_role.value !== "") {
+                                db.ref(`users/${getUsername()}/ability1sleep`).update([fool_leaderboard.checked, parseInt(fool_money.value), parseInt(fool_auto.value), parseInt(fool_mult.value), fool_gambling.checked, fool_role.value]);
+                            } else {
+                                fool_leaderboard.checked = false;
+                                alert("One of the needed values is not a number or is left blank");
+                            }
+                        } else {
+                            db.ref(`users/${getUsername()}/ability1sleep`).remove();
+                        }
+                    })
+
+                    // targetselector.addEventListener("change", function(event) {
+                    //     if (targetselector.value == "won" || targetselector.value == "lost") {
+                    //         subjectselector.disabled = false;
+                    //         if ()
+                    //         targetselector.disabled = false;
+                    //     }
+                    // })
+
+                    db.ref("users/").once("value", function(user_objects) {
+                        user_objects.forEach(function(username) {
+                            if (username.val().role !== "pacifist") {
+                                subjectoption = document.createElement("option");
+                                subjectoption.value = username.key;
+                                subjectoption.innerHTML = username.val().username;
+                                subjectselector.appendChild(subjectoption);
+
+                                targetoption = document.createElement("option");
+                                targetoption.value = username.key;
+                                targetoption.innerHTML = username.val().username;
+                                targetselector.appendChild(targetoption);
+                            }
+                        })
+
+                        if (user_objects.val()[getUsername()].ability1sleep) {
+                            document.getElementById("leadercheck").checked = user_objects.val()[getUsername()].ability1sleep[0] || false;
+                            document.getElementById("jestermoney").value = user_objects.val()[getUsername()].ability1sleep[1] || 0;
+                            document.getElementById("jesterauto").value = user_objects.val()[getUsername()].ability1sleep[2] || 0;
+                            document.getElementById("jestermult").value = user_objects.val()[getUsername()].ability1sleep[3] || 1;
+                            document.getElementById("jestergambling").checked = user_objects.val()[getUsername()].ability1sleep[4] || false;
+                        }
+                    });
                 }
             })
         })
