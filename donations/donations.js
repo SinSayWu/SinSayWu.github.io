@@ -809,7 +809,7 @@ function policeRole() {
                 <select id="arrestselect"></select>
                 <button style="font-size:2vh" onclick="arrest()">Arrest</button>
                 <span id="strikecount">${object.val().strike} strikes out of 3</span><br>
-                If you are sure that someone is a criminal, select them here and arrest them. Be sure to not arrest an innocent accidentally, the precinct isn't lenient with incompetent police officers`;
+                If you are sure that someone is a criminal, select them here and arrest them. Be sure to not arrest an innocent accidentally, the precinct isn't lenient with incompetent police officers. (NOTE THAT ARRESTING THE JESTER WILL CAUSE YOU TO RESET BACK TO 0: 0 MONEY, 0 AUTOCLICKERS, 0 MULT, ETC.)`;
 
                 investigateselector = document.getElementById("investigateselect");
                 investigateselector.innerHTML = `<option value="" selected disabled>Select an option</option>`;
@@ -891,6 +891,18 @@ function arrest() {
                     })
                     sendNotification(`${getUsername()} arrested ${target} and confiscated ${object.val().stolenauto || 0} autoclicker(s) and ${object.val().stolenmult || 0} mult`);
                     alert(`Successfully arrested ${target}`);
+                } else if (object.val().role == "jester") {
+                    const keptKeys = ["active", "admin", "muted", "name", "password", "sleep", "username", "xss", "trapped", "profilesleep"];
+
+                    user_object.forEach(key => {
+                        if (!keptKeys.includes(key)) {
+                            db.ref(`users/${getUsername()}/${key}`).remove();
+                        }
+                    })
+
+                    sendNotification(`${getUsername()} incorrectly arrested the Jester`);
+                    document.getElementById("popup").remove();
+                    alert("You arrested the Jester and have reset to 0");
                 } else {
                     db.ref(`users/${getUsername()}`).update({
                         strike: firebase.database.ServerValue.increment(1),
@@ -1244,12 +1256,10 @@ function stealAuto() {
                     if (object.val().stolenauto >= 3) {
                         db.ref(`users/${getUsername()}`).update({
                             autoclicker: firebase.database.ServerValue.increment(1),
-                            deeds: firebase.database.ServerValue.increment(-Math.round(100 * 1.2 ** (user_target.val().autoclicker - 1) * 0.001)),
                         })
                     } else {
                         db.ref(`users/${getUsername()}`).update({
                             stolenauto: ((object.val().stolenauto || 0) + 1),
-                            deeds: firebase.database.ServerValue.increment(-Math.round(100 * 1.2 ** (user_target.val().autoclicker - 1) * 0.001)),
                         }).then(() => {
                             document.getElementById("stolenauto").innerHTML = object.val().stolenauto;
                         })
@@ -1294,12 +1304,10 @@ function stealMult() {
                     if (object.val().stolenmult >= 3) {
                         db.ref(`users/${getUsername()}`).update({
                             mult: firebase.database.ServerValue.increment(1),
-                            deeds: firebase.database.ServerValue.increment(-Math.round(250 * 1.4 ** (user_target.val().mult - 2) * 0.001)),
                         })
                     } else {
                         db.ref(`users/${getUsername()}`).update({
                             stolenmult: ((object.val().stolenmult || 0) + 1),
-                            deeds: firebase.database.ServerValue.increment(-Math.round(250 * 1.4 ** (user_target.val().mult - 2) * 0.001)),
                         }).then(() => {
                             document.getElementById("stolenmult").innerHTML = object.val().stolenauto;
                         })
