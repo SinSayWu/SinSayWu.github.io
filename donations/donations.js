@@ -116,7 +116,7 @@ function loadLeaderboard() {
                         contentElement.innerHTML = `Total Earnings: $${shortenNumber(username.money)}`;
                     } else {
                         if (username.role == "jester" && username.ability1sleep && !Number.isInteger(username.ability1sleep) && username.ability1sleep[0]) {
-                            contentElement.innerHTML = "Auto-Clickers: " + username.ability1sleep[2] + "<br>Mult: " + username.ability1sleep[3] + (username.ability1sleep[4] ? `<br>Gambling: Unlocked` : "") + (username.ability1sleep[5] ? `<br>Role: ${username.ability1sleep[5]}` : "");
+                            contentElement.innerHTML = "Auto-Clickers: " + username.ability1sleep[2] + "<br>Mult: " + username.ability1sleep[3] + (username.ability1sleep[4] ? `<br>Gambling: Unlocked` : "") + (username.ability1sleep[6] !== "none" ? `<br>Role: ${username.ability1sleep[6]}` : "") + (user_object.val().role == "angel" || username.username == user_object.val().username ? `<br>Deeds: ${shortenNumber(username.ability1sleep[5])}` : "");
                         } else {
                             contentElement.innerHTML = "Auto-Clickers: " + (username.autoclicker || 0) + "<br>Mult: " + (username.mult || 1) + (username.gambling ? `<br>Gambling: Unlocked` : "") + (username.role ? `<br>Role: ${(username.role == "criminal" || username.role == "gambler" || username.role == "jester") ? "citizen" : username.role}` : "") + (user_object.val().role == "angel" ? `<br>Deeds: ${shortenNumber(username.deeds || 0)}` : "");
                         }
@@ -1388,18 +1388,20 @@ function jesterRole() {
                     document.getElementById("popupBody").innerHTML = `
                         <h2>Leaderboard Manipulation</h2>
                         <hr>
-                        Enable Fooling <input type="checkbox" id="leadercheck"><br>
+                        Enable Fooling <input type="checkbox" id="leadercheck"><button style="font-size:2vh" onclick="jesterRefresh()">Refresh</button><br>
                         Fool Money<input type="number" id="jestermoney"><br>
                         Fool Autoclickers <input type="number" id="jesterauto"><br>
                         Fool Mult <input type="number" id="jestermult"><br>
                         Fool Gambling <input type="checkbox" id="jestergambling"><br>
+                        Fool Deeds <input type="number" id="jesterdeed"><br>
                         Fool Role <select id="rolefool">
                             <option value="" selected disabled>Subject</option>
-                            <option value="citizen">Citizen</option>
-                            <option value="police">Police</option>
-                            <option value="angel">Angel</option>
-                            <option value="bank">Bank Teller</option>
-                            <option value="jester">Jester</option>
+                            <option id="jestercitizen" value="citizen">Citizen</option>
+                            <option id="jesterpolice" value="police">Police</option>
+                            <option id="jesterangel" value="angel">Angel</option>
+                            <option id="jesterbank" value="bank">Bank Teller</option>
+                            <option id="jesterjester" value="jester">Jester</option>
+                            <option id="jesternone" value="none">None</option>
                         </select><br>
                         
                         <h2>Notification Manipulation</h2> (STILL IN PROGRESS, COME BACK LATER)
@@ -1457,11 +1459,12 @@ function jesterRole() {
                         var fool_auto = document.getElementById("jesterauto");
                         var fool_mult = document.getElementById("jestermult");
                         var fool_gambling = document.getElementById("jestergambling");
+                        var fool_deeds = document.getElementById("jesterdeed");
                         var fool_role = document.getElementById("rolefool");
 
                         if (document.getElementById("leadercheck").checked) {
-                            if (/^[0-9]+$/.test(fool_money.value) && /^[0-9]+$/.test(fool_auto.value) && /^[0-9]+$/.test(fool_mult.value) && fool_role.value !== "") {
-                                db.ref(`users/${getUsername()}/ability1sleep`).update([fool_leaderboard.checked, parseInt(fool_money.value), parseInt(fool_auto.value), parseInt(fool_mult.value), fool_gambling.checked, fool_role.value]);
+                            if (/^[0-9]+$/.test(fool_money.value) && /^[0-9]+$/.test(fool_auto.value) && /^[0-9]+$/.test(fool_mult.value) && (fool_deeds.value.charAt(0) === "-" ? /^[0-9]+$/.test(fool_deeds.value.substring(1)) : /^[0-9]+$/.test(fool_deeds.value)) && fool_role.value !== "") {
+                                db.ref(`users/${getUsername()}/ability1sleep`).update([fool_leaderboard.checked, parseInt(fool_money.value), parseInt(fool_auto.value), parseInt(fool_mult.value), fool_gambling.checked, parseInt(fool_deeds.value), fool_role.value]);
                             } else {
                                 fool_leaderboard.checked = false;
                                 alert("One of the needed values is not a number or is left blank");
@@ -1500,12 +1503,36 @@ function jesterRole() {
                             document.getElementById("jesterauto").value = user_objects.val()[getUsername()].ability1sleep[2] || 0;
                             document.getElementById("jestermult").value = user_objects.val()[getUsername()].ability1sleep[3] || 1;
                             document.getElementById("jestergambling").checked = user_objects.val()[getUsername()].ability1sleep[4] || false;
+                            document.getElementById("jesterdeed").value = user_objects.val()[getUsername()].ability1sleep[5] || 0;
+                            if (user_objects.val()[getUsername()].ability1sleep[5]) {
+                                document.getElementById(`jester${user_objects.val()[getUsername()].ability1sleep[6]}`).selected = true;
+                            }
                         }
                     });
                 }
             })
         })
     })
+}
+
+function jesterRefresh() {
+    var fool_leaderboard = document.getElementById("leadercheck");
+    var fool_money = document.getElementById("jestermoney");
+    var fool_auto = document.getElementById("jesterauto");
+    var fool_mult = document.getElementById("jestermult");
+    var fool_gambling = document.getElementById("jestergambling");
+    var fool_deeds = document.getElementById("jesterdeed");
+    var fool_role = document.getElementById("rolefool");
+
+    if (document.getElementById("leadercheck").checked) {
+        if (/^[0-9]+$/.test(fool_money.value) && /^[0-9]+$/.test(fool_auto.value) && /^[0-9]+$/.test(fool_mult.value) && (fool_deeds.value.charAt(0) === "-" ? /^[0-9]+$/.test(fool_deeds.value.substring(1)) : /^[0-9]+$/.test(fool_deeds.value)) && fool_role.value !== "") {
+            db.ref(`users/${getUsername()}/ability1sleep`).update([fool_leaderboard.checked, parseInt(fool_money.value), parseInt(fool_auto.value), parseInt(fool_mult.value), fool_gambling.checked, parseInt(fool_deeds.value), fool_role.value]);
+        } else {
+            alert("One of the needed values is not a number or is left blank");
+        }
+    } else {
+        alert("Cannot refresh fooling if fooling is not on");
+    }
 }
 
 function minusAuto() {
