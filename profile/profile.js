@@ -22,8 +22,7 @@ function submit() {
                     } else if (newPassword != newCopyPassword) {
                         alert("Passwords do not match!");
                         return;
-                    } else if (!(checkInput(newUsername) && checkInput(newPassword)) && newUsername == "Casino") {
-                        alert("Something went wrong...");
+                    } else if (!(checkInput(newUsername) && checkInput(newPassword)) || newUsername == "Casino") {
                         return;
                     } else if (newUsername.length > 20) {
                         alert("New username cannot be longer than 20 characters");
@@ -89,6 +88,14 @@ function submit() {
 }
 
 window.onload = function() {
+    fetch('https://us-central1-pebble-rocks.cloudfunctions.net/api/checkVersion')
+    .then(response => response.json())
+    .then(data => {
+        if (data.value !== "v4.2") {
+            document.body.innerHTML = `An error has occured. You are most likely using an outdated version of the site. Fetch a new version by pressing "ctrl + shift + R" or "ctrl + f5"`;
+        }
+    })
+    
     const config = {
         apiKey: "AIzaSyCE9mOZD-GqrDYSeVO_olhyEx8m233iU0s",
         authDomain: "chatter-v2-8616b.firebaseapp.com",

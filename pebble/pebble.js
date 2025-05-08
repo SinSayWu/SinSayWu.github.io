@@ -1916,7 +1916,15 @@ window.onload = function() {
         const appCheck = firebase.appCheck();
         appCheck.activate('6LfM-SUrAAAAAOOkSTBb-tHBQ7BKabRa55bGBWH3', true, { provider: firebase.appCheck.ReCaptchaV3Provider });
 
-        setup();
+        fetch('https://us-central1-pebble-rocks.cloudfunctions.net/api/checkVersion')
+        .then(response => response.json())
+        .then(data => {
+            if (data.value === "v4.2") {
+                setup();
+            } else {
+                document.body.innerHTML = `An error has occured. You are most likely using an outdated version of the site. Fetch a new version by pressing "ctrl + shift + R" or "ctrl + f5"`;
+            }
+        })
     } catch(err) {
         alert(err);
     }
