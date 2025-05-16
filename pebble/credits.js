@@ -75,7 +75,13 @@ const commands = `!mute @[username] -- mutes the specified user (@everyone compa
 
 !vote [title] [option 1, option 2, option 3] -- creates a vote message that allows all users to vote on an option (only one vote message can exist at a time)/
 
-!set @[username] [key] [value] -- sets the username node's specified key to a specified value (only available to those above 5000 admin level)`;
+!set @[username] [key] [value] -- sets the username node's specified key to a specified value (only available to those above 5000 admin level)/
+
+!cleardonations -- clears the data of donations for all users (only available to those above 5000 admin level)/
+
+!donationsoff -- turns the donations campaign off (only available to those above 5000 admin level)/
+
+!donationson -- turns the donation campaign on (only available to those above 5000 admin level)`;
 
 
 const usrCommands = `!reveal @[username] -- shows the specified user's real name and admin level (compatible with @everyone)/

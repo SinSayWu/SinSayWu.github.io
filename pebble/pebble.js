@@ -1108,8 +1108,26 @@ function sendMessage() {
                         });
 
                         db.ref().update(updates);
-                        sendServerMessage(`${getUsername()} has cleared the data of donations`)
+                        sendServerMessage(`${getUsername()} has cleared the data of donations`);
                     })
+                }
+                document.getElementById("text-box").value = "";
+                return;
+            } else if (message == "!donationsoff") {
+                if (obj.admin > 5000) {
+                    db.ref(`other/`).update({
+                        campaign: false,
+                    });
+                    sendServerMessage(`${getUsername()} has stopped the donations campaign`);
+                }
+                document.getElementById("text-box").value = "";
+                return;
+            } else if (message == "!donationson") {
+                if (obj.admin > 5000) {
+                    db.ref(`other/`).update({
+                        campaign: true,
+                    });
+                    sendServerMessage(`${getUsername()} has started the donations campaign`);
                 }
                 document.getElementById("text-box").value = "";
                 return;
@@ -1919,7 +1937,7 @@ window.onload = function() {
         fetch('https://us-central1-pebble-rocks.cloudfunctions.net/api/checkVersion')
         .then(response => response.json())
         .then(data => {
-            let curr_version = "v4.2";
+            let curr_version = "v4.3";
             if (data.value === curr_version) {
                 setup();
             } else {
