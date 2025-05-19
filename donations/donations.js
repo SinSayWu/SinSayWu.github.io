@@ -1863,7 +1863,7 @@ function giftMoney() {
 }
 
 function showInstructions() {
-    if (localStorage.getItem("agreement") == null) {
+    if (localStorage.getItem("agree") == null) {
         showPopUp(`User Agreement`, `
             This is the last week of the donations game before the school year ends, therefore, this week's game will be a little special.<br>
             <b>DinoShark</b> is the "boss" of this week's campaign and your goal is to team up and defeat him.<br>
@@ -1882,7 +1882,7 @@ function showInstructions() {
             <input type="text" id="agreement" style="width:100%">`, [["Close", () => {
                 if (document.getElementById("agreement").value == "DinoShark is my enemy") {
                     document.getElementById("popup").remove();
-                    localStorage.setItem("agreement", "true")
+                    localStorage.setItem("agree", "true")
                 }
             }]]);
         document.getElementById("closePopup").remove();
@@ -2189,11 +2189,7 @@ function setup() {
         }
     })
 
-    db.ref(`users/${getUsername()}`).once("value", (amount) => {
-        if ((amount.val().money || 0) <= 500 && (amount.val().autoclicker || 0) == 0) {
-            showInstructions();
-        }
-    })
+    showInstructions();
 }
 
 window.onload = function() {
