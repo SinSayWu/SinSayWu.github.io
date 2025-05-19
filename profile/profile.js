@@ -91,7 +91,6 @@ window.onload = function() {
     fetch('https://us-central1-pebble-rocks.cloudfunctions.net/api/checkVersion')
     .then(response => response.json())
     .then(data => {
-        let curr_version = "v4.3";
         if (data.value === curr_version) {
             setup();
         } else {
@@ -102,15 +101,16 @@ window.onload = function() {
     })
     
     const config = {
-        apiKey: "AIzaSyCE9mOZD-GqrDYSeVO_olhyEx8m233iU0s",
-        authDomain: "chatter-v2-8616b.firebaseapp.com",
-        databaseURL: "https://chatter-v2-8616b-default-rtdb.firebaseio.com",
-        projectId: "chatter-v2-8616b",
-        storageBucket: "chatter-v2-8616b.firebasestorage.app",
-        messagingSenderId: "459315641865",
-        appId: "1:459315641865:web:3a6527087666fbc66c82d8",
-        measurementId: "G-7YX3NN3SBV"
-    };          
+        apiKey: "AIzaSyAsp44iKOav3dbHrViABHETRmAnRtQnVwA",
+        authDomain: "chatter-97e8c.firebaseapp.com",
+        databaseURL: "https://chatter-97e8c-default-rtdb.firebaseio.com",
+        projectId: "chatter-97e8c",
+        storageBucket: "chatter-97e8c.firebasestorage.app",
+        messagingSenderId: "281722915171",
+        appId: "1:281722915171:web:3b136d8a0b79389f2f6b56",
+        measurementId: "G-4CGJ1JFX58"
+    };
+
     firebase.initializeApp(config);
     db = firebase.database();
 
@@ -121,7 +121,7 @@ window.onload = function() {
     }
 
     const appCheck = firebase.appCheck();
-    appCheck.activate('6LfM-SUrAAAAAOOkSTBb-tHBQ7BKabRa55bGBWH3', true, { provider: firebase.appCheck.ReCaptchaV3Provider });
+    appCheck.activate('6LdCtT0rAAAAAMLtV7TbvgzemnHKbw28Ev8IzXyA', true, { provider: firebase.appCheck.ReCaptchaV3Provider });
 
     // log out in another window check
     window.addEventListener("storage", function(event) {

@@ -33,7 +33,6 @@ window.onload = function() {
         fetch('https://us-central1-pebble-rocks.cloudfunctions.net/api/checkVersion')
         .then(response => response.json())
         .then(data => {
-            let curr_version = "v4.3";
             if (data.value === curr_version) {
                 setup();
             } else {

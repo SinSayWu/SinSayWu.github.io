@@ -1,6 +1,6 @@
 const credits = `Credit to Mr. BungoChungo for cooperating with me (at least for a short time) on this project.
 Credit to Mr. WagnerRizzer for the logo of this site, which originated from a school project.
-Credit to Mr. Tschaun for assisting me in updating and upkeeping this site.`;
+Credit to the biggest Summer Pockets fan for assisting me in updating and upkeeping this site.`;
 
 
 const termsOfService = `TERMS OF SERVICE:

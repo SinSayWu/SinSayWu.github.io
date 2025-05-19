@@ -7,233 +7,268 @@ var messageSleep = 0;
 var imageSleep = 0;
 let active_users;
 let inactive_users;
+var globalMessages = [];
+let images
 let db;
 
-function refreshChat() {
+function getChats() {
+    db.ref(`users/${getUsername()}`).once("value", function(user_object) {
+        db.ref('chats/').on('child_added', function(message_object) {
+            globalMessages.push(message_object);
+
+            refreshChat(user_object);
+        })
+    })
+}
+
+function checkDeletion() {
+    db.ref(`users/${getUsername()}`).once("value", function(user_object) {
+        db.ref('chats/').on('child_removed', function(message_object) {
+            const index = globalMessages.findIndex(obj =>
+                obj.key === message_object.key
+            );
+
+            if (index !== -1) {
+                globalMessages.splice(index, 1);
+            }
+
+            refreshChat(user_object);
+        })
+    })
+}
+
+function checkEdit() {
+    db.ref(`users/${getUsername()}`).once("value", function(user_object) {
+        db.ref('chats/').on('child_changed', function(message_object) {
+            const index = globalMessages.findIndex(obj =>
+                obj.key === message_object.key
+            );
+
+            if (index !== -1) {
+                globalMessages[index] = message_object;
+            }
+
+            refreshChat(user_object);
+        })
+    })
+}
+
+function checkVoting() {
+    db.ref('other/vote').on('value', function(vote_object) {
+        vote_object.forEach((vote_child) => {
+            if (vote_child.key != "message" && vote_child.key != "voters") {
+                document.getElementById(vote_child.key).innerHTML = vote_child.val();
+            }
+        })
+        db.ref('other/vote/voters/' + getUsername()).once('value', function(voter_object) {
+            if (voter_object.exists()) {
+                const buttons = document.querySelectorAll('.votebutton');
+                buttons.forEach(button => {
+                    button.disabled = true;
+                });
+            }
+        })
+    })
+}
+
+function refreshChat(user_data, change_channel = false) {
     // alert("Refresh Chat");
     var textarea = document.getElementById('textarea');
 
-    // Get the chats from firebase
-    db.ref('chats/').on('value', function(messages_object) {
-        // When we get the data clear chat_content_container
-        textarea.innerHTML = '';
-        // if there are no messages in the chat. Return . Don't load anything
-        if(messages_object.numChildren() == 0){
+    // When we get the data clear chat_content_container
+    textarea.innerHTML = '';
+
+    var obj = user_data.val();
+    globalMessages.forEach(function(data, index) {
+        if ((data.val().whisper == null || data.val().whisper == getUsername() || data.val().name == getUsername() || obj.admin > 0) && (data.val().channel == (sessionStorage.getItem("channel") || "general") || (data.val().name == "[SERVER]" && sessionStorage.getItem("channel") !== "extra"))) {
+            if (everyoneRevealed) {
+                var username = data.val().real_name || "[SERVER]";
+            } else {
+                var username = data.val().name;
+            }
+
+            // TODO: FIX THIS TO DO SOMETHING IDK WHAT
+            if (data.val().removed) {
+                var message = data.val().message;
+            } else {
+                var message = data.val().message;
+            }
+            
+            let prevIndex = index - 1;
+            let prevItem = prevIndex >= 0 ? globalMessages[prevIndex] : null;
+            
+            var messageElement = document.createElement("div");
+            messageElement.setAttribute("class", "message");
+
+            if (data.val().name == "[SERVER]") {
+                var messageImg = document.createElement("img");
+                messageImg.src = "../images/meteorite.png";
+                messageImg.setAttribute("class", "profile-img");
+                messageElement.appendChild(messageImg);
+            }
+
+            var timeElement = document.createElement("div");
+            timeElement.setAttribute("id", "time");
+            timeElement.innerHTML = data.val().time;
+            messageElement.appendChild(timeElement);
+
+            if (data.val().name == "[SERVER]") {
+                var userElement = document.createElement("div");
+                userElement.setAttribute("class", "username");
+                userElement.innerHTML = username;
+                userElement.style.fontWeight = "bold";
+                userElement.style.color = "Yellow";
+                messageElement.appendChild(userElement);
+            } else if (prevItem == null || prevItem.val().name != data.val().name || data.val().edited) {
+                var userElement = document.createElement("div");
+                userElement.setAttribute("class", "username");
+                userElement.addEventListener("click", function(e) {
+                    if (userElement.innerHTML.includes("@")) {
+                        userElement.innerHTML = username;
+                    } else {
+                        userElement.innerHTML = username + " @(" + data.val().real_name + ")";
+                    }
+                })
+                userElement.innerHTML = username;
+                if (data.val().edited) {
+                    userElement.innerHTML += " <span style='color: gray; font-size: 60%'>(Edited)</span>";
+                }
+                userElement.style.fontWeight = "bold";
+                timeElement.style.marginTop = "25px";
+                messageElement.appendChild(userElement);
+            }
+
+
+
+            messageElement.addEventListener("mouseover", function(e) {
+                messageContent.style.backgroundColor = "gray";
+                if ((data.val().name == getUsername() || data.val().admin < obj.admin) && !messageElement.querySelector("#delete-button") && !globalMessages[index].val().removed) {
+                    setTimeout(() => {
+                        var trashButton = document.createElement("button");
+                        timeElement.style.visibility = "hidden";
+                        trashButton.innerHTML = "🗑️️";
+                        trashButton.setAttribute("id", "delete-button");
+                        trashButton.addEventListener("click", function() {
+                            db.ref("chats/" + globalMessages[index].key).update({
+                                removed: true,
+                                message: `<i><b>REMOVED BY ${getUsername()}</b></i><span style="display: none">@${getUsername()} @${data.val().name}</span>`,
+                            });
+                        })
+                        messageElement.appendChild(trashButton);
+                    }, 100);
+                }
+                if (data.val().name == getUsername() && !messageElement.querySelector("#edit-button") && !globalMessages[index].val().removed) {
+                    db.ref("users/" + getUsername()).once('value', function(user_object) {
+                        var obj = user_object.val();
+                        var editButton = document.createElement("button");
+                        var textBox = document.getElementById("text-box");
+                        editButton.setAttribute("id", "edit-button");
+                        timeElement.style.visibility = "hidden";
+                        if (obj && "editing" in obj && obj.editing == globalMessages[index].key) {
+                            editButton.innerHTML = "🗙";
+                        } else {
+                            editButton.innerHTML = "✏️";
+                        }
+                        editButton.addEventListener("click", function() {
+                            if (obj && "editing" in obj && obj.editing == globalMessages[index].key) {
+                                editButton.innerHTML = "✏️";
+                                db.ref("users/" + getUsername() + "/editing").remove()
+                                textBox.value = "";
+                                textBox.focus();
+                            } else {
+                                editButton.innerHTML = "🗙";
+                                db.ref(`chats/${globalMessages[index].key}/message`).once("value", function(edit_message) {
+                                    textBox.value = unsanitize(edit_message.val());
+                                })
+                                textBox.focus();
+                                db.ref("users/" + getUsername()).update({
+                                    editing: globalMessages[index].key,
+                                });
+                            }
+                        });
+
+                        messageElement.appendChild(editButton);
+                    })
+                }
+            })
+            messageElement.addEventListener("mouseleave", function(e) {
+                messageContent.style.backgroundColor = "";
+                timeElement.style.visibility = "visible";
+
+                setTimeout(() => {
+                    var buttons = messageElement.querySelectorAll("#delete-button, #edit-button");
+                    buttons.forEach(function(button) {
+                        button.remove();
+                    })
+                    timeElement.style.visibility = "visible";
+                }, 100)
+            })
+            
+
+            var messageContent = document.createElement("div");
+            messageContent.setAttribute("class", "message-text");
+            messageContent.innerHTML = message;
+            if (message.includes("@" + getUsername()) || message.includes("@everyone")) {
+                messageContent.setAttribute("id", "ping-text");
+            }
+            if (globalMessages.at(-1).val().message == "GOD has joined the chat<span style='visibility: hidden;'>@GOD</span>" && data.key == globalMessages.at(-1).key) {
+                var textContent = document.createElement("div");
+                messageElement.appendChild(textContent);
+                textContent.setAttribute("id", "god-border");
+                // messageContent.innerHTML = "";
+                textContent.appendChild(messageContent);
+                
+                messageContent.setAttribute("id", "god-text");
+                messageContent.setAttribute("class", "");
+                messageElement.appendChild(textContent);
+            } else {
+                messageElement.appendChild(messageContent);
+            }
+
+
+            textarea.appendChild(messageElement);
+
+            if (data.val().name == "[VOTING]") {
+                checkVoting();
+            }
+        }
+    });
+
+    // Notifications
+    var prevMessage = globalMessages.at(-1)
+
+    if (document.visibilityState === "hidden") {
+        var announceNotification = localStorage.getItem("announceNotification") || true;
+        var mentionNotification = localStorage.getItem("mentionNotification") || true;
+        var messageNotification = localStorage.getItem("messageNotification") || false;
+
+        if (!(prevMessage.val().channel == "admin" && obj.admin == 0)) {
+            if (prevMessage.val().username == "[SERVER]" && JSON.parse(announceNotification)) {
+                notificationNumber += 1
+            } else if ((prevMessage.val().message.includes("@" + getUsername()) || prevMessage.val().message.includes("@everyone")) && JSON.parse(mentionNotification)) {
+                notificationNumber += 1
+            } else if (JSON.parse(messageNotification)) {
+                notificationNumber += 1
+            }
+            if (notificationNumber != 0) {
+                document.title = "(" + notificationNumber + ") Pebble";
+            }
+        }
+    }
+    
+    if ((sessionStorage.getItem("channel") || "general") != globalMessages.at(-1).val().channel && !(globalMessages.at(-1).val().channel == "admin" && obj.admin == 0)) {
+        if (joined) {
+            joined = false;
+            return;
+        } else if (change_channel) {
             return;
         }
 
-        var messages = [];
+        var notif = document.getElementById(`${globalMessages.at(-1).val().channel}-notif`);
 
-        messages_object.forEach((messages_child) => {
-            if (messages_child.val().channel == (sessionStorage.getItem("channel") || "general") || (messages_child.val().name == "[SERVER]" && sessionStorage.getItem("channel") !== "extra")) {
-                messages.push(messages_child)
-            }
-        });
-
-        // Now we're done. Simply display the ordered messages
-        db.ref("users/" + getUsername()).once('value', function(user_object) {
-            var obj = user_object.val();
-            messages.forEach(function(data, index) {
-                if (data.val().whisper == null || data.val().whisper == getUsername() || data.val().name == getUsername() || obj.admin > 0) {
-                    if (everyoneRevealed) {
-                        var username = data.val().real_name || "[SERVER]";
-                    } else {
-                        var username = data.val().name;
-                    }
-
-                    // TODO: FIX THIS TO DO SOMETHING IDK WHAT
-                    if (data.val().removed) {
-                        var message = data.val().message;
-                    } else {
-                        var message = data.val().message;
-                    }
-                    
-                    let prevIndex = index - 1;
-                    let prevItem = prevIndex >= 0 ? messages[prevIndex] : null;
-                    
-                    var messageElement = document.createElement("div");
-                    messageElement.setAttribute("class", "message");
-
-                    if (data.val().name == "[SERVER]") {
-                        var messageImg = document.createElement("img");
-                        messageImg.src = "../images/meteorite.png";
-                        messageImg.setAttribute("class", "profile-img");
-                        messageElement.appendChild(messageImg);
-                    }
-
-                    var timeElement = document.createElement("div");
-                    timeElement.setAttribute("id", "time");
-                    timeElement.innerHTML = data.val().time;
-                    messageElement.appendChild(timeElement);
-
-                    if (data.val().name == "[SERVER]") {
-                        var userElement = document.createElement("div");
-                        userElement.setAttribute("class", "username");
-                        userElement.innerHTML = username;
-                        userElement.style.fontWeight = "bold";
-                        userElement.style.color = "Yellow";
-                        messageElement.appendChild(userElement);
-                    } else if (prevItem == null || prevItem.val().name != data.val().name || data.val().edited) {
-                        var userElement = document.createElement("div");
-                        userElement.setAttribute("class", "username");
-                        userElement.addEventListener("click", function(e) {
-                            if (userElement.innerHTML.includes("@")) {
-                                userElement.innerHTML = username;
-                            } else {
-                                userElement.innerHTML = username + " @(" + data.val().real_name + ")";
-                            }
-                        })
-                        userElement.innerHTML = username;
-                        if (data.val().edited) {
-                            userElement.innerHTML += " <span style='color: gray; font-size: 60%'>(Edited)</span>";
-                        }
-                        userElement.style.fontWeight = "bold";
-                        timeElement.style.marginTop = "25px";
-                        messageElement.appendChild(userElement);
-                    }
-
-
-
-                    messageElement.addEventListener("mouseover", function(e) {
-                        messageContent.style.backgroundColor = "gray";
-                        if ((data.val().name == getUsername() || data.val().admin < obj.admin) && !messageElement.querySelector("#delete-button") && !messages[index].val().removed) {
-                            setTimeout(() => {
-                                var trashButton = document.createElement("button");
-                                timeElement.style.visibility = "hidden";
-                                trashButton.innerHTML = "🗑️️";
-                                trashButton.setAttribute("id", "delete-button");
-                                trashButton.addEventListener("click", function() {
-                                    db.ref("chats/" + messages[index].key).update({
-                                        removed: true,
-                                        message: `<i><b>REMOVED BY ${getUsername()}</b></i><span style="display: none">@${getUsername()} @${data.val().name}</span>`,
-                                    });
-                                })
-                                messageElement.appendChild(trashButton);
-                            }, 100);
-                        }
-                        if (data.val().name == getUsername() && !messageElement.querySelector("#edit-button") && !messages[index].val().removed) {
-                            db.ref("users/" + getUsername()).once('value', function(user_object) {
-                                var obj = user_object.val();
-                                var editButton = document.createElement("button");
-                                var textBox = document.getElementById("text-box");
-                                editButton.setAttribute("id", "edit-button");
-                                timeElement.style.visibility = "hidden";
-                                if (obj && "editing" in obj && obj.editing == messages[index].key) {
-                                    editButton.innerHTML = "🗙";
-                                } else {
-                                    editButton.innerHTML = "✏️";
-                                }
-                                editButton.addEventListener("click", function() {
-                                    if (obj && "editing" in obj && obj.editing == messages[index].key) {
-                                        editButton.innerHTML = "✏️";
-                                        db.ref("users/" + getUsername() + "/editing").remove()
-                                        textBox.value = "";
-                                        textBox.focus();
-                                    } else {
-                                        editButton.innerHTML = "🗙";
-                                        db.ref(`chats/${messages[index].key}/message`).once("value", function(edit_message) {
-                                            textBox.value = unsanitize(edit_message.val());
-                                        })
-                                        textBox.focus();
-                                        db.ref("users/" + getUsername()).update({
-                                            editing: messages[index].key,
-                                        });
-                                    }
-                                });
-
-                                messageElement.appendChild(editButton);
-                            })
-                        }
-                    })
-                    messageElement.addEventListener("mouseleave", function(e) {
-                        messageContent.style.backgroundColor = "";
-                        timeElement.style.visibility = "visible";
-
-                        setTimeout(() => {
-                            var buttons = messageElement.querySelectorAll("#delete-button, #edit-button");
-                            buttons.forEach(function(button) {
-                                button.remove();
-                            })
-                            timeElement.style.visibility = "visible";
-                        }, 100)
-                    })
-                    
-
-                    var messageContent = document.createElement("div");
-                    messageContent.setAttribute("class", "message-text");
-                    messageContent.innerHTML = message;
-                    if (message.includes("@" + getUsername()) || message.includes("@everyone")) {
-                        messageContent.setAttribute("id", "ping-text");
-                    }
-                    if (messages.at(-1).val().message == "GOD has joined the chat<span style='visibility: hidden;'>@GOD</span>" && data.key == messages.at(-1).key) {
-                        var textContent = document.createElement("div");
-                        messageElement.appendChild(textContent);
-                        textContent.setAttribute("id", "god-border");
-                        // messageContent.innerHTML = "";
-                        textContent.appendChild(messageContent);
-                        
-                        messageContent.setAttribute("id", "god-text");
-                        messageContent.setAttribute("class", "");
-                        messageElement.appendChild(textContent);
-                    } else {
-                        messageElement.appendChild(messageContent);
-                    }
-
-                    textarea.appendChild(messageElement);
-                }
-            });
-
-            // voting auto-update integration
-            db.ref('other/vote').on('value', function(vote_object) {
-                vote_object.forEach((vote_child) => {
-                    if (vote_child.key != "message" && vote_child.key != "voters") {
-                        document.getElementById(vote_child.key).innerHTML = vote_child.val();
-                    }
-                })
-                db.ref('other/vote/voters/' + getUsername()).once('value', function(voter_object) {
-                    if (voter_object.exists()) {
-                        const buttons = document.querySelectorAll('.votebutton');
-                        buttons.forEach(button => {
-                        button.disabled = true;
-                        });
-                    }
-                })
-            })
-            // Notifications
-            var prevMessage = messages.at(-1)
-
-            if (document.visibilityState === "hidden") {
-                var announceNotification = localStorage.getItem("announceNotification") || true;
-                var mentionNotification = localStorage.getItem("mentionNotification") || true;
-                var messageNotification = localStorage.getItem("messageNotification") || false;
-
-                if (!(prevMessage.val().channel == "admin" && obj.admin == 0)) {
-                    if (prevMessage.val().username == "[SERVER]" && JSON.parse(announceNotification)) {
-                        notificationNumber += 1
-                    } else if ((prevMessage.val().message.includes("@" + getUsername()) || prevMessage.val().message.includes("@everyone")) && JSON.parse(mentionNotification)) {
-                        notificationNumber += 1
-                    } else if (JSON.parse(messageNotification)) {
-                        notificationNumber += 1
-                    }
-                    if (notificationNumber != 0) {
-                        document.title = "(" + notificationNumber + ") Pebble";
-                    }
-                }
-            }
-            
-            if ((sessionStorage.getItem("channel") || "general") != Object.values(messages_object.val()).at(-1).channel && !(Object.values(messages_object.val()).at(-1).channel == "admin" && obj.admin == 0)) {
-                if (joined) {
-                    joined = false;
-                    return;
-                }
-
-                var notif = document.getElementById(`${Object.values(messages_object.val()).at(-1).channel}-notif`);
-
-                notif.innerHTML = `(${(parseInt(notif.innerHTML.substring(1,2)) || 0) + 1})`;
-            }
-        })
-        textarea.scrollTop = textarea.scrollHeight;
-    });
+        notif.innerHTML = `(${(parseInt(notif.innerHTML.substring(1,2)) || 0) + 1})`;
+    }
+    textarea.scrollTop = textarea.scrollHeight;
 }
 
 function displayMembers() {
@@ -1055,7 +1090,7 @@ function sendMessage() {
                     });
                     var curr = new Date();
                     messageref = db.ref('chats/').push({
-                        name: "[SERVER]",
+                        name: "[VOTING]",
                         message: `<span style="display:none">@everyone</span><h2 class="voteheader">${title}</h2> <div class="votecontent">${votemessage.join("<br/>")}</div>`,
                         admin: 9998,
                         channel: (sessionStorage.getItem("channel") || "general"),
@@ -1092,7 +1127,7 @@ function sendMessage() {
             } else if (message == "!cleardonations") {
                 if (obj.admin > 5000) {
                     db.ref(`users/`).once("value", function(data_clear) {
-                        const keptKeys = ["active", "admin", "muted", "name", "password", "sleep", "username", "xss", "trapped"];
+                        const keptKeys = ["active", "admin", "muted", "name", "password", "sleep", "username", "xss", "trapped", "profilesleep"];
                         var updates = {};
 
                         data_clear.forEach(child => {
@@ -1293,7 +1328,7 @@ function back() {
 function globalUpdate() {
     checkMute();
     db.ref(`users/${getUsername()}/active`).once("value", function(user_object) {
-        if (!user_object.val()) {
+        if (!user_object.val() && getUsername() !== "hbrfan") {
             db.ref(`users/${getUsername()}`).update({
                 active: true,
             })
@@ -1322,156 +1357,7 @@ function changeChannel(channel) {
             document.getElementById((sessionStorage.getItem("channel") || "general")).style.backgroundColor = null;
             document.getElementById(channel).style.backgroundColor = "#42464d";
             sessionStorage.setItem("channel", channel);
-            db.ref('chats/').once('value', function(messages_object) {
-                var textarea = document.getElementById('textarea');
-                // When we get the data clear chat_content_container
-                textarea.innerHTML = '';
-                // if there are no messages in the chat. Return . Don't load anything
-                if(messages_object.numChildren() == 0){
-                    return
-                }
-        
-                var messages = [];
-                var nodename = []; // there's probably a better way to do this
-        
-                messages_object.forEach((messages_child) => {
-                    if (messages_child.val().channel == (sessionStorage.getItem("channel") || "general") || (messages_child.val().name == "[SERVER]" && sessionStorage.getItem("channel") !== "extra")) {
-                        messages.push(messages_child.val())
-                        nodename.push(messages_child.key)
-                    }
-                });
-
-                var obj = user_object.val();
-                messages.forEach(function(data, index) {
-                    if (data.whisper == null || data.whisper == getUsername() || data.name == getUsername() || obj.admin > 0) {
-                        if (everyoneRevealed) {
-                            var username = data.real_name || "[SERVER]";
-                        } else {
-                            var username = data.name;
-                        }
-                        
-                        let prevIndex = index - 1;
-                        let prevItem = prevIndex >= 0 ? messages[prevIndex] : null;
-                        
-                        var messageElement = document.createElement("div");
-                        messageElement.setAttribute("class", "message");
-    
-                        if (data.name == "[SERVER]") {
-                            var messageImg = document.createElement("img");
-                            messageImg.src = "../images/meteorite.png";
-                            messageImg.setAttribute("class", "profile-img");
-                            messageElement.appendChild(messageImg);
-                        }
-    
-                        var timeElement = document.createElement("div");
-                        timeElement.setAttribute("id", "time");
-                        timeElement.innerHTML = data.time;
-                        messageElement.appendChild(timeElement);
-    
-                        if (data.name == "[SERVER]") {
-                            var userElement = document.createElement("div");
-                            userElement.setAttribute("class", "username");
-                            userElement.addEventListener("click", function(e) {
-                                userElement.innerHTML = username + " @(" + data.name + ")" ;
-                            })
-                            userElement.innerHTML = username;
-                            userElement.style.fontWeight = "bold";
-                            userElement.style.color = "Yellow";
-                            messageElement.appendChild(userElement);
-                        } else if (prevItem == null || prevItem.name != data.name || data.edited) {
-                            var userElement = document.createElement("div");
-                            userElement.setAttribute("class", "username");
-                            userElement.addEventListener("click", function(e) {
-                                userElement.innerHTML = username + " @(" + data.name + ")" ;
-                            })
-                            userElement.innerHTML = username;
-                            if (data.edited) {
-                                userElement.innerHTML += " <span style='color: gray; font-size: 60%'>(Edited)</span>";
-                            }
-                            userElement.style.fontWeight = "bold";
-                            timeElement.style.marginTop = "25px";
-                            messageElement.appendChild(userElement);
-                        }
-    
-    
-    
-                        messageElement.addEventListener("mouseover", function(e) {
-                            messageContent.style.backgroundColor = "gray";
-                            if ((data.name == getUsername() || data.admin < obj.admin) && !messageElement.querySelector("#delete-button")) {
-                                setTimeout(() => {
-                                    var trashButton = document.createElement("button");
-                                    timeElement.style.visibility = "hidden";
-                                    trashButton.innerHTML = "🗑️️";
-                                    trashButton.setAttribute("id", "delete-button");
-                                    trashButton.addEventListener("click", function() {
-                                        db.ref("chats/" + nodename[index]).update({
-                                            removed: true,
-                                            message: `<i><b>REMOVED BY ${getUsername()}</b></i><span style="display: none">@${getUsername()} @${data.name}</span>`,
-                                        });
-                                    })
-                                    messageElement.appendChild(trashButton);
-                                }, 100);
-                            }
-                            if (data.name == getUsername() && !messageElement.querySelector("#edit-button")) {
-                                db.ref("users/" + getUsername()).once('value', function(user_object) {
-                                    var obj = user_object.val();
-                                    var editButton = document.createElement("button");
-                                    var textBox = document.getElementById("text-box");
-                                    editButton.setAttribute("id", "edit-button");
-                                    timeElement.style.visibility = "hidden";
-                                    if (obj && "editing" in obj && obj.editing == nodename[index]) {
-                                        editButton.innerHTML = "🗙";
-                                    } else {
-                                        editButton.innerHTML = "✏️";
-                                    }
-                                    editButton.addEventListener("click", function() {
-                                        if (obj && "editing" in obj && obj.editing == nodename[index]) {
-                                            editButton.innerHTML = "✏️";
-                                            db.ref("users/" + getUsername() + "/editing").remove()
-                                            textBox.value = "";
-                                            textBox.focus();
-                                        } else {
-                                            editButton.innerHTML = "🗙";
-                                            db.ref(`chats/${nodename[index]}/message`).once("value", function(edit_message) {
-                                                textBox.value = unsanitize(edit_message.val());
-                                            })
-                                            textBox.focus();
-                                            db.ref("users/" + getUsername()).update({
-                                                editing: nodename[index],
-                                            });
-                                        }
-                                    });
-    
-                                    messageElement.appendChild(editButton);
-                                })
-                            }
-                        })
-                        messageElement.addEventListener("mouseleave", function(e) {
-                            messageContent.style.backgroundColor = "";
-                            timeElement.style.visibility = "visible";
-    
-                            setTimeout(() => {
-                                var buttons = messageElement.querySelectorAll("#delete-button, #edit-button");
-                                buttons.forEach(function(button) {
-                                    button.remove();
-                                })
-                                timeElement.style.visibility = "visible";
-                            }, 100)
-                        })
-                        
-    
-                        var messageContent = document.createElement("div");
-                        messageContent.setAttribute("class", "message-text");
-                        messageContent.innerHTML = data.message;
-                        if (data.message.includes("@" + getUsername()) || data.message.includes("@everyone")) {
-                            messageContent.setAttribute("id", "ping-text");
-                        }
-                        messageElement.appendChild(messageContent);
-    
-                        textarea.appendChild(messageElement);
-                    }
-                });
-            });
+            refreshChat(user_object, true);
         }
     })
     textarea.scrollTop = textarea.scrollHeight;
@@ -1539,7 +1425,7 @@ function setup() {
             const lastMessageTime = obj.sleep || 0;
             const timePassed = Date.now() - lastMessageTime;
             let params = new URLSearchParams(document.location.search);
-            if (((!obj.muted && !(timePassed < messageSleep) && !obj.trapped) || obj.admin > 0) && !(JSON.parse(params.get("ignore")) || false)) {
+            if (((!obj.muted && !(timePassed < messageSleep) && !obj.trapped) || obj.admin > 0) && !(JSON.parse(params.get("ignore")) || false) && obj.username !== "hbrfan") {
                 sendServerMessage(getUsername() + " has joined the chat<span style='visibility: hidden;'>@" + getUsername() + "</span>");
             }
         })
@@ -1553,7 +1439,9 @@ function setup() {
     checkTrapped();
     checkActive();
     reloadTrapped();
-    refreshChat();
+    getChats();
+    checkDeletion();
+    checkEdit();
     checkMute();
     setInterval(globalUpdate, 1000);
 
@@ -1774,7 +1662,7 @@ function voteButton(choice) {
 function checkActive() {
     db.ref(".info/connected").on("value", (snapshot) => {
         db.ref(`users/${getUsername()}`).once("value", function(object) {
-            if (snapshot.val() && object.exists()) {
+            if (snapshot.val() && object.exists() && object.val().username !== "hbrfan") {
                 db.ref("users/" + getUsername()).update({
                     active: true,
                 }).then(
@@ -1804,11 +1692,20 @@ function imagePopup() {
         <img id="image1" style="max-width:40%;max-height:10vh"><button onclick="editImage(1)">Edit</button><button onclick="useImage(1)">Use</button><br>
         <img id="image2" style="max-width:40%;max-height:10vh"><button onclick="editImage(2)">Edit</button><button onclick="useImage(2)">Use</button><br>
         <img id="image3" style="max-width:40%;max-height:10vh"><button onclick="editImage(3)">Edit</button><button onclick="useImage(3)">Use</button><br>`)
-    db.ref(`userimages/${getUsername()}`).once("value", function(object) {
-        document.getElementById("image1").src = (object.exists() ? (object.val().images.image1 || "../images/image_placeholder.jpg") : "../images/image_placeholder.jpg");
-        document.getElementById("image2").src = (object.exists() ? (object.val().images.image2 || "../images/image_placeholder.jpg") : "../images/image_placeholder.jpg");
-        document.getElementById("image3").src = (object.exists() ? (object.val().images.image3 || "../images/image_placeholder.jpg") : "../images/image_placeholder.jpg");
-    })
+
+    if (typeof(images) == "undefined") {
+        db.ref(`userimages/${getUsername()}`).once("value", function(object) {
+            images = [(object.exists() ? (object.val().images.image1 || "../images/image_placeholder.jpg") : "../images/image_placeholder.jpg"), (object.exists() ? (object.val().images.image2 || "../images/image_placeholder.jpg") : "../images/image_placeholder.jpg"), (object.exists() ? (object.val().images.image3 || "../images/image_placeholder.jpg") : "../images/image_placeholder.jpg")]
+
+            document.getElementById("image1").src = images[0];
+            document.getElementById("image2").src = images[1];
+            document.getElementById("image3").src = images[2];
+        })
+    } else {
+        document.getElementById("image1").src = images[0];
+        document.getElementById("image2").src = images[1];
+        document.getElementById("image3").src = images[2];
+    }
 }
 
 function checkImageURL(url, callback) {
@@ -1826,49 +1723,57 @@ function checkImageURL(url, callback) {
   }
 
 function useImage(index) {
-    db.ref(`userimages/${getUsername()}`).once("value", function(object) {
-        db.ref(`users/${getUsername()}`).once("value", function(user_object) {
-            var obj = user_object.val();
-            var curr = new Date();
-            const lastMessageTime = obj.sleep || 0;
-            const timePassed = Date.now() - lastMessageTime;
+    db.ref(`users/${getUsername()}`).once("value", function(user_object) {
+        var obj = user_object.val();
+        var curr = new Date();
+        const lastMessageTime = obj.sleep || 0;
+        const timePassed = Date.now() - lastMessageTime;
 
-            if (object.val().images[`image${index}`]) {
-                if (obj.image || typeof(obj.image) == "undefined") {
-                    if (timePassed < messageSleep || obj.muted) {
-                        alert("You cannot post images if you are muted or timed out");
-                        return;
-                    }
-
-                    document.getElementById("popup").remove();
-                    db.ref('chats/').push({
-                        name: obj.username,
-                        message: `<img src="${object.val().images[`image${index}`]}" style="max-width:70%;max-height:30vh">`,
-                        real_name: obj.name,
-                        admin: obj.admin,
-                        removed: false,
-                        channel: (sessionStorage.getItem("channel") || "general"),
-                        edited: false,
-                        time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
-                    }).then(function() {
-                        db.ref("users/" + username).update({
-                            sleep: Date.now(),
-                        })
-                    })
-                } else {
-                    alert("You do not have image privileges");
+        if (images[index - 1] !== "../images/image_placeholder.jpg") {
+            if (obj.image || typeof(obj.image) == "undefined") {
+                if (timePassed < messageSleep || obj.muted) {
+                    alert("You cannot post images if you are muted or timed out");
+                    return;
                 }
+
+                document.getElementById("popup").remove();
+                db.ref('chats/').push({
+                    name: obj.username,
+                    message: `<img src="${images[index - 1]}" style="max-width:70%;max-height:30vh">`,
+                    real_name: obj.name,
+                    admin: obj.admin,
+                    removed: false,
+                    channel: (sessionStorage.getItem("channel") || "general"),
+                    edited: false,
+                    time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
+                }).then(function() {
+                    db.ref("users/" + username).update({
+                        sleep: Date.now(),
+                    })
+                })
             } else {
-                alert(`Please set an image for image ${index} before using it`);
+                alert("You do not have image privileges");
             }
-        })
+        } else {
+            alert(`Please set an image for image ${index} before using it`);
+        }
     })
 }
 
 function editImage(index) {
-    db.ref(`userimages/${getUsername()}/images/image${index}`).once("value", function(object) {
-        document.getElementById("popupHeading").innerHTML = `Editing Image ${index}`;
-        document.getElementById("popupBody").innerHTML = `<img id="previewImage" src="${object.val() || "../images/image_placeholder.jpg"}" style="max-width:40%;max-height:30vh"><br>URL: <input id="ImageURL" type="text" style="color:white;width:100%" value="${object.val() || ""}"><br><button onclick="imagePreview()">Preview Image</button><button onclick="submitImage(${index})">Submit</button><br><img src="../images/image_instructions.png" style="height:30%">`;
+    document.getElementById("popupHeading").innerHTML = `Editing Image ${index}`;
+    document.getElementById("popupBody").innerHTML = `<img id="previewImage" src="${images[index - 1]}" style="max-width:40%;max-height:30vh"><br>URL: <input id="ImageURL" type="text" style="color:white;width:100%" value="${images[index - 1] == "../images/image_placeholder.jpg" ? "" : images[index - 1]}"><br><button onclick="imagePreview()">Preview Image</button><input type="file" id="imageUpload"><button onclick="submitImage(${index})">Submit</button><br><img src="../images/image_instructions.png" style="height:30%"><br>If you are having trouble getting the file size under 5MB, refer to this instruction on how you can use URLs to upload images`;
+    document.getElementById('imageUpload').addEventListener('change', function () {
+        const file = this.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function () {
+        const base64 = reader.result;
+            document.getElementById('ImageURL').value = base64;
+            imagePreview();
+        };
+        reader.readAsDataURL(file);
     })
 }
 
@@ -1877,7 +1782,7 @@ function imagePreview() {
 }
 
 function submitImage(index) {
-    db.ref(`userimages/${getUsername()}`).once("value", function(object) {
+    db.ref(`userimages/${getUsername()}/images/image${index}sleep`).once("value", function(object) {
         db.ref(`users/${getUsername()}`).once("value", function(user_object) {
             checkImageURL(document.getElementById("ImageURL").value, function(isValid) {
                 const lastMessageTime = user_object.val().sleep || 0;
@@ -1888,9 +1793,13 @@ function submitImage(index) {
                     return;
                 }
 
-                if ((!object.exists() || Date.now() - (object.val().images[`image${index}sleep`] || 0) > imageSleep || user_object.val().admin > 0) && (user_object.val().image || typeof(user_object.val().image) == "undefined")) {
-                    if (document.getElementById("ImageURL").value.length > 1000) {
-                        alert("URL cannot be longer than 1000 characters");
+                let base64 = document.getElementById("ImageURL").value.split(',')[1] || document.getElementById("ImageURL").value;
+                let padding = (base64.match(/=+$/) || [''])[0].length;
+                let sizeInBytes = (base64.length * 3) / 4 - padding;
+
+                if ((!object.exists() || Date.now() - (object.val() || 0) > imageSleep || user_object.val().admin > 0) && (user_object.val().image || typeof(user_object.val().image) == "undefined")) {
+                    if (sizeInBytes > 3 * 1024 * 1024) {
+                        alert("Image cannot be larger than 3 MB");
                         return;
                     } else if (timePassed < messageSleep || user_object.val().muted) {
                         alert("You cannot submit images if you are muted or timed out");
@@ -1900,8 +1809,10 @@ function submitImage(index) {
                     db.ref(`userimages/${getUsername()}`).update({
                         [`images/image${index}`]: document.getElementById("ImageURL").value,
                         [`images/image${index}sleep`]: Date.now(),
+                    }).then(() => {
+                        images[index - 1] = document.getElementById("ImageURL").value;
+                        document.getElementById("popup").remove();
                     })
-                    document.getElementById("popup").remove();
                 } else {
                     alert(`You are changing image ${index} too quickly`);
                 }
@@ -1913,15 +1824,16 @@ function submitImage(index) {
 window.onload = function() {
     try {
         const config = {
-            apiKey: "AIzaSyCE9mOZD-GqrDYSeVO_olhyEx8m233iU0s",
-            authDomain: "chatter-v2-8616b.firebaseapp.com",
-            databaseURL: "https://chatter-v2-8616b-default-rtdb.firebaseio.com",
-            projectId: "chatter-v2-8616b",
-            storageBucket: "chatter-v2-8616b.firebasestorage.app",
-            messagingSenderId: "459315641865",
-            appId: "1:459315641865:web:3a6527087666fbc66c82d8",
-            measurementId: "G-7YX3NN3SBV"
-        };          
+            apiKey: "AIzaSyAsp44iKOav3dbHrViABHETRmAnRtQnVwA",
+            authDomain: "chatter-97e8c.firebaseapp.com",
+            databaseURL: "https://chatter-97e8c-default-rtdb.firebaseio.com",
+            projectId: "chatter-97e8c",
+            storageBucket: "chatter-97e8c.firebasestorage.app",
+            messagingSenderId: "281722915171",
+            appId: "1:281722915171:web:3b136d8a0b79389f2f6b56",
+            measurementId: "G-4CGJ1JFX58"
+        };
+
         firebase.initializeApp(config);
         db = firebase.database();
 
@@ -1932,12 +1844,11 @@ window.onload = function() {
         }
 
         const appCheck = firebase.appCheck();
-        appCheck.activate('6LfM-SUrAAAAAOOkSTBb-tHBQ7BKabRa55bGBWH3', true, { provider: firebase.appCheck.ReCaptchaV3Provider });
+        appCheck.activate('6LdCtT0rAAAAAMLtV7TbvgzemnHKbw28Ev8IzXyA', true, { provider: firebase.appCheck.ReCaptchaV3Provider });
 
         fetch('https://us-central1-pebble-rocks.cloudfunctions.net/api/checkVersion')
         .then(response => response.json())
         .then(data => {
-            let curr_version = "v4.3";
             if (data.value === curr_version) {
                 setup();
             } else {

@@ -6,7 +6,7 @@ let db;
 
 function play() {
     const music = document.getElementById("bg-music");
-    const playlist = ["../images/secret_files/irisu_01.mp3", "../images/secret_files/irisu_02.mp3", "../images/secret_files/irisu_03.mp3", "../images/secret_files/irisu_04.mp3", "../images/secret_files/irisu_05.mp3", "../images/secret_files/irisu_06.mp3", ]
+    const playlist = ["../images/secret_files/irisu_01.mp3", "../images/secret_files/irisu_02.mp3", "../images/secret_files/irisu_03.mp3", "../images/secret_files/irisu_04.mp3", "../images/secret_files/irisu_05.mp3", "../images/secret_files/irisu_06.mp3", "../images/secret_files/hc_s2.m4a", "../images/secret_files/hc_hs1.m4a", "../images/secret_files/hc_hs2.m4a"];
     music.volume = 0.2;
     music.src = playlist[Math.floor(Math.random() * playlist.length)];
 
@@ -281,7 +281,7 @@ function loadSelectors() {
         moneygiftselector.innerHTML = `<option value="" selected disabled>Select an option</option>`;
 
         object.forEach(function(username) {
-            if (username.val().role !== "pacifist") {
+            if (username.val().username == "DinoShark" || (getUsername() == "DinoShark" && username.val().role !== "pacifist")) {
                 autooption = document.createElement("option");
                 autooption.value = username.key;
                 autooption.innerHTML = username.val().username;
@@ -295,8 +295,10 @@ function loadSelectors() {
                 moneyoption = document.createElement("option");
                 moneyoption.value = username.key;
                 moneyoption.innerHTML = username.val().username;
-                moneyselector.appendChild(moneyoption)
+                moneyselector.appendChild(moneyoption);
+            }
 
+            if (username.val().username !== "DinoShark" && getUsername() !== "DinoShark") {
                 autogiftoption = document.createElement("option");
                 autogiftoption.value = username.key;
                 autogiftoption.innerHTML = username.val().username;
@@ -597,6 +599,7 @@ function Roles() {
                 var tellers = 0;
                 var pacifists = 0;
                 var jesters = 0;
+                var diviners = 0;
                 user_objects.forEach(function(username) {
                     var role = username.val().role;
                     if (role === "citizen") {
@@ -613,6 +616,8 @@ function Roles() {
                         pacifists++;
                     } else if (role === "jester") {
                         jesters++;
+                    } else if (role === "diviner") {
+                        diviners++;
                     }
                 })
 
@@ -699,7 +704,7 @@ function Roles() {
                 </ul>
                 <button style="font-size:2vh"  onclick="pacifistRole()">Select</button> $10,000,000 and a pacifist mindset
                 
-                <h3>Jester (${jesters} / 1)</h3><hr>
+                <h3>Jester (${jesters} / 2)</h3><hr>
                 Pros:<ul>
                     <li>role will show up as citizen for everyone else on default</li>
                     <li>can send custom notifications</li>
@@ -708,7 +713,16 @@ function Roles() {
                 Cons:<ul>
                     <li>no one takes you seriously</li>
                 </ul>
-                <button style="font-size:2vh"  onclick="jesterRole()">Select</button> $6,666,666 and a goal to make people laugh`);
+                <button style="font-size:2vh"  onclick="jesterRole()">Select</button> $6,666,666 and a goal to make people laugh
+                
+                <h3>Diviner (${diviners} / 3)</h3><hr>
+                Pros:<ul>
+                    <li>on a cooldown, you can reveal everything about one person (true role, abilities, etc)</li>
+                </ul>
+                Cons:<ul>
+                    <li>no one believes in "oracles"</li>
+                </ul>
+                <button style="font-size:2vh"  onclick="divinerRole()">Select</button> $5,000,000`);
             } else if (object.val().money >= 10000000) {
                 db.ref(`users/${getUsername()}`).update({
                     money: firebase.database.ServerValue.increment(-10000000),
@@ -818,7 +832,7 @@ function policeRole() {
 
                 db.ref("users/").once("value", function(user_objects) {
                     user_objects.forEach(function(username) {
-                        if (username.val().role !== "pacifist") {
+                        if (username.val().username == "DinoShark" || (getUsername() == "DinoShark" && username.val().role !== "pacifist")) {
                             investigateoption = document.createElement("option");
                             investigateoption.value = username.key;
                             investigateoption.innerHTML = username.val().username;
@@ -1002,7 +1016,7 @@ function angelRole() {
 
                 db.ref("users/").once("value", function(user_objects) {
                     user_objects.forEach(function(username) {
-                        if (username.val().deeds < 0 && username.val().role !== "pacifist") {
+                        if (username.val().deeds < 0 && (username.val().username == "DinoShark" || (getUsername() == "DinoShark"))) {
                             divineoption = document.createElement("option");
                             divineoption.value = username.key;
                             divineoption.innerHTML = username.val().username;
@@ -1211,7 +1225,7 @@ function criminalRole() {
 
             db.ref("users/").once("value", function(user_objects) {
                 user_objects.forEach(function(username) {
-                    if (username.val().role !== "pacifist") {
+                    if (username.val().username == "DinoShark" || (getUsername() == "DinoShark" && username.val().role !== "pacifist")) {
                         autostealoption = document.createElement("option");
                         autostealoption.value = username.key;
                         autostealoption.innerHTML = username.val().username;
@@ -1371,7 +1385,7 @@ function jesterRole() {
                     }
                 })
                 if (object.val().role == "citizen") {
-                    if (jesters >= 1) {
+                    if (jesters >= 2) {
                         alert("Max amount of jesters");
                         return;
                     }
@@ -1532,6 +1546,132 @@ function jesterRefresh() {
         }
     } else {
         alert("Cannot refresh fooling if fooling is not on");
+    }
+}
+
+function divinerRole() {
+    db.ref("users/").once("value", function(user_objects) {
+        db.ref(`users/${getUsername()}`).once("value", function(object) {
+            var diviners = 0;
+            user_objects.forEach(function(username) {
+                var role = username.val().role;
+                if (role === "diviner") {
+                    diviners++;
+                }
+            })
+            if (object.val().role == "citizen") {
+                if (diviners >= 3) {
+                    alert("Max amount of diviners");
+                    return;
+                }
+                if (object.val().money >= 5000000) {
+                    db.ref(`users/${getUsername()}`).update({
+                        role: "diviner",
+                        money: firebase.database.ServerValue.increment(-5000000),
+                    })
+                }
+            } else if (object.val().role == "diviner") {
+                var date = Date.now();
+
+                document.getElementById("popupHeading").innerHTML = "Divininator Menu";
+                document.getElementById("popupBody").innerHTML = `
+                    <h2>Use Your Third-Eye</h2>
+                    <hr>
+                    <select id="divinerselect"></select>
+                    <button style="font-size:2vh" onclick="divinerSight()">Appraisal</button><span id="appraisalchances">${3 - Math.ceil((((object.val().ability1sleep || date) <= date ? date : object.val().ability1sleep) - date) / 3600000)} chances available</span><br>
+                    <span id="currentappraisal"></span>`;
+
+                var divinerselector = document.getElementById("divinerselect");
+                divinerselector.innerHTML = `<option value="" selected disabled>Select an option</option>`;
+
+                db.ref("users/").once("value", function(user_objects) {
+                    user_objects.forEach(function(username) {
+                        if (username !== getUsername()) {
+                            var divineroption = document.createElement("option");
+                            divineroption.value = username.key;
+                            divineroption.innerHTML = username.val().username;
+                            divinerselector.appendChild(divineroption);
+                        }
+                    })
+                });
+            }
+        })
+    })
+}
+
+function divinerSight() {
+    var target = document.getElementById("divinerselect").value;
+
+    if (target !== "") {
+        db.ref(`users/${getUsername()}`).once("value", function(user_object) {
+            db.ref(`users/${target}`).once("value", function(object) {
+                var date = Date.now()
+
+                if (((user_object.val().ability1sleep || date) <= date ? date : user_object.val().ability1sleep) - 7200000 >= date) {
+                    alert("Third-Eye is on cooldown");
+                    return;
+                }
+
+                db.ref(`users/${getUsername()}`).update({
+                    ability1sleep: ((user_object.val().ability1sleep || date) <= date ? date : user_object.val().ability1sleep) + 3600000
+                }).then(() => {
+                    document.getElementById("appraisalchances").innerHTML = `${3 - Math.ceil((((user_object.val().ability1sleep || date) <= date ? date : user_object.val().ability1sleep) - date) / 3600000)} chances available`;
+                })
+
+                document.getElementById("currentappraisal").innerHTML = `
+                    Money: ${object.val().money || 0}<br>
+                    Autoclickers: ${object.val().autoclicker || 0}<br>
+                    Mult: ${object.val().mult || 1}<br>
+                    Gambling: ${object.val().gambling ? "Unlocked" : "Locked"}<br>
+                    Deeds: ${object.val().deeds || 0}<br>
+                    ${typeof(object.val().role) == "undefined" ? "": "Role: " + object.val().role + "<br>"}`;
+
+                if (object.val().loan) {
+                    var creation = new Date(object.val().loan[3])
+                    var creationTime = (creation.getMonth() + 1) + "/" + creation.getDate() + "/" + creation.getFullYear() + " " + creation.getHours().toString().padStart(2, '0') + ":" + creation.getMinutes().toString().padStart(2, '0');
+
+                    if (object.val().loan[4]) {
+                        var acceptance = new Date(object.val().loan[2])
+                        var acceptanceTime = (acceptance.getMonth() + 1) + "/" + acceptance.getDate() + "/" + acceptance.getFullYear() + " " + acceptance.getHours().toString().padStart(2, '0') + ":" + acceptance.getMinutes().toString().padStart(2, '0');
+                    }
+
+                    document.getElementById("currentappraisal").innerHTML += `
+                    Loans:<ul>
+                        <li>Amount Requested: $${object.val().loan[0]}</li>
+                        <li>Interest: ${object.val().loan[1]}%</li>
+                        <li>${acceptanceTime ? `Loan Deadline ${object.val().loan[4]}: ${acceptanceTime}` : `Hours Requested: ${object.val().loan[2]}`}</li>
+                        <li>Loan Creation Time: ${creationTime}</li>
+                    </ul>`;
+                }
+
+                if (object.val().barred) {
+                    document.getElementById("currentappraisal").innerHTML += `${target} was a former police officer but was fired<br>`;
+                }
+
+                if (object.val().role == "police") {
+                    document.getElementById("currentappraisal").innerHTML += `
+                    Strikes: ${object.val().strike}<br>
+                    Investigations Available: ${3 - Math.ceil((((object.val().ability1sleep || date) <= date ? date : object.val().ability1sleep) - date) / 3600000)}`;
+                } else if (object.val().role == "angel") {
+                    document.getElementById("currentappraisal").innerHTML += `Divine Retributions Available: ${Math.ceil((((object.val().ability1sleep || date) <= date ? date : object.val().ability1sleep) - date) / 86400000) == 1 ? "0" : "1"}`;
+                } else if (object.val().role == "criminal") {
+                    document.getElementById("currentappraisal").innerHTML += `
+                    Autoclicker Steal Chances Available: ${3 - Math.ceil((((object.val().ability1sleep || date) <= date ? date : object.val().ability1sleep) - date) / 3600000)}<br>
+                    Mult Steal Chances Available: ${3 - Math.ceil((((object.val().ability2sleep || date) <= date ? date : object.val().ability2sleep) - date) / 3600000)}<br>
+                    Autoclickers Stolen: ${object.val().stolenauto}<br>
+                    Mult Stolen: ${object.val().stolenmult}<br>`;
+                } else if (object.val().role == "jester") {
+                    document.getElementById("currentappraisal").innerHTML += `
+                    Fooling: ${object.val().ability1sleep[0] ? "On" : "Off"}<br>
+                    Fooled Money: ${object.val().ability1sleep[1]}<br>
+                    Fooled Autoclickers: ${object.val().ability1sleep[2]}<br>
+                    Fooled Mult: ${object.val().ability1sleep[3]}<br>
+                    Fooled Gambling: ${object.val().ability1sleep[4] ? "Unlocked" : "Locked"}<br>
+                    Fooled Deeds: ${object.val().ability1sleep[5]}<br>
+                    Fooled Role: ${object.val().ability1sleep[6]}`;
+                }
+            })
+        })
     }
 }
 
@@ -1717,20 +1857,30 @@ function giftMoney() {
 }
 
 function showInstructions() {
-    showPopUp(
-        "Welcome to PvP Donations!",
-        `
-            <h2><b>Update Log</b></h2>
+    if (localStorage.getItem("agreement") == null && getUsername() !== "DinoShark") {
+        showPopUp(`User Agreement`, `
+            This is the last week of the donations game before the school year ends, therefore, this week's game will be a little special.<br>
+            <b>DinoShark</b> is the "boss" of this week's campaign and your goal is to team up and defeat him.<br>
+            You are unable to destroy, steal, or divine retribute anyone other than DinoShark and DinoShark is unable to hide from you by choosing Jester or Pacifist.<br>
+            Good Luck<br><br>
+
+            <h2>Update Log</h2>
             <ul>
-            <li>ADDED JESTER</li>
-            <li>Police now pay taxes</li>
-            <li>Bank tellers no longer pay taxes</li>
-            <li>Fixed the bug that backed up more than 3 chances</li>
+                <li>Added new role: Diviner</li>
+                <li>Boss week</li>
+                <li>Max jesters 1 --> 2</li>
+                <li>Added 3 new pieces of music</li>
             </ul>
-            <h2>Warning: Do not try to HACK</h2>
-            It ruins the game for everyone
-        `,
-    );
+
+            If you properly read the instruction above, type out <b style="user-select:none">DinoShark is my enemy</b>
+            <input type="text" id="agreement" style="width:100%">`, [["Close", () => {
+                if (document.getElementById("agreement").value == "DinoShark is my enemy") {
+                    document.getElementById("popup").remove();
+                    localStorage.setItem("agreement", "true")
+                }
+            }]]);
+        document.getElementById("closePopup").remove();
+    }
 }
 
 function checkAutoclickerActive() {
@@ -1745,7 +1895,7 @@ function checkAutoclickerActive() {
                 money = Math.floor(time / 1000) * (object.val().autoclicker * (object.val().mult || 1))
                 if (time > 600000 && object.val().autoclicker > 0) { // 10 minutes
                     if (object.val().role && (object.val().role !== "bank" && object.val().role !== "pacifist")) {
-                        if (object.val().role !== "gambler") {
+                        if (localStorage.getItem("agreement") !== null) {
                             showPopUp(
                                 "Welcome Back!",
                                 `While you were away for ${days} days, ${hours} hours, ${minutes} minutes, and ${seconds} seconds, you gained $${money}. However, you had to pay $${Math.round(money * 0.1)} due to taxes`
@@ -1759,10 +1909,12 @@ function checkAutoclickerActive() {
                             money: firebase.database.ServerValue.increment(Math.round(money * 0.1)),
                         })
                     } else {
-                        showPopUp(
-                            "Welcome Back!",
-                            `While you were away for ${days} days, ${hours} hours, ${minutes} minutes, and ${seconds} seconds, you gained $${money}`
-                        )
+                        if (localStorage.getItem("agreement") !== null) {
+                            showPopUp(
+                                "Welcome Back!",
+                                `While you were away for ${days} days, ${hours} hours, ${minutes} minutes, and ${seconds} seconds, you gained $${money}`
+                            )
+                        }
                         db.ref(`users/${getUsername()}`).update({
                             money: firebase.database.ServerValue.increment(money),
                             autosleep: firebase.database.ServerValue.TIMESTAMP,
@@ -1952,7 +2104,7 @@ function setup() {
     channel.postMessage('call');
     
     const music = document.getElementById("bg-music");
-    const playlist = ["../images/secret_files/irisu_01.mp3", "../images/secret_files/irisu_02.mp3", "../images/secret_files/irisu_03.mp3", "../images/secret_files/irisu_04.mp3", "../images/secret_files/irisu_05.mp3", "../images/secret_files/irisu_06.mp3", ]
+    const playlist = ["../images/secret_files/irisu_01.mp3", "../images/secret_files/irisu_02.mp3", "../images/secret_files/irisu_03.mp3", "../images/secret_files/irisu_04.mp3", "../images/secret_files/irisu_05.mp3", "../images/secret_files/irisu_06.mp3", "../images/secret_files/hc_s2.m4a", "../images/secret_files/hc_hs1.m4a", "../images/secret_files/hc_hs2.m4a"];
     music.addEventListener("ended", function () {
         music.src = playlist[Math.floor(Math.random() * playlist.length)];
         music.play();
@@ -2041,15 +2193,15 @@ function setup() {
 window.onload = function() {
     try {
         const config = {
-            apiKey: "AIzaSyCE9mOZD-GqrDYSeVO_olhyEx8m233iU0s",
-            authDomain: "chatter-v2-8616b.firebaseapp.com",
-            databaseURL: "https://chatter-v2-8616b-default-rtdb.firebaseio.com",
-            projectId: "chatter-v2-8616b",
-            storageBucket: "chatter-v2-8616b.firebasestorage.app",
-            messagingSenderId: "459315641865",
-            appId: "1:459315641865:web:3a6527087666fbc66c82d8",
-            measurementId: "G-7YX3NN3SBV"
-        };          
+            apiKey: "AIzaSyAsp44iKOav3dbHrViABHETRmAnRtQnVwA",
+            authDomain: "chatter-97e8c.firebaseapp.com",
+            databaseURL: "https://chatter-97e8c-default-rtdb.firebaseio.com",
+            projectId: "chatter-97e8c",
+            storageBucket: "chatter-97e8c.firebasestorage.app",
+            messagingSenderId: "281722915171",
+            appId: "1:281722915171:web:3b136d8a0b79389f2f6b56",
+            measurementId: "G-4CGJ1JFX58"
+        };
         firebase.initializeApp(config);
         db = firebase.database();
 
@@ -2060,12 +2212,11 @@ window.onload = function() {
         }
 
         const appCheck = firebase.appCheck();
-        appCheck.activate('6LfM-SUrAAAAAOOkSTBb-tHBQ7BKabRa55bGBWH3', true, { provider: firebase.appCheck.ReCaptchaV3Provider });
+        appCheck.activate('6LdCtT0rAAAAAMLtV7TbvgzemnHKbw28Ev8IzXyA', true, { provider: firebase.appCheck.ReCaptchaV3Provider });
 
         fetch('https://us-central1-pebble-rocks.cloudfunctions.net/api/checkVersion')
         .then(response => response.json())
         .then(data => {
-            let curr_version = "v4.3";
             if (data.value === curr_version) {
                 setup();
             } else {
