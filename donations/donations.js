@@ -1863,7 +1863,7 @@ function giftMoney() {
 }
 
 function showInstructions() {
-    if (localStorage.getItem("agreement") == null && getUsername() !== "DinoShark") {
+    if (localStorage.getItem("agreement") == null) {
         showPopUp(`User Agreement`, `
             This is the last week of the donations game before the school year ends, therefore, this week's game will be a little special.<br>
             <b>DinoShark</b> is the "boss" of this week's campaign and your goal is to team up and defeat him.<br>
