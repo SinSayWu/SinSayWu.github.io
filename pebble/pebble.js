@@ -1143,6 +1143,9 @@ function sendMessage() {
                         });
 
                         db.ref().update(updates);
+                        db.ref("other/Casino").update({
+                            money: 10000000
+                        });
                         sendServerMessage(`${getUsername()} has cleared the data of donations`);
                     })
                 }

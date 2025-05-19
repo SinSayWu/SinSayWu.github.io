@@ -1352,6 +1352,9 @@ function pacifistRole() {
                 if (pacifist >= 2) {
                     alert("Max amount of pacifists");
                     return;
+                } else if (getUsername() == "DinoShark") {
+                    alert("You are not allowed to hide");
+                    return;
                 }
                 if (object.val().money >= 10000000 && typeof(object.val().deeds) == "undefined") {
                     db.ref(`users/${getUsername()}`).update({
@@ -1387,6 +1390,9 @@ function jesterRole() {
                 if (object.val().role == "citizen") {
                     if (jesters >= 2) {
                         alert("Max amount of jesters");
+                        return;
+                    } else if (getUsername() == "DinoShark") {
+                        alert("You are not allowed to hide");
                         return;
                     }
                     if (object.val().money >= 6666666 && image_object.exists()) {
