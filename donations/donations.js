@@ -387,7 +387,7 @@ function DoubleNothing() {
         db.ref(`users/${getUsername()}`).once("value", function(object) {
             if (moneyinput <= object.val().money) {
                 if (Math.random() < 0.499 + (object.val().role == "gambler" ? 0.001 : 0)) {
-                    if (moneyinput >= object.val().money * 0.5) {
+                    if (moneyinput >= object.val().money * 0.5 && moneyinput >= 10000000) {
                         sendNotification(`${object.val().username} just won $${moneyinput} in Double-or-Nothing!`)
                     }
                     db.ref(`users/${getUsername()}`).update({
@@ -397,7 +397,7 @@ function DoubleNothing() {
                         money: firebase.database.ServerValue.increment(-moneyinput),
                     })
                 } else {
-                    if (moneyinput >= object.val().money * 0.5) {
+                    if (moneyinput >= object.val().money * 0.5 && moneyinput >= 10000000) {
                         sendNotification(`${object.val().username} just lost $${moneyinput} in Double-or-Nothing!`)
                     }
                     db.ref(`users/${getUsername()}`).update({
@@ -498,7 +498,7 @@ function blackStand() {
                 document.getElementById('blackjack').value = "";
                 document.getElementById("dealer").innerHTML += " Won";
                 document.getElementById("player").innerHTML += " Lost";
-                if (moneyinput > object.val().money * 0.5) {
+                if (moneyinput > object.val().money * 0.5 && moneyinput >= 10000000) {
                     sendNotification(`${object.val().username} just lost $${moneyinput} in Blackjack!`)
                 }
                 db.ref(`other/Casino/`).update({
@@ -509,7 +509,7 @@ function blackStand() {
                 document.getElementById('blackjack').value = "";
                 document.getElementById("dealer").innerHTML += " Won";
                 document.getElementById("player").innerHTML += " Lost";
-                if (moneyinput > object.val().money * 0.5) {
+                if (moneyinput > object.val().money * 0.5 && moneyinput >= 10000000) {
                     sendNotification(`${object.val().username} just lost $${moneyinput} in Blackjack!`)
                 }
                 db.ref(`other/Casino/`).update({
@@ -523,7 +523,7 @@ function blackStand() {
                 document.getElementById('blackjack').value = "";
                 document.getElementById("dealer").innerHTML += " Tied";
                 document.getElementById("player").innerHTML += " Tied";
-                if (moneyinput > object.val().money * 0.5) {
+                if (moneyinput > object.val().money * 0.5 && moneyinput >= 10000000) {
                     sendNotification(`${object.val().username} just tied with $${moneyinput} in Blackjack!`)
                 }
             } else if (hand <= 21 && sum > hand) {
@@ -537,7 +537,7 @@ function blackStand() {
                 document.getElementById('blackjack').value = "";
                 document.getElementById("dealer").innerHTML += " Lost";
                 document.getElementById("player").innerHTML += " Won";
-                if (moneyinput > object.val().money * 0.5) {
+                if (moneyinput > object.val().money * 0.5 && moneyinput >= 10000000) {
                     sendNotification(`${object.val().username} just won $${moneyinput} in Blackjack!`)
                 }
             } else if (hand > 21) {
@@ -551,7 +551,7 @@ function blackStand() {
                 document.getElementById('blackjack').value = "";
                 document.getElementById("dealer").innerHTML += " Lost";
                 document.getElementById("player").innerHTML += " Won";
-                if (moneyinput > object.val().money * 0.5) {
+                if (moneyinput > object.val().money * 0.5 && moneyinput >= 10000000) {
                     sendNotification(`${object.val().username} just won $${moneyinput} in Blackjack!`)
                 }
             }
@@ -570,7 +570,10 @@ function ultimateGamble() {
                     db.ref(`other/Casino/`).update({
                         money: firebase.database.ServerValue.increment(-casino_object.val().money),
                     })
-                    sendNotification(`${getUsername()} has just won the Ultimate Gamble!`);
+
+                    if (casino_object.val().money >= 10000000) {
+                        sendNotification(`${getUsername()} has just won the Ultimate Gamble!`);
+                    }
                 } else {
                     db.ref(`users/${getUsername()}`).update({
                         money: firebase.database.ServerValue.increment(-user_object.val().money),
@@ -1706,7 +1709,7 @@ function minusAuto() {
                     autoclicker: victim.autoclicker - 1,
                 })
 
-                if (price >= attacker.money * 0.5) {
+                if (price >= attacker.money * 0.5 && price >= 10000000) {
                     sendNotification(`${attacker.username} has just removed an Auto-Clicker from ${victim.username}!`);
                 }
             }
@@ -1739,7 +1742,7 @@ function minusMult() {
                     mult: victim.mult - 1,
                 })
 
-                if (price >= attacker.money * 0.5) {
+                if (price >= attacker.money * 0.5 && price >= 10000000) {
                     sendNotification(`${attacker.username} has just removed one Mult from ${victim.username}!`);
                 }
             }
@@ -1772,7 +1775,7 @@ function minusMoney() {
                 db.ref(`users/${moneyselector.value}/money`).set(
                     (money - Math.abs(Math.round(moneyinput.value)) < 0 ? 0 : money - Math.abs(Math.round(moneyinput.value)))
                 )
-                if (price >= attacker.money * 0.5) {
+                if (price >= attacker.money * 0.5 && price >= 10000000) {
                     sendNotification(`${attacker.username} has just removed $${Math.abs(Math.round(moneyinput.value))} from ${victim.username}!`);
                 }
             }
@@ -1799,7 +1802,7 @@ function giftAuto() {
                     (victim.autoclicker || 0) + 1,
                 )
 
-                if (price >= attacker.money * 0.5) {
+                if (price >= attacker.money * 0.5 && price >= 10000000) {
                     sendNotification(`${attacker.username} has just gifted an Auto-Clicker to ${victim.username}!`);
                 }
             }
@@ -1826,7 +1829,7 @@ function giftMult() {
                     (victim.mult || 1) + 1
                 )
 
-                if (price >= attacker.money * 0.5) {
+                if (price >= attacker.money * 0.5 && price >= 10000000) {
                     sendNotification(`${attacker.username} has just gifted one Mult to ${victim.username}!`);
                 }
             }
@@ -1854,7 +1857,7 @@ function giftMoney() {
                 db.ref(`users/${moneyselector.value}/money`).set(
                     money + price,
                 )
-                if (price >= attacker.money * 0.5) {
+                if (price >= attacker.money * 0.5 && price >= 10000000) {
                     sendNotification(`${attacker.username} has just gifted $${price} to ${victim.username}!`);
                 }
             }
@@ -1901,7 +1904,7 @@ function checkAutoclickerActive() {
                 money = Math.floor(time / 1000) * (object.val().autoclicker * (object.val().mult || 1))
                 if (time > 600000 && object.val().autoclicker > 0) { // 10 minutes
                     if (object.val().role && (object.val().role !== "bank" && object.val().role !== "pacifist")) {
-                        if (localStorage.getItem("agreement") !== null) {
+                        if (localStorage.getItem("agree") !== null) {
                             showPopUp(
                                 "Welcome Back!",
                                 `While you were away for ${days} days, ${hours} hours, ${minutes} minutes, and ${seconds} seconds, you gained $${money}. However, you had to pay $${Math.round(money * 0.1)} due to taxes`
@@ -1915,7 +1918,7 @@ function checkAutoclickerActive() {
                             money: firebase.database.ServerValue.increment(Math.round(money * 0.1)),
                         })
                     } else {
-                        if (localStorage.getItem("agreement") !== null) {
+                        if (localStorage.getItem("agree") !== null) {
                             showPopUp(
                                 "Welcome Back!",
                                 `While you were away for ${days} days, ${hours} hours, ${minutes} minutes, and ${seconds} seconds, you gained $${money}`

@@ -1,4 +1,4 @@
-let curr_version = "v5.2"
+let curr_version = "v5.3"
 
 function getUsername() {
     return localStorage.getItem("username");
