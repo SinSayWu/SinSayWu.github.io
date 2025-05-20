@@ -1764,7 +1764,7 @@ function useImage(index) {
 
 function editImage(index) {
     document.getElementById("popupHeading").innerHTML = `Editing Image ${index}`;
-    document.getElementById("popupBody").innerHTML = `<img id="previewImage" src="${images[index - 1]}" style="max-width:40%;max-height:30vh"><br>URL: <input id="ImageURL" type="text" style="color:white;width:100%" value="${images[index - 1] == "../images/image_placeholder.jpg" ? "" : images[index - 1]}"><br><button onclick="imagePreview()">Preview Image</button><input type="file" id="imageUpload"><button onclick="submitImage(${index})">Submit</button><br><img src="../images/image_instructions.png" style="height:30%"><br>If you are having trouble getting the file size under 5MB, refer to this instruction on how you can use URLs to upload images`;
+    document.getElementById("popupBody").innerHTML = `<img id="previewImage" src="${images[index - 1]}" style="max-width:40%;max-height:30vh"><br>URL: <input id="ImageURL" type="text" style="color:white;width:100%"><br><button onclick="imagePreview()">Preview Image</button><input type="file" id="imageUpload"><button onclick="submitImage(${index})">Submit</button><br><img src="../images/image_instructions.png" style="height:30%"><br>If you are having trouble getting the file size under 5MB, refer to this instruction on how you can use URLs to upload images`;
     document.getElementById('imageUpload').addEventListener('change', function () {
         const file = this.files[0];
         if (!file) return;
