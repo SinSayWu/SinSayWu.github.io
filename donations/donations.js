@@ -298,7 +298,7 @@ function loadSelectors() {
                 moneyselector.appendChild(moneyoption);
             }
 
-            if (username.val().username !== "DinoShark" && getUsername() !== "DinoShark") {
+            if (username.val().username !== "DinoShark" || getUsername() == "DinoShark") {
                 autogiftoption = document.createElement("option");
                 autogiftoption.value = username.key;
                 autogiftoption.innerHTML = username.val().username;
