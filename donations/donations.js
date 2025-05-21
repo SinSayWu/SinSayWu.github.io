@@ -698,12 +698,14 @@ function Roles() {
                 Pros:<ul>
                     <li>other users cannot destroy, steal, or divine retribute you</li>
                     <li>don't have to pay taxes</li>
+                    <li>Everyone except diviners have no way of knowing your money, mult, auto, etc</li>
                 </ul>
                 Cons:<ul>
                     <li>other users cannot gift mult, autos, or money to you</li>
                     <li>you cannot gift mult, autos, or money to other users</li>
                     <li>you cannot destroy mult, auto, or money from other users</li>
                     <li>you can no longer take out loans</li>
+                    <li>you can no longer see the leaderboard</li>
                 </ul>
                 <button style="font-size:2vh"  onclick="pacifistRole()">Select</button> $10,000,000 and a pacifist mindset
                 

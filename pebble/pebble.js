@@ -8,15 +8,30 @@ var imageSleep = 0;
 let active_users;
 let inactive_users;
 var globalMessages = [];
+var loadSubsequentMessages = false;
 let images
 let db;
 
 function getChats() {
     db.ref(`users/${getUsername()}`).once("value", function(user_object) {
-        db.ref('chats/').on('child_added', function(message_object) {
-            globalMessages.push(message_object);
+        db.ref('chats/').limitToLast(1).once("value", function(last_message) {
+            db.ref('chats/').on('child_added', function(message_object) {
+                let key = null;
 
-            refreshChat(user_object);
+                globalMessages.push(message_object);
+
+                last_message.forEach((childSnapshot) => {
+                    key = childSnapshot.key;
+                })
+
+                if (message_object.key == key) {
+                    loadSubsequentMessages = true;
+                }
+
+                if (loadSubsequentMessages) {
+                    refreshChat(user_object);
+                }
+            })
         })
     })
 }
