@@ -1425,6 +1425,7 @@ function jesterRole() {
                             <option id="jesterpolice" value="police">Police</option>
                             <option id="jesterangel" value="angel">Angel</option>
                             <option id="jesterbank" value="bank">Bank Teller</option>
+                            <option id="jesterdiviner" value="diviner">Diviner</option>
                             <option id="jesterjester" value="jester">Jester</option>
                             <option id="jesternone" value="none">None</option>
                         </select><br>
