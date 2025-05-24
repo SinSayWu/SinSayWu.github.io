@@ -1345,12 +1345,8 @@ function back() {
 
 function globalUpdate() {
     checkMute();
-    db.ref(`users/${getUsername()}/active`).once("value", function(user_object) {
-        if (!user_object.val() && getUsername() !== "hbrfan") {
-            db.ref(`users/${getUsername()}`).update({
-                active: true,
-            })
-        }
+    db.ref(`users/${getUsername()}`).update({
+        active: true,
     })
 }
 
@@ -1443,7 +1439,7 @@ function setup() {
             const lastMessageTime = obj.sleep || 0;
             const timePassed = Date.now() - lastMessageTime;
             let params = new URLSearchParams(document.location.search);
-            if (((!obj.muted && !(timePassed < messageSleep) && !obj.trapped) || obj.admin > 0) && !(JSON.parse(params.get("ignore")) || false) && obj.username !== "hbrfan") {
+            if (((!obj.muted && !(timePassed < messageSleep) && !obj.trapped) || obj.admin > 0) && !(JSON.parse(params.get("ignore")) || false)) {
                 sendServerMessage(getUsername() + " has joined the chat<span style='visibility: hidden;'>@" + getUsername() + "</span>");
             }
         })
@@ -1679,7 +1675,7 @@ function voteButton(choice) {
 function checkActive() {
     db.ref(".info/connected").on("value", (snapshot) => {
         db.ref(`users/${getUsername()}`).once("value", function(object) {
-            if (snapshot.val() && object.exists() && object.val().username !== "hbrfan") {
+            if (snapshot.val() && object.exists()) {
                 db.ref("users/" + getUsername()).update({
                     active: true,
                 }).then(
