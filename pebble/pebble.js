@@ -173,37 +173,33 @@ function refreshChat(user_data, change_channel = false) {
                     }, 100);
                 }
                 if (data.val().name == getUsername() && !messageElement.querySelector("#edit-button") && !globalMessages[index].val().removed) {
-                    db.ref("users/" + getUsername()).once('value', function(user_object) {
-                        var obj = user_object.val();
-                        var editButton = document.createElement("button");
-                        var textBox = document.getElementById("text-box");
-                        editButton.setAttribute("id", "edit-button");
-                        timeElement.style.visibility = "hidden";
-                        if (obj && "editing" in obj && obj.editing == globalMessages[index].key) {
-                            editButton.innerHTML = "🗙";
-                        } else {
+                    var editing_message = localStorage.getItem("editing");
+                    var editButton = document.createElement("button");
+                    var textBox = document.getElementById("text-box");
+                    editButton.setAttribute("id", "edit-button");
+                    timeElement.style.visibility = "hidden";
+                    if (editing_message == globalMessages[index].key) {
+                        editButton.innerHTML = "🗙";
+                    } else {
+                        editButton.innerHTML = "✏️";
+                    }
+                    editButton.addEventListener("click", function() {
+                        if (editing_message == globalMessages[index].key) {
                             editButton.innerHTML = "✏️";
+                            localStorage.removeItem("editing");
+                            textBox.value = "";
+                            textBox.focus();
+                        } else {
+                            editButton.innerHTML = "🗙";
+                            db.ref(`chats/${globalMessages[index].key}/message`).once("value", function(edit_message) {
+                                textBox.value = unsanitize(edit_message.val());
+                            })
+                            textBox.focus();
+                            localStorage.setItem("editing", globalMessages[index].key);
                         }
-                        editButton.addEventListener("click", function() {
-                            if (obj && "editing" in obj && obj.editing == globalMessages[index].key) {
-                                editButton.innerHTML = "✏️";
-                                db.ref("users/" + getUsername() + "/editing").remove()
-                                textBox.value = "";
-                                textBox.focus();
-                            } else {
-                                editButton.innerHTML = "🗙";
-                                db.ref(`chats/${globalMessages[index].key}/message`).once("value", function(edit_message) {
-                                    textBox.value = unsanitize(edit_message.val());
-                                })
-                                textBox.focus();
-                                db.ref("users/" + getUsername()).update({
-                                    editing: globalMessages[index].key,
-                                });
-                            }
-                        });
+                    });
 
-                        messageElement.appendChild(editButton);
-                    })
+                    messageElement.appendChild(editButton);
                 }
             })
             messageElement.addEventListener("mouseleave", function(e) {
@@ -1188,12 +1184,12 @@ function sendMessage() {
 
             document.getElementById("text-box").value = "";
             var curr = new Date();
-            if (obj && "editing" in obj) {
-                db.ref("chats/" + obj.editing).update({
+            if (localStorage.getItem("editing")) {
+                db.ref("chats/" + localStorage.getItem("editing")).update({
                     message: "edited: " + message,
                     time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
                 }).then(function() {
-                    db.ref("users/" + username + "/editing").remove()
+                    localStorage.removeItem("editing");
                 })
             } else {
                 db.ref('chats/').push({
