@@ -281,7 +281,7 @@ function loadSelectors() {
         moneygiftselector.innerHTML = `<option value="" selected disabled>Select an option</option>`;
 
         object.forEach(function(username) {
-            if (username.val().username == "DinoShark" || (getUsername() == "DinoShark" && username.val().role !== "pacifist")) {
+            if (username.val().role !== "pacifist") {
                 autooption = document.createElement("option");
                 autooption.value = username.key;
                 autooption.innerHTML = username.val().username;
@@ -296,9 +296,7 @@ function loadSelectors() {
                 moneyoption.value = username.key;
                 moneyoption.innerHTML = username.val().username;
                 moneyselector.appendChild(moneyoption);
-            }
 
-            if (username.val().username !== "DinoShark" || getUsername() == "DinoShark") {
                 autogiftoption = document.createElement("option");
                 autogiftoption.value = username.key;
                 autogiftoption.innerHTML = username.val().username;
@@ -837,7 +835,7 @@ function policeRole() {
 
                 db.ref("users/").once("value", function(user_objects) {
                     user_objects.forEach(function(username) {
-                        if (username.val().username == "DinoShark" || (getUsername() == "DinoShark" && username.val().role !== "pacifist")) {
+                        if (username.val().role !== "pacifist") {
                             investigateoption = document.createElement("option");
                             investigateoption.value = username.key;
                             investigateoption.innerHTML = username.val().username;
@@ -1021,7 +1019,7 @@ function angelRole() {
 
                 db.ref("users/").once("value", function(user_objects) {
                     user_objects.forEach(function(username) {
-                        if (username.val().deeds < 0 && (username.val().username == "DinoShark" || (getUsername() == "DinoShark"))) {
+                        if (username.val().deeds < 0) {
                             divineoption = document.createElement("option");
                             divineoption.value = username.key;
                             divineoption.innerHTML = username.val().username;
@@ -1230,7 +1228,7 @@ function criminalRole() {
 
             db.ref("users/").once("value", function(user_objects) {
                 user_objects.forEach(function(username) {
-                    if (username.val().username == "DinoShark" || (getUsername() == "DinoShark" && username.val().role !== "pacifist")) {
+                    if (username.val().role !== "pacifist") {
                         autostealoption = document.createElement("option");
                         autostealoption.value = username.key;
                         autostealoption.innerHTML = username.val().username;
@@ -1357,10 +1355,8 @@ function pacifistRole() {
                 if (pacifist >= 2) {
                     alert("Max amount of pacifists");
                     return;
-                } else if (getUsername() == "DinoShark") {
-                    alert("You are not allowed to hide");
-                    return;
                 }
+
                 if (object.val().money >= 10000000 && typeof(object.val().deeds) == "undefined") {
                     db.ref(`users/${getUsername()}`).update({
                         role: "pacifist",
@@ -1396,10 +1392,8 @@ function jesterRole() {
                     if (jesters >= 2) {
                         alert("Max amount of jesters");
                         return;
-                    } else if (getUsername() == "DinoShark") {
-                        alert("You are not allowed to hide");
-                        return;
                     }
+
                     if (object.val().money >= 6666666 && image_object.exists()) {
                         db.ref(`users/${getUsername()}`).update({
                             role: "jester",
@@ -1869,30 +1863,14 @@ function giftMoney() {
 }
 
 function showInstructions() {
-    if (localStorage.getItem("agree") == null) {
-        showPopUp(`User Agreement`, `
-            This is the last week of the donations game before the school year ends, therefore, this week's game will be a little special.<br>
-            <b>DinoShark</b> is the "boss" of this week's campaign and your goal is to team up and defeat him.<br>
-            You are unable to destroy, steal, or divine retribute anyone other than DinoShark and DinoShark is unable to hide from you by choosing Jester or Pacifist.<br>
-            Good Luck<br><br>
-
-            <h2>Update Log</h2>
-            <ul>
-                <li>Added new role: Diviner</li>
-                <li>Boss week</li>
-                <li>Max jesters 1 --> 2</li>
-                <li>Added 3 new pieces of music</li>
-            </ul>
-
-            If you properly read the instruction above, type out <b style="user-select:none">DinoShark is my enemy</b>
-            <input type="text" id="agreement" style="width:100%">`, [["Close", () => {
-                if (document.getElementById("agreement").value == "DinoShark is my enemy") {
-                    document.getElementById("popup").remove();
-                    localStorage.setItem("agree", "true")
-                }
-            }]]);
-        document.getElementById("closePopup").remove();
-    }
+    showPopUp(`PVP Donations`, `
+        <h2>Update Log</h2>
+        <ul>
+            <li>Added new role: Diviner</li>
+            <li>Boss week</li>
+            <li>Max jesters 1 --> 2</li>
+            <li>Added 3 new pieces of music</li>
+        </ul>`)
 }
 
 function checkAutoclickerActive() {
@@ -2193,9 +2171,11 @@ function setup() {
         } else if (object.val().role == "pacifist") {
             pacifistLoader();
         }
-    })
 
-    showInstructions();
+        if ((object.val().money || 0) <= 500 && (object.val().autoclicker || 0) == 0) {
+            showInstructions();
+        }
+    })
 }
 
 window.onload = function() {
