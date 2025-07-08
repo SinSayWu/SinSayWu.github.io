@@ -219,9 +219,15 @@ function refreshChat(user_data, change_channel = false) {
             var messageContent = document.createElement("div");
             messageContent.setAttribute("class", "message-text");
             messageContent.innerHTML = message;
+
             if (message.includes("@" + getUsername()) || message.includes("@everyone")) {
                 messageContent.setAttribute("id", "ping-text");
             }
+
+            if (data.val().edited) {
+                messageContent.innerHTML = "edited: " + message;
+            }
+
             if (globalMessages.at(-1).val().message == "GOD has joined the chat<span style='visibility: hidden;'>@GOD</span>" && data.key == globalMessages.at(-1).key) {
                 var textContent = document.createElement("div");
                 messageElement.appendChild(textContent);
@@ -1186,7 +1192,8 @@ function sendMessage() {
             var curr = new Date();
             if (localStorage.getItem("editing")) {
                 db.ref("chats/" + localStorage.getItem("editing")).update({
-                    message: "edited: " + message,
+                    message: message,
+                    edited: true,
                     time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
                 }).then(function() {
                     localStorage.removeItem("editing");
