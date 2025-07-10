@@ -1275,31 +1275,38 @@ function register() {
         return;
     }
     
-    db.ref("users/" + username).once('value', function(user_object) {
-        if (user_object.exists() == true) {
-            alert("Username already exists!");
-            return;
-        }
-        db.ref("users/" + username).set({
-            password: password,
-            username: username,
-            name: realName,
-            muted: true,
-            active: true,
-            admin: 0,
-            xss: false,
-            money: 0,
-            autoclicker: 0,
-            mult: 1,
-        }).then(function() {
-            updateMedianAdmin();
-            localStorage.setItem('username', username);
-            localStorage.setItem('password', password);
-            localStorage.setItem("name", realName);
-            alert(credits);
-            alert(termsOfService);
-            window.location.reload();
-            sendServerMessage(username + " has joined the chat for the first time<span style='visibility: hidden;'>@" + username + "</span>");
+    db.ref("other/current_id").once("value", function(id_object) {
+        db.ref("users/" + username).once('value', function(user_object) {
+            if (user_object.exists() == true) {
+                alert("Username already exists!");
+                return;
+            }
+            db.ref("users/" + username).set({
+                password: password,
+                username: username,
+                name: realName,
+                muted: true,
+                active: true,
+                admin: 0,
+                xss: false,
+                money: 0,
+                autoclicker: 0,
+                mult: 1,
+                id: id_object.val(),
+            }).then(function() {
+                updateMedianAdmin();
+                localStorage.setItem('username', username);
+                localStorage.setItem('password', password);
+                localStorage.setItem("name", realName);
+                alert(credits);
+                alert(termsOfService);
+                sendServerMessage(username + " has joined the chat for the first time<span style='visibility: hidden;'>@" + username + "</span>");
+                db.ref("other/").update({
+                    current_id: firebase.database.ServerValue.increment(1),
+                }).then(function() {
+                    window.location.reload();
+                })
+            })
         })
     })
 }
