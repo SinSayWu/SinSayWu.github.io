@@ -1298,12 +1298,12 @@ function register() {
                 localStorage.setItem('username', username);
                 localStorage.setItem('password', password);
                 localStorage.setItem("name", realName);
-                alert(credits);
-                alert(termsOfService);
                 sendServerMessage(username + " has joined the chat for the first time<span style='visibility: hidden;'>@" + username + "</span>");
                 db.ref("other/").update({
                     current_id: firebase.database.ServerValue.increment(1),
                 }).then(function() {
+                    alert(credits);
+                    alert(termsOfService);
                     window.location.reload();
                 })
             })
