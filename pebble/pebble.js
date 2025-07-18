@@ -165,8 +165,8 @@ function refreshChat(user_data, change_channel = false) {
                         trashButton.setAttribute("id", "delete-button");
                         trashButton.addEventListener("click", function() {
                             db.ref("chats/" + globalMessages[index].key).update({
-                                removed: true,
-                                message: `<i><b>REMOVED BY ${getUsername()}</b></i><span style="display: none">@${getUsername()} @${data.val().name}</span>`,
+                                removed: getUsername(),
+                                admin: obj.admin,
                             });
                         })
                         messageElement.appendChild(trashButton);
@@ -228,7 +228,13 @@ function refreshChat(user_data, change_channel = false) {
                 messageContent.innerHTML = "edited: " + message;
             }
 
-            if (globalMessages.at(-1).val().message == "GOD has joined the chat<span style='visibility: hidden;'>@GOD</span>" && data.key == globalMessages.at(-1).key) {
+            if (data.val().removed && data.val().admin >= obj.admin) {
+                messageContent.innerHTML = `<i><b>REMOVED BY ${data.val().removed}</b></i><span style="display: none">@${data.val().removed} @${data.val().name}</span>`;
+            } else if (data.val().removed && data.val().admin < obj.admin) {
+                messageContent.innerHTML = `Removed by ${data.val().removed}: ${message}`;
+            }
+
+            if (data.val().effect === 0) {
                 var textContent = document.createElement("div");
                 messageElement.appendChild(textContent);
                 textContent.setAttribute("id", "god-border");
@@ -247,6 +253,10 @@ function refreshChat(user_data, change_channel = false) {
 
             if (data.val().name == "[VOTING]") {
                 checkVoting();
+            }
+
+            if (globalMessages.at(-1).val().effect === 1 && data.key == globalMessages.at(-1).key) {
+                var scrambleText = new ScrambleText(messageContent).start();
             }
         }
     });
@@ -604,7 +614,7 @@ function redisplayMembers() {
 
 function sendServerMessage(message) {
     var message = message;
-    db.ref('chats/').once('value', function(message_object) {
+    db.ref(`users/${getUsername()}`).once('value', function(user_object) {
         var curr = new Date();
         db.ref('chats/').push({
             name: "[SERVER]",
@@ -614,6 +624,7 @@ function sendServerMessage(message) {
             removed: false,
             edited: false,
             time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
+            effect: typeof(user_object.val().active_effect) == "undefined" ? false : user_object.val().active_effect,
         })
     })
 }
@@ -1640,6 +1651,55 @@ function commandments() {
     })
     newComms += "</ol>"
     showPopUp("Admin Commands", newComms);
+}
+
+function effectMenu() {
+    db.ref(`users/${getUsername()}`).once("value", function(user_object) {
+        showPopUp("Effects", `
+            <div>
+                ???<br><br>
+                <div id="message">
+                    <div class="username" style="font-weight: bold; color: yellow;">[SERVER]</div>
+                    <div id="god-border"><div class="" id="god-text" style="">${getUsername()} has joined the chat<span style="visibility: hidden;">@${getUsername()}</span></div></div>
+                </div><br><br>
+                Unlock Requirement: ???     <button onclick="${user_object.val().active_effect === 0 ? "equipEffect('remove')" : "equipEffect(0)"}">${user_object.val().active_effect === 0 ? "Unequip" : "Equip"}</button>
+            </div>
+
+            <br><hr>
+
+            <div>
+                Ä̶͙̞̹̙́̆͊n̴̎̋̿͜͝o̶͍̦̩̗͒ḿ̴̲ǎ̶̡̼̑̿͗l̵͕̩̼͒y̵̗̺͈̔̎̊̚<br><br>
+                <div id="message">
+                    <div class="username" style="font-weight: bold; color: yellow;">[SERVER]</div>
+                    <div class="message-text" id="anomaly-text" style="">${getUsername()} has joined the chat<span style="visibility: hidden;">@${getUsername()}</span></div>
+                </div><br><br>
+                Unlock Requirement: Donate 10 billion dollars during the 2025 Summer Break     <button onclick="${user_object.val().active_effect === 0 ? "equipEffect('remove')" : "equipEffect(1)"}">${user_object.val().active_effect === 1 ? "Unequip" : "Equip"}</button>
+            </div>
+        `)
+
+        scramblePreview();
+    })
+}
+
+function scramblePreview() {
+    if (document.getElementById("anomaly-text")) {
+        var scrambleText = new ScrambleText(document.getElementById("anomaly-text")).start();
+        setTimeout(scramblePreview, 5000);
+    }
+}
+
+function equipEffect(effect) {
+    if (effect == "remove") {
+        db.ref(`users/${getUsername()}/active_effect`).remove();
+        document.getElementById("popup").remove();
+    } else {
+        db.ref(`users/${getUsername()}/effects/${effect}`).once("value", function(effect_object) {
+            if (effect_object.val()) {
+                db.ref(`users/${getUsername()}/active_effect`).set(effect);
+                document.getElementById("popup").remove();
+            }
+        })
+    }
 }
 
 function updateMedianAdmin() {
