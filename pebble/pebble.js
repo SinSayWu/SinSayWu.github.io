@@ -612,7 +612,7 @@ function redisplayMembers() {
     })
 }
 
-function sendServerMessage(message) {
+function sendServerMessage(message, join=false) {
     var message = message;
     db.ref(`users/${getUsername()}`).once('value', function(user_object) {
         var curr = new Date();
@@ -624,7 +624,7 @@ function sendServerMessage(message) {
             removed: false,
             edited: false,
             time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
-            effect: typeof(user_object.val().active_effect) == "undefined" ? false : user_object.val().active_effect,
+            effect: typeof(user_object.val().active_effect) == "undefined" || !join ? false : user_object.val().active_effect,
         })
     })
 }
@@ -1461,7 +1461,7 @@ function setup() {
             const timePassed = Date.now() - lastMessageTime;
             let params = new URLSearchParams(document.location.search);
             if (((!obj.muted && !(timePassed < messageSleep) && !obj.trapped) || obj.admin > 0) && !(JSON.parse(params.get("ignore")) || false)) {
-                sendServerMessage(getUsername() + " has joined the chat<span style='visibility: hidden;'>@" + getUsername() + "</span>");
+                sendServerMessage(getUsername() + " has joined the chat<span style='visibility: hidden;'>@" + getUsername() + "</span>", true);
             }
         })
     } else {
