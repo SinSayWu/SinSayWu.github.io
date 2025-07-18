@@ -1155,7 +1155,7 @@ function sendMessage() {
             } else if (message == "!cleardonations") {
                 if (obj.admin > 5000) {
                     db.ref(`users/`).once("value", function(data_clear) {
-                        const keptKeys = ["active", "admin", "muted", "name", "password", "sleep", "username", "xss", "trapped", "profilesleep"];
+                        const keptKeys = ["active", "admin", "muted", "name", "password", "sleep", "username", "xss", "trapped", "profilesleep", "active_effect", "effects", "id"];
                         var updates = {};
 
                         data_clear.forEach(child => {
