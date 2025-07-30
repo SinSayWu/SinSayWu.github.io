@@ -2,6 +2,7 @@ var playing = false;
 var golden_cookie = false;
 var gambled_money = 0;
 const channel = new BroadcastChannel('tab-check');
+const policy_list = ["Is Yume 2kki the best game to ever exist?", "Should police officers pay taxes?", "Should bank tellers pay taxes?", "Should stealing autoclickers or mult be a sin?", "Should destroying autolickers, mult, or money be a sin?", "Should arresting the Jester cause police officers to be reset to complete zero?", "Should Council Members pay taxes?", "Should non-Council Members be allowed to see the current policy being voted on and the number of yes and no votes?", "Should Council Members be allowed to change their vote until the last minute?", "Should Council Member votes be anonymous?"];
 let db;
 
 function play() {
@@ -164,7 +165,7 @@ function clearNotifs() {
     db.ref(`users/${getUsername()}`).once("value", function(object) {
         obj = object.val();
 
-        if (obj.admin > 0) {
+        if (obj.admin >= 9000) {
             db.ref("other/clickernotifications").remove();
         }
     })
@@ -385,7 +386,7 @@ function DoubleNothing() {
         db.ref(`users/${getUsername()}`).once("value", function(object) {
             if (moneyinput <= object.val().money) {
                 if (Math.random() < 0.499 + (object.val().role == "gambler" ? 0.001 : 0)) {
-                    if (moneyinput >= object.val().money * 0.5 && moneyinput >= 10000000) {
+                    if (moneyinput >= object.val().money * 0.5 && moneyinput >= 10000000 && object.val().role !== "pacifist") {
                         sendNotification(`${object.val().username} just won $${moneyinput} in Double-or-Nothing!`)
                     }
                     db.ref(`users/${getUsername()}`).update({
@@ -395,7 +396,7 @@ function DoubleNothing() {
                         money: firebase.database.ServerValue.increment(-moneyinput),
                     })
                 } else {
-                    if (moneyinput >= object.val().money * 0.5 && moneyinput >= 10000000) {
+                    if (moneyinput >= object.val().money * 0.5 && moneyinput >= 10000000 && object.val().role !== "pacifist") {
                         sendNotification(`${object.val().username} just lost $${moneyinput} in Double-or-Nothing!`)
                     }
                     db.ref(`users/${getUsername()}`).update({
@@ -496,7 +497,7 @@ function blackStand() {
                 document.getElementById('blackjack').value = "";
                 document.getElementById("dealer").innerHTML += " Won";
                 document.getElementById("player").innerHTML += " Lost";
-                if (moneyinput > object.val().money * 0.5 && moneyinput >= 10000000) {
+                if (moneyinput > object.val().money * 0.5 && moneyinput >= 10000000 && object.val().role !== "pacifist") {
                     sendNotification(`${object.val().username} just lost $${moneyinput} in Blackjack!`)
                 }
                 db.ref(`other/Casino/`).update({
@@ -507,7 +508,7 @@ function blackStand() {
                 document.getElementById('blackjack').value = "";
                 document.getElementById("dealer").innerHTML += " Won";
                 document.getElementById("player").innerHTML += " Lost";
-                if (moneyinput > object.val().money * 0.5 && moneyinput >= 10000000) {
+                if (moneyinput > object.val().money * 0.5 && moneyinput >= 10000000 && object.val().role !== "pacifist") {
                     sendNotification(`${object.val().username} just lost $${moneyinput} in Blackjack!`)
                 }
                 db.ref(`other/Casino/`).update({
@@ -521,7 +522,7 @@ function blackStand() {
                 document.getElementById('blackjack').value = "";
                 document.getElementById("dealer").innerHTML += " Tied";
                 document.getElementById("player").innerHTML += " Tied";
-                if (moneyinput > object.val().money * 0.5 && moneyinput >= 10000000) {
+                if (moneyinput > object.val().money * 0.5 && moneyinput >= 10000000 && object.val().role !== "pacifist") {
                     sendNotification(`${object.val().username} just tied with $${moneyinput} in Blackjack!`)
                 }
             } else if (hand <= 21 && sum > hand) {
@@ -535,7 +536,7 @@ function blackStand() {
                 document.getElementById('blackjack').value = "";
                 document.getElementById("dealer").innerHTML += " Lost";
                 document.getElementById("player").innerHTML += " Won";
-                if (moneyinput > object.val().money * 0.5 && moneyinput >= 10000000) {
+                if (moneyinput > object.val().money * 0.5 && moneyinput >= 10000000 && object.val().role !== "pacifist") {
                     sendNotification(`${object.val().username} just won $${moneyinput} in Blackjack!`)
                 }
             } else if (hand > 21) {
@@ -549,7 +550,7 @@ function blackStand() {
                 document.getElementById('blackjack').value = "";
                 document.getElementById("dealer").innerHTML += " Lost";
                 document.getElementById("player").innerHTML += " Won";
-                if (moneyinput > object.val().money * 0.5 && moneyinput >= 10000000) {
+                if (moneyinput > object.val().money * 0.5 && moneyinput >= 10000000 && object.val().role !== "pacifist") {
                     sendNotification(`${object.val().username} just won $${moneyinput} in Blackjack!`)
                 }
             }
@@ -569,7 +570,7 @@ function ultimateGamble() {
                         money: firebase.database.ServerValue.increment(-casino_object.val().money),
                     })
 
-                    if (casino_object.val().money >= 10000000) {
+                    if (casino_object.val().money >= 10000000 && user_object.val().role !== "pacifist") {
                         sendNotification(`${getUsername()} has just won the Ultimate Gamble!`);
                     }
                 } else {
@@ -580,7 +581,7 @@ function ultimateGamble() {
                         money: firebase.database.ServerValue.increment(user_object.val().money),
                     })
 
-                    if (user_object.val().money >= 100000000) {
+                    if (user_object.val().money >= 100000000 && user_object.val().role !== "pacifist") {
                         sendNotification(`${getUsername()} has just lost the Ultimate Gamble!`);
                     }
                 }
@@ -590,148 +591,166 @@ function ultimateGamble() {
 }
 
 function Roles() {
-    db.ref("users/").once("value", function(user_objects) {
-        db.ref(`users/${getUsername()}`).once("value", function(object) {
-            if (object.val().role) {
-                var citizens = 0;
-                var police = 0;
-                var gamblers = 0;
-                var angels = 0;
-                var tellers = 0;
-                var pacifists = 0;
-                var jesters = 0;
-                var diviners = 0;
-                user_objects.forEach(function(username) {
-                    var role = username.val().role;
-                    if (role === "citizen") {
-                        citizens++;
-                    } else if (role === "police") {
-                        police++;
-                    } else if (role === "gambler") {
-                        gamblers++;
-                    } else if (role === "angel") {
-                        angels++;
-                    } else if (role === "bank") {
-                        tellers++;
-                    } else if (role === "pacifist") {
-                        pacifists++;
-                    } else if (role === "jester") {
-                        jesters++;
-                    } else if (role === "diviner") {
-                        diviners++;
-                    }
-                })
+    db.ref("other/policy/list").once("value", function(policy_object) {
+        db.ref("users/").once("value", function(user_objects) {
+            db.ref(`users/${getUsername()}`).once("value", function(object) {
+                if (object.val().role) {
+                    var citizens = 0;
+                    var police = 0;
+                    var gamblers = 0;
+                    var angels = 0;
+                    var tellers = 0;
+                    var pacifists = 0;
+                    var jesters = 0;
+                    var diviners = 0;
+                    var councils = 0;
+                    user_objects.forEach(function(username) {
+                        var role = username.val().role;
+                        if (role === "citizen") {
+                            citizens++;
+                        } else if (role === "police") {
+                            police++;
+                        } else if (role === "gambler") {
+                            gamblers++;
+                        } else if (role === "angel") {
+                            angels++;
+                        } else if (role === "bank") {
+                            tellers++;
+                        } else if (role === "pacifist") {
+                            pacifists++;
+                        } else if (role === "jester") {
+                            jesters++;
+                        } else if (role === "diviner") {
+                            diviners++;
+                        } else if (role === "council") {
+                            councils++;
+                        }
+                    })
 
-                showPopUp(`Welcome to the Donationville! Role: <span id="current-role">${object.val().role}</span>`,`
-                <h3>Citizen (${citizens})</h3><hr>
-                Pros:<ul>
-                    <li>can take part in society</li>
-                    <li>can take out loans</li>
-                </ul>
-                Cons:<ul>
-                    <li>pay taxes</li>
-                </ul>
-                <button style="font-size:2vh" onclick="loanRequest()">Select</button>
+                    showPopUp(`Welcome to the Donationville! Role: <span id="current-role">${object.val().role}</span>`,`
+                    <h3>Citizen (${citizens})</h3><hr>
+                    Pros:<ul>
+                        <li>can take part in society</li>
+                        <li>can take out loans</li>
+                    </ul>
+                    Cons:<ul>
+                        <li>pay taxes</li>
+                    </ul>
+                    <button style="font-size:2vh" onclick="loanRequest()">Select</button>
 
-                <h3>Police Officer (${police} / 5)</h3><hr>
-                Pros:<ul>
-                    <li>confiscate what criminals have stolen</li>
-                </ul>
-                Cons:<ul>
-                    <li>criminals hate you</li>
-                    <li>arresting the jester will cause you to reset back to complete 0</li>
-                </ul>
-                <button style="font-size:2vh" onclick="policeRole()">Select</button> $10,000,000
+                    <h3>Police Officer (${police} / 5)</h3><hr>
+                    Pros:<ul>
+                        ${policy_object.val()[1] ? "" : "<li>don't have to pay taxes</li>"}
+                        <li>confiscate what criminals have stolen</li>
+                    </ul>
+                    Cons:<ul>
+                        <li>criminals hate you</li>
+                        ${policy_object.val()[5] ? "<li>arresting the jester will cause you to reset back to complete 0</li>" : ""}
+                    </ul>
+                    <button style="font-size:2vh" onclick="policeRole()">Select</button> $10,000,000
 
-                <h3>Gambler (${gamblers} / 5)</h3><hr>
-                Pros:<ul>
-                    <li>have higher luck when gambling</li>
-                    <li>role will show up as citizen for everyone else</li>
-                </ul>
-                Cons:<ul>
-                    <li>can no longer buy, gift, or remove autos, mult, or money</li>
-                </ul>
-                <button style="font-size:2vh" onclick="gamblerRole()">Select</button> $5,000,000
+                    <h3>Gambler (${gamblers} / 5)</h3><hr>
+                    Pros:<ul>
+                        <li>have higher luck when gambling</li>
+                        <li>role will show up as citizen for everyone else</li>
+                    </ul>
+                    Cons:<ul>
+                        <li>can no longer buy, gift, or remove autos, mult, or money</li>
+                    </ul>
+                    <button style="font-size:2vh" onclick="gamblerRole()">Select</button> $5,000,000
 
-                <h3>Angel (${angels} / 1)</h3><hr>
-                Pros:<ul>
-                    <li>can see the good and bad deeds of everyone</li>
-                    <li>can give divine retribution to evildoers</li>
-                    <li>has a fixed higher chance of getting frenzy every second</li>
-                </ul>
-                Cons:<ul>
-                    <li>can no longer destroy auto, mult, or money (but what kind of angel would do that, right?)</li>
-                </ul>
-                <button style="font-size:2vh" onclick="angelRole()">Select</button> $20,000,000 and a good heart
+                    <h3>Angel (${angels} / 1)</h3><hr>
+                    Pros:<ul>
+                        <li>can see the good and bad deeds of everyone</li>
+                        <li>can give divine retribution to evildoers</li>
+                        <li>has a fixed higher chance of getting frenzy every second</li>
+                    </ul>
+                    Cons:<ul>
+                        <li>can no longer destroy auto, mult, or money (but what kind of angel would do that, right?)</li>
+                    </ul>
+                    <button style="font-size:2vh" onclick="angelRole()">Select</button> $15,000,000 and a good heart
 
-                <h3>Bank Teller (${tellers} / 3)</h3><hr>
-                Pros:<ul>
-                    <li>you can accept loans that people request</li>
-                    <li>gain the money that would be interest</li>
-                    <li>can put people into crippling debt</li>
-                    <li>dont have to pay taxes</li>
-                </ul>
-                Cons:<ul>
-                    <li>not many people make loans</li>
-                    <li>your wage is dependent on the interest that the loaner is acceptable with</li>
-                </ul>
-                <button style="font-size:2vh" onclick="bankRole()">Select</button> $5,000,000
+                    <h3>Bank Teller (${tellers} / 3)</h3><hr>
+                    Pros:<ul>
+                        <li>you can accept loans that people request</li>
+                        <li>gain the money that would be interest</li>
+                        <li>can put people into crippling debt</li>
+                        ${policy_object.val()[2] ? "" : "<li>don't have to pay taxes</li>"}
+                    </ul>
+                    Cons:<ul>
+                        <li>not many people make loans</li>
+                        <li>your wage is dependent on the interest that the loaner is acceptable with</li>
+                    </ul>
+                    <button style="font-size:2vh" onclick="bankRole()">Select</button> $5,000,000
 
-                <h3>Criminal</h3><hr>
-                Pros:<ul>
-                    <li>role will show up as citizen for everyone else</li>
-                    <li>can steal autoclickers or mult on a cooldown</li>
-                    <li>stealing auto, mult, or money is not notified server-wide</li>
-                </ul>
-                Cons:<ul>
-                    <li>EVERYONE IS OUT TO GET YOU:</li>
-                    <li>citizens will have a grudge against you and potentially destroy what you gained out of spite if they find out who stole from them</li>
-                    <li>police officers will be on a hunt for you as they get to confiscate what you have stolen</li>
-                    <li>cannot go back to being a citizen unless arrested</li>
-                    <li>your autoclickers, mult, and money will all get halved when you get arrested</li>
-                </ul>
-                <button style="font-size:2vh"  onclick="criminalRole()">Select</button> $2,500,000
-                
-                <h3>Pacifist (${pacifists} / 2)</h3><hr>
-                Pros:<ul>
-                    <li>other users cannot destroy, steal, or divine retribute you</li>
-                    <li>don't have to pay taxes</li>
-                    <li>Everyone except diviners have no way of knowing your money, mult, auto, etc</li>
-                </ul>
-                Cons:<ul>
-                    <li>other users cannot gift mult, autos, or money to you</li>
-                    <li>you cannot gift mult, autos, or money to other users</li>
-                    <li>you cannot destroy mult, auto, or money from other users</li>
-                    <li>you can no longer take out loans</li>
-                    <li>you can no longer see the leaderboard</li>
-                </ul>
-                <button style="font-size:2vh"  onclick="pacifistRole()">Select</button> $10,000,000 and a pacifist mindset
-                
-                <h3>Jester (${jesters} / 2)</h3><hr>
-                Pros:<ul>
-                    <li>role will show up as citizen for everyone else on default</li>
-                    <li>can send custom notifications</li>
-                    <li>can edit the money, auto, mult, gambling, and role of yourself on the leaderboard</li>
-                </ul>
-                Cons:<ul>
-                    <li>no one takes you seriously</li>
-                </ul>
-                <button style="font-size:2vh"  onclick="jesterRole()">Select</button> $6,666,666 and a goal to make people laugh
-                
-                <h3>Diviner (${diviners} / 3)</h3><hr>
-                Pros:<ul>
-                    <li>on a cooldown, you can reveal everything about one person (true role, abilities, etc)</li>
-                </ul>
-                Cons:<ul>
-                    <li>no one believes in "oracles"</li>
-                </ul>
-                <button style="font-size:2vh"  onclick="divinerRole()">Select</button> $5,000,000`);
-            } else if (object.val().money >= 10000000) {
-                db.ref(`users/${getUsername()}`).update({
-                    money: firebase.database.ServerValue.increment(-10000000),
-                    role: "citizen",
-                })
-            }
+                    <h3>Criminal</h3><hr>
+                    Pros:<ul>
+                        <li>role will show up as citizen for everyone else</li>
+                        <li>can steal autoclickers or mult on a cooldown</li>
+                        <li>stealing auto, mult, or money is not notified server-wide</li>
+                    </ul>
+                    Cons:<ul>
+                        <li>EVERYONE IS OUT TO GET YOU:</li>
+                        <li>citizens will have a grudge against you and potentially destroy what you gained out of spite if they find out who stole from them</li>
+                        <li>police officers will be on a hunt for you as they get to confiscate what you have stolen</li>
+                        <li>cannot go back to being a citizen unless arrested</li>
+                        <li>your autoclickers, mult, and money will all get halved when you get arrested</li>
+                        ${policy_object.val()[3] ? "<li>stealing is considered a sin</li>" : ""}
+                    </ul>
+                    <button style="font-size:2vh"  onclick="criminalRole()">Select</button> $2,500,000
+                    
+                    <h3>Pacifist (${pacifists} / 2)</h3><hr>
+                    Pros:<ul>
+                        <li>other users cannot destroy, steal, or divine retribute you</li>
+                        <li>don't have to pay taxes</li>
+                        <li>Everyone except diviners have no way of knowing your money, mult, auto, etc</li>
+                    </ul>
+                    Cons:<ul>
+                        <li>other users cannot gift mult, autos, or money to you</li>
+                        <li>you cannot gift mult, autos, or money to other users</li>
+                        <li>you cannot destroy mult, auto, or money from other users</li>
+                        <li>you can no longer take out loans</li>
+                        <li>you can no longer see the leaderboard</li>
+                    </ul>
+                    <button style="font-size:2vh"  onclick="pacifistRole()">Select</button> $10,000,000 and a pacifist mindset
+                    
+                    <h3>Jester (${jesters} / 2)</h3><hr>
+                    Pros:<ul>
+                        <li>role will show up as citizen for everyone else on default</li>
+                        <li>can send custom notifications</li>
+                        <li>can edit the money, auto, mult, gambling, and role of yourself on the leaderboard</li>
+                    </ul>
+                    Cons:<ul>
+                        <li>no one takes you seriously</li>
+                    </ul>
+                    <button style="font-size:2vh"  onclick="jesterRole()">Select</button> $6,666,666 and a goal to make people laugh
+                    
+                    <h3>Diviner (${diviners} / 3)</h3><hr>
+                    Pros:<ul>
+                        <li>on a cooldown, you can reveal everything about one person (true role, abilities, etc)</li>
+                    </ul>
+                    Cons:<ul>
+                        <li>no one believes in "oracles"</li>
+                    </ul>
+                    <button style="font-size:2vh"  onclick="divinerRole()">Select</button> $5,000,000
+                    
+                    <h3>Council Member (${councils} / 5)</h3><hr>
+                    Pros:<ul>
+                        <li>you can change the fundamental rules that govern the universe (donations)</li>
+                        ${policy_object.val()[6] ? "" : "<li>don't have to pay taxes</li>"}
+                    </ul>
+                    Cons:<ul>
+                        <li>everyone hates you if you are corrupt</li>
+                    </ul>
+                    <button style="font-size:2vh"  onclick="councilRole()">Select</button> $20,000,000
+                    <button style="font-size:2vh"  onclick="currentPolicies()">See Current Policies</button>`);
+                } else if (object.val().money >= 2500000) {
+                    db.ref(`users/${getUsername()}`).update({
+                        money: firebase.database.ServerValue.increment(-2500000),
+                        role: "citizen",
+                    })
+                }
+            })
         })
     })
 }
@@ -751,7 +770,7 @@ function loanRequest() {
             document.getElementById("loanmoney").value = object.val().loan[0] || "";
             document.getElementById("loaninterest").value = object.val().loan[1] || "";
             document.getElementById("loantime").value = object.val().loan[2] || "";
-            document.getElementById("loanstatus").innerHTML = object.val().loan[4] ? `Your loan was accepted by ${object.val().loan[4]}` : `Your loan is still waiting to be accepted`;
+            document.getElementById("loanstatus").innerHTML = object.val().loan[4] ? `Your loan was accepted by ${object.val().loan[4][1]}` : `Your loan is still waiting to be accepted`;
         }
     })
 }
@@ -776,79 +795,79 @@ function takeLoan() {
             })
             alert("successfully requested loan");
             
-            if (object.val().role !== "gambler") {
-                document.getElementById("popup").remove();
-            }
+            document.getElementById("popup").remove();
         }
     })
 }
 
 function policeRole() {
-    db.ref("users/").once("value", function(user_objects) {
-        db.ref(`users/${getUsername()}`).once("value", function(object) {
-            var police = 0;
-            user_objects.forEach(function(username) {
-                var role = username.val().role;
-                if (role === "police") {
-                    police++;
+    db.ref("other/policy/list").once("value", function(policy_object) {
+        db.ref("users/").once("value", function(user_objects) {
+            db.ref(`users/${getUsername()}`).once("value", function(object) {
+                var police = 0;
+                user_objects.forEach(function(username) {
+                    var role = username.val().role;
+                    if (role === "police") {
+                        police++;
+                    }
+                })
+                if (object.val().role == "citizen") {
+                    if (police >= 5) {
+                        alert("Max amount of police officers");
+                        return;
+                    } else if (object.val().barred) {
+                        alert("They don't want to hire incompetent police officers");
+                        return;
+                    }
+                    if (object.val().money >= 10000000) {
+                        db.ref(`users/${getUsername()}`).update({
+                            role: "police",
+                            money: firebase.database.ServerValue.increment(-10000000),
+                            strike: 0,
+                        })
+                    }
+                } else if (object.val().role == "police") {
+                    var date = Date.now();
+
+                    document.getElementById("popupHeading").innerHTML = "Police Menu";
+                    document.getElementById("popupBody").innerHTML = `
+                    <h2>Investigate</h2>
+                    <hr>
+                    <select id="investigateselect"></select>
+                    <button style="font-size:2vh" onclick="investigate()">Investigate</button>
+                    <span id="investigatechances">${3 - Math.ceil((((object.val().ability1sleep || date) <= date ? date : object.val().ability1sleep) - date) / 3600000)} chances available</span><br>
+                    Investigate people to see if they are a criminal before arresting them. Inconclusive investigations may mean that they are a criminal, but it doesn't always mean that they are a criminal. Some investigations on citizens can be inconclusive as well.
+                    <br><br>
+                    
+                    <h2>Arrest</h2>
+                    <hr>
+                    <select id="arrestselect"></select>
+                    <button style="font-size:2vh" onclick="arrest()">Arrest</button>
+                    <span id="strikecount">${object.val().strike} strikes out of 3</span><br>
+                    If you are sure that someone is a criminal, select them here and arrest them. Be sure to not arrest an innocent accidentally, the precinct isn't lenient with incompetent police officers. ${policy_object.val()[5] ? "(NOTE THAT ARRESTING THE JESTER WILL CAUSE YOU TO RESET BACK TO 0: 0 MONEY, 0 AUTOCLICKERS, 0 MULT, ETC.)" : ""}`;
+
+                    investigateselector = document.getElementById("investigateselect");
+                    investigateselector.innerHTML = `<option value="" selected disabled>Select an option</option>`;
+                    arrestselector = document.getElementById("arrestselect");
+                    arrestselector.innerHTML = `<option value="" selected disabled>Select an option</option>`;
+
+                    db.ref("users/").once("value", function(user_objects) {
+                        user_objects.forEach(function(username) {
+                            if (username.val().role !== "pacifist") {
+                                investigateoption = document.createElement("option");
+                                investigateoption.value = username.key;
+                                investigateoption.innerHTML = username.val().username;
+                                investigateselector.appendChild(investigateoption);
+
+                                arrestoption = document.createElement("option");
+                                arrestoption.value = username.key;
+                                arrestoption.innerHTML = username.val().username;
+                                arrestselector.appendChild(arrestoption);
+                            }
+                        })
+                    });
                 }
             })
-            if (object.val().role == "citizen") {
-                if (police >= 5) {
-                    alert("Max amount of police officers");
-                    return;
-                } else if (object.val().barred) {
-                    alert("They don't want to hire incompetent police officers");
-                    return;
-                }
-                if (object.val().money >= 10000000) {
-                    db.ref(`users/${getUsername()}`).update({
-                        role: "police",
-                        money: firebase.database.ServerValue.increment(-10000000),
-                        strike: 0,
-                    })
-                }
-            } else if (object.val().role == "police") {
-                var date = Date.now();
-
-                document.getElementById("popupHeading").innerHTML = "Police Menu";
-                document.getElementById("popupBody").innerHTML = `
-                <h2>Investigate</h2>
-                <hr>
-                <select id="investigateselect"></select>
-                <button style="font-size:2vh" onclick="investigate()">Investigate</button>
-                <span id="investigatechances">${3 - Math.ceil((((object.val().ability1sleep || date) <= date ? date : object.val().ability1sleep) - date) / 3600000)} chances available</span><br>
-                Investigate people to see if they are a criminal before arresting them. Inconclusive investigations may mean that they are a criminal, but it doesn't always mean that they are a criminal. Some investigations on citizens can be inconclusive as well.
-                <br><br>
-                
-                <h2>Arrest</h2>
-                <hr>
-                <select id="arrestselect"></select>
-                <button style="font-size:2vh" onclick="arrest()">Arrest</button>
-                <span id="strikecount">${object.val().strike} strikes out of 3</span><br>
-                If you are sure that someone is a criminal, select them here and arrest them. Be sure to not arrest an innocent accidentally, the precinct isn't lenient with incompetent police officers. (NOTE THAT ARRESTING THE JESTER WILL CAUSE YOU TO RESET BACK TO 0: 0 MONEY, 0 AUTOCLICKERS, 0 MULT, ETC.)`;
-
-                investigateselector = document.getElementById("investigateselect");
-                investigateselector.innerHTML = `<option value="" selected disabled>Select an option</option>`;
-                arrestselector = document.getElementById("arrestselect");
-                arrestselector.innerHTML = `<option value="" selected disabled>Select an option</option>`;
-
-                db.ref("users/").once("value", function(user_objects) {
-                    user_objects.forEach(function(username) {
-                        if (username.val().role !== "pacifist") {
-                            investigateoption = document.createElement("option");
-                            investigateoption.value = username.key;
-                            investigateoption.innerHTML = username.val().username;
-                            investigateselector.appendChild(investigateoption);
-
-                            arrestoption = document.createElement("option");
-                            arrestoption.value = username.key;
-                            arrestoption.innerHTML = username.val().username;
-                            arrestselector.appendChild(arrestoption);
-                        }
-                    })
-                });
-            }
         })
     })
 }
@@ -890,58 +909,61 @@ function investigate() {
 function arrest() {
     var target = document.getElementById("arrestselect").value;
 
-    db.ref(`users/${getUsername()}`).once("value", function(user_object) {
-        db.ref(`users/${target}`).once("value", function(object) {
-            if (target !== "") {
-                if (object.val().role == "criminal") {
-                    db.ref(`users/${getUsername()}`).update({
-                        autoclicker: firebase.database.ServerValue.increment(object.val().stolenauto || 0),
-                        mult: firebase.database.ServerValue.increment(object.val().stolenmult || 0),
-                    })
-                    db.ref(`users/${target}`).update({
-                        stolenauto: 0,
-                        stolenmult: 0,
-                        role: "citizen",
-                        autoclicker: Math.round(object.val().autoclicker * 0.5),
-                        mult: Math.round(object.val().mult * 0.5),
-                        money: Math.round(object.val().money * 0.5),
-                    })
-                    sendNotification(`${getUsername()} arrested ${target} and confiscated ${object.val().stolenauto || 0} autoclicker(s) and ${object.val().stolenmult || 0} mult`);
-                    alert(`Successfully arrested ${target}`);
-                } else if (object.val().role == "jester") {
-                    const keptKeys = ["active", "admin", "muted", "name", "password", "sleep", "username", "xss", "trapped", "profilesleep"];
-
-                    user_object.forEach(key => {
-                        if (!keptKeys.includes(key.key)) {
-                            db.ref(`users/${getUsername()}/${key.key}`).remove();
-                        }
-                    })
-
-                    sendNotification(`${getUsername()} incorrectly arrested the Jester`);
-                    document.getElementById("popup").remove();
-                    alert("You arrested the Jester and have reset to 0");
-                } else {
-                    db.ref(`users/${getUsername()}`).update({
-                        strike: firebase.database.ServerValue.increment(1),
-                    })
-
-                    if (user_object.val().strike >= 2) {
+    db.ref(`other/policy/list/5`).once("value", function(policy_object) {
+        db.ref(`users/${getUsername()}`).once("value", function(user_object) {
+            db.ref(`users/${target}`).once("value", function(object) {
+                if (target !== "") {
+                    if (object.val().role == "criminal") {
                         db.ref(`users/${getUsername()}`).update({
-                            strike: 0,
-                            role: "citizen",
-                            barred: true,
+                            autoclicker: firebase.database.ServerValue.increment(object.val().stolenauto || 0),
+                            mult: firebase.database.ServerValue.increment(object.val().stolenmult || 0),
                         })
-                        document.getElementById("popup").remove();
-                        sendNotification(`${getUsername()} was fired as a police officer due to incompetency`);
-                        alert("You were fired due to incompetency");
-                        return;
-                    }
+                        db.ref(`users/${target}`).update({
+                            stolenauto: 0,
+                            stolenmult: 0,
+                            role: "citizen",
+                            autoclicker: Math.round(object.val().autoclicker * 0.5),
+                            mult: Math.round(object.val().mult * 0.5),
+                            money: Math.round(object.val().money * 0.5),
+                        })
+                        sendNotification(`${getUsername()} arrested ${target} and confiscated ${object.val().stolenauto || 0} autoclicker(s) and ${object.val().stolenmult || 0} mult`);
+                        alert(`Successfully arrested ${target}`);
+                    } else if (object.val().role == "jester" && policy_object.val()) {
+                        const keptKeys = ["active", "admin", "muted", "name", "password", "sleep", "username", "xss", "trapped", "profilesleep", "active_effect", "effects", "id"];
 
-                    document.getElementById("strikecount").innerHTML = `${user_object.val().strike + 1} strikes out of 3`;
-                    sendNotification(`${getUsername()} incorrectly arrested ${target}`);
-                    alert("Wrong Arrest!");
+                        user_object.forEach(key => {
+                            if (!keptKeys.includes(key.key)) {
+                                db.ref(`users/${getUsername()}/${key.key}`).remove();
+                            }
+                        })
+
+                        sendNotification(`${getUsername()} incorrectly arrested the Jester`);
+                        document.getElementById("popup").remove();
+                        alert("You arrested the Jester and zenlossed");
+                    } else {
+                        db.ref(`users/${getUsername()}`).update({
+                            strike: firebase.database.ServerValue.increment(1),
+                        })
+
+                        if (user_object.val().strike >= 2) {
+                            db.ref(`users/${getUsername()}`).update({
+                                strike: 0,
+                                role: "citizen",
+                                barred: true,
+                            })
+                            db.ref(`users/${getUsername()}/ability1sleep`).remove();
+                            document.getElementById("popup").remove();
+                            sendNotification(`${getUsername()} was fired as a police officer due to incompetency`);
+                            alert("You were fired due to incompetency");
+                            return;
+                        }
+
+                        document.getElementById("strikecount").innerHTML = `${user_object.val().strike + 1} strikes out of 3`;
+                        sendNotification(`${getUsername()} incorrectly arrested ${target}`);
+                        alert("Wrong Arrest!");
+                    }
                 }
-            }
+            })
         })
     })
 }
@@ -997,10 +1019,10 @@ function angelRole() {
                     alert("Max amount of angels");
                     return;
                 }
-                if (object.val().money >= 20000000 && object.val().deeds >= 1000) {
+                if (object.val().money >= 15000000 && object.val().deeds >= 1000) {
                     db.ref(`users/${getUsername()}`).update({
                         role: "angel",
-                        money: firebase.database.ServerValue.increment(-20000000),
+                        money: firebase.database.ServerValue.increment(-15000000),
                     })
                 }
             } else if (object.val().role == "angel") {
@@ -1126,7 +1148,7 @@ function bankRole() {
                             bankselector.appendChild(bankoption);
                         }
 
-                        if (username.val().loan && username.val().loan[4] == getUsername()) {
+                        if (username.val().loan && username.val().loan[4][0] == object.val().id) {
                             var bankoption = document.createElement("option");
                             bankoption.value = username.key;
                             bankoption.innerHTML = username.val().username;
@@ -1154,7 +1176,7 @@ function acceptLoan() {
 
             db.ref(`users/${bankselector.value}/loan`).update({
                 2: customer.val().loan[2] * 3600000 + Date.now(),
-                4: getUsername(),
+                4: [object.val().id, getUsername()],
             })
             db.ref(`users/${bankselector.value}`).update({
                 money: firebase.database.ServerValue.increment(customer.val().loan[0]),
@@ -1175,7 +1197,7 @@ function collectLoan() {
             if (customer.val().loan[2] > Date.now()) {
                 alert(`${loanselector.value}'s loan is not ready to be collected yet`);
                 return;
-            } else if (customer.val().loan[4] !== getUsername()) {
+            } else if (customer.val().loan[4][0] !== object.val().id) {
                 alert("You are not the one that accepted this loan");
                 return;
             }
@@ -1248,47 +1270,51 @@ function criminalRole() {
 function stealAuto() {
     var target = document.getElementById("autostealselect").value;
 
-    db.ref(`users/${target}`).once("value", function(user_target) {
-        db.ref(`users/${getUsername()}`).once("value", function(object) {
-            if (target !== "") {
-                var date = Date.now();
+    db.ref(`other/policy/list/3`).once("value", function(policy_object) {
+        db.ref(`users/${target}`).once("value", function(user_target) {
+            db.ref(`users/${getUsername()}`).once("value", function(object) {
+                if (target !== "") {
+                    var date = Date.now();
 
-                if (((object.val().ability1sleep || date) <= date ? date : object.val().ability1sleep) - 7200000 >= date) {
-                    alert("Stealing autoclickers is on cooldown");
-                    return;
-                } else if (!user_target.val().autoclicker || user_target.val().autoclicker <= 0) {
-                    alert("You cannot steal from the poor");
-                    return;
-                }
-
-                var chances = Math.random();
-
-                db.ref(`users/${getUsername()}`).update({
-                    ability1sleep: ((object.val().ability1sleep || date) <= date ? date : object.val().ability1sleep) + 3600000
-                }).then(() => {
-                    document.getElementById("autostealchances").innerHTML = `${3 - Math.ceil((((object.val().ability1sleep || date) <= date ? date : object.val().ability1sleep) - date) / 3600000)} chances available`;
-                })
-
-                if (chances <= 0.5) {
-                    if (object.val().stolenauto >= 3) {
-                        db.ref(`users/${getUsername()}`).update({
-                            autoclicker: firebase.database.ServerValue.increment(1),
-                        })
-                    } else {
-                        db.ref(`users/${getUsername()}`).update({
-                            stolenauto: ((object.val().stolenauto || 0) + 1),
-                        }).then(() => {
-                            document.getElementById("stolenauto").innerHTML = object.val().stolenauto;
-                        })
+                    if (((object.val().ability1sleep || date) <= date ? date : object.val().ability1sleep) - 7200000 >= date) {
+                        alert("Stealing autoclickers is on cooldown");
+                        return;
+                    } else if (!user_target.val().autoclicker || user_target.val().autoclicker <= 0) {
+                        alert("You cannot steal from the poor");
+                        return;
                     }
-                    db.ref(`users/${target}`).update({
-                        autoclicker: firebase.database.ServerValue.increment(-1),
+
+                    var chances = Math.random();
+
+                    db.ref(`users/${getUsername()}`).update({
+                        ability1sleep: ((object.val().ability1sleep || date) <= date ? date : object.val().ability1sleep) + 3600000
+                    }).then(() => {
+                        document.getElementById("autostealchances").innerHTML = `${3 - Math.ceil((((object.val().ability1sleep || date) <= date ? date : object.val().ability1sleep) - date) / 3600000)} chances available`;
                     })
-                    alert(`Successfully stole an autoclicker from ${target}`);
-                } else {
-                    alert(`Failed to steal an autoclicker from ${target}`);
+
+                    if (chances <= 0.5) {
+                        if (object.val().stolenauto >= 3) {
+                            db.ref(`users/${getUsername()}`).update({
+                                autoclicker: firebase.database.ServerValue.increment(1),
+                                deeds: firebase.database.ServerValue.increment(policy_object.val() ? -Math.round(100 * 1.2 ** (user_target.val().autoclicker - 1) * 0.0003) : 0),
+                            })
+                        } else {
+                            db.ref(`users/${getUsername()}`).update({
+                                stolenauto: ((object.val().stolenauto || 0) + 1),
+                                deeds: firebase.database.ServerValue.increment(policy_object.val() ? -Math.round(100 * 1.2 ** (user_target.val().autoclicker - 1) * 0.0003) : 0),
+                            }).then(() => {
+                                document.getElementById("stolenauto").innerHTML = object.val().stolenauto;
+                            })
+                        }
+                        db.ref(`users/${target}`).update({
+                            autoclicker: firebase.database.ServerValue.increment(-1),
+                        })
+                        alert(`Successfully stole an autoclicker from ${target}`);
+                    } else {
+                        alert(`Failed to steal an autoclicker from ${target}`);
+                    }
                 }
-            }
+            })
         })
     })
 }
@@ -1296,47 +1322,51 @@ function stealAuto() {
 function stealMult() {
     var target = document.getElementById("multstealselect").value;
 
-    db.ref(`users/${target}`).once("value", function(user_target) {
-        db.ref(`users/${getUsername()}`).once("value", function(object) {
-            if (target !== "") {
-                var date = Date.now();
+    db.ref(`other/policy/list/3`).once("value", function(policy_object) {
+        db.ref(`users/${target}`).once("value", function(user_target) {
+            db.ref(`users/${getUsername()}`).once("value", function(object) {
+                if (target !== "") {
+                    var date = Date.now();
 
-                if (((object.val().ability2sleep || date) <= date ? date : object.val().ability2sleep) - 7200000 >= date) {
-                    alert("Stealing mult is on cooldown");
-                    return;
-                } else if (!user_target.val().mult || user_target.val().mult <= 1) {
-                    alert("You cannot steal from the poor");
-                    return;
-                }
-
-                var chances = Math.random();
-
-                db.ref(`users/${getUsername()}`).update({
-                    ability2sleep: ((object.val().ability2sleep || date) <= date ? date : object.val().ability2sleep) + 3600000
-                }).then(() => {
-                    document.getElementById("multstealchances").innerHTML = `${3 - Math.ceil((((object.val().ability2sleep || date) <= date ? date : object.val().ability2sleep) - date) / 3600000)} chances available`;
-                })
-
-                if (chances <= 0.33) {
-                    if (object.val().stolenmult >= 3) {
-                        db.ref(`users/${getUsername()}`).update({
-                            mult: firebase.database.ServerValue.increment(1),
-                        })
-                    } else {
-                        db.ref(`users/${getUsername()}`).update({
-                            stolenmult: ((object.val().stolenmult || 0) + 1),
-                        }).then(() => {
-                            document.getElementById("stolenmult").innerHTML = object.val().stolenauto;
-                        })
+                    if (((object.val().ability2sleep || date) <= date ? date : object.val().ability2sleep) - 7200000 >= date) {
+                        alert("Stealing mult is on cooldown");
+                        return;
+                    } else if (!user_target.val().mult || user_target.val().mult <= 1) {
+                        alert("You cannot steal from the poor");
+                        return;
                     }
-                    db.ref(`users/${target}`).update({
-                        mult: firebase.database.ServerValue.increment(-1),
+
+                    var chances = Math.random();
+
+                    db.ref(`users/${getUsername()}`).update({
+                        ability2sleep: ((object.val().ability2sleep || date) <= date ? date : object.val().ability2sleep) + 3600000
+                    }).then(() => {
+                        document.getElementById("multstealchances").innerHTML = `${3 - Math.ceil((((object.val().ability2sleep || date) <= date ? date : object.val().ability2sleep) - date) / 3600000)} chances available`;
                     })
-                    alert(`Successfully stole mult from ${target}`);
-                } else {
-                    alert(`Failed to steal mult from ${target}`);
+
+                    if (chances <= 0.33) {
+                        if (object.val().stolenmult >= 3) {
+                            db.ref(`users/${getUsername()}`).update({
+                                mult: firebase.database.ServerValue.increment(1),
+                                deeds: firebase.database.ServerValue.increment(policy_object.val() ? -Math.round(250 * 1.4 ** (user_target.val().mult - 2) * 0.0003) : 0),
+                            })
+                        } else {
+                            db.ref(`users/${getUsername()}`).update({
+                                stolenmult: ((object.val().stolenmult || 0) + 1),
+                                deeds: firebase.database.ServerValue.increment(policy_object.val() ? -Math.round(250 * 1.4 ** (user_target.val().mult - 2) * 0.0003) : 0),
+                            }).then(() => {
+                                document.getElementById("stolenmult").innerHTML = object.val().stolenauto;
+                            })
+                        }
+                        db.ref(`users/${target}`).update({
+                            mult: firebase.database.ServerValue.increment(-1),
+                        })
+                        alert(`Successfully stole mult from ${target}`);
+                    } else {
+                        alert(`Failed to steal mult from ${target}`);
+                    }
                 }
-            }
+            })
         })
     })
 }
@@ -1422,56 +1452,8 @@ function jesterRole() {
                             <option id="jesterdiviner" value="diviner">Diviner</option>
                             <option id="jesterjester" value="jester">Jester</option>
                             <option id="jesternone" value="none">None</option>
-                        </select><br>
-                        
-                        <h2>Notification Manipulation</h2> (STILL IN PROGRESS, COME BACK LATER)
-                        <hr>
-                        <select id="jestersubject" disabled>
-                            <option value="" selected disabled>Subject</option>
-                        </select>
-
-                        <span id="subject-action"></span>
-
-                        <select id="jesteraction">
-                            <option value="" selected disabled>Action</option>
-                            <option value="won">won</option>
-                            <option value="lost">lost</option>
-                            <option value="arrested">arrested</option>
-                            <option value="fired">fired</option>
-                            <option value="wrongarrest">incorrectly arrested</option>
-                            <option value="divine">Divine Retribution</option>
-                            <option value="removed">removed</option>
-                            <option value="gifted">gifted</option>
-                        </select>
-
-                        <span id="action-target"></span>
-                        
-                        <select id="jestertarget" disabled>
-                            <option value="" selected disabled>Target</option>
-                        </select>
-
-                        <span id="target-extra"></span>
-                        
-                        <input id="jesterextra" type="number" disabled>
-
-                        <span id="extra1-extra2"></span>
-                        
-                        <input id="jesterextra2" type="number" disabled>
-
-                        <span id="extra2-extra3"></span>
-                        
-                        <select id="jesterextra3" disabled>
-                            <option value="" selected disabled>Action</option>
-                            <option value="money">money</option>
-                            <option value="autoclicker">autoclickers</option>
-                            <option value="mult">mult</option>
                         </select>`;
 
-                    subjectselector = document.getElementById("jestersubject");
-                    targetselector = document.getElementById("jestertarget");
-                    extraselector = document.getElementById("jesterextra");
-                    extra2selector = document.getElementById("jesterextra2");
-                    extra3selector = document.getElementById("jesterextra3");
 
                     document.getElementById("leadercheck").addEventListener("change", function(event) {
                         var fool_leaderboard = document.getElementById("leadercheck");
@@ -1494,30 +1476,7 @@ function jesterRole() {
                         }
                     })
 
-                    // targetselector.addEventListener("change", function(event) {
-                    //     if (targetselector.value == "won" || targetselector.value == "lost") {
-                    //         subjectselector.disabled = false;
-                    //         if ()
-                    //         targetselector.disabled = false;
-                    //     }
-                    // })
-
-                    db.ref("users/").once("value", function(user_objects) {
-                        user_objects.forEach(function(username) {
-                            if (username.val().role !== "pacifist") {
-                                subjectoption = document.createElement("option");
-                                subjectoption.value = username.key;
-                                subjectoption.innerHTML = username.val().username;
-                                subjectselector.appendChild(subjectoption);
-
-                                targetoption = document.createElement("option");
-                                targetoption.value = username.key;
-                                targetoption.innerHTML = username.val().username;
-                                targetselector.appendChild(targetoption);
-                            }
-                        })
-
-                        if (user_objects.val()[getUsername()].ability1sleep) {
+                    db.ref("users/").once("value", function(user_objects) {if (user_objects.val()[getUsername()].ability1sleep) {
                             document.getElementById("leadercheck").checked = user_objects.val()[getUsername()].ability1sleep[0] || false;
                             document.getElementById("jestermoney").value = user_objects.val()[getUsername()].ability1sleep[1] || 0;
                             document.getElementById("jesterauto").value = user_objects.val()[getUsername()].ability1sleep[2] || 0;
@@ -1635,17 +1594,19 @@ function divinerSight() {
                 if (object.val().loan) {
                     var creation = new Date(object.val().loan[3])
                     var creationTime = (creation.getMonth() + 1) + "/" + creation.getDate() + "/" + creation.getFullYear() + " " + creation.getHours().toString().padStart(2, '0') + ":" + creation.getMinutes().toString().padStart(2, '0');
+                    var acceptanceTime = false;
 
                     if (object.val().loan[4]) {
                         var acceptance = new Date(object.val().loan[2])
-                        var acceptanceTime = (acceptance.getMonth() + 1) + "/" + acceptance.getDate() + "/" + acceptance.getFullYear() + " " + acceptance.getHours().toString().padStart(2, '0') + ":" + acceptance.getMinutes().toString().padStart(2, '0');
+                        acceptanceTime = (acceptance.getMonth() + 1) + "/" + acceptance.getDate() + "/" + acceptance.getFullYear() + " " + acceptance.getHours().toString().padStart(2, '0') + ":" + acceptance.getMinutes().toString().padStart(2, '0');
                     }
 
                     document.getElementById("currentappraisal").innerHTML += `
                     Loans:<ul>
                         <li>Amount Requested: $${object.val().loan[0]}</li>
                         <li>Interest: ${object.val().loan[1]}%</li>
-                        <li>${acceptanceTime ? `Loan Deadline ${object.val().loan[4]}: ${acceptanceTime}` : `Hours Requested: ${object.val().loan[2]}`}</li>
+                        ${acceptanceTime ? `<li>Loan accepted by ${object.val().loan[4][1]}</li>` : ""}
+                        <li>${acceptanceTime ? `Loan Deadline: ${acceptanceTime}` : `Hours Requested: ${object.val().loan[2]}`}</li>
                         <li>Loan Creation Time: ${creationTime}</li>
                     </ul>`;
                 }
@@ -1681,35 +1642,246 @@ function divinerSight() {
     }
 }
 
+function councilRole() {
+    db.ref("users/").once("value", function(user_objects) {
+        db.ref(`users/${getUsername()}`).once("value", function(object) {
+            var councils = 0;
+            user_objects.forEach(function(username) {
+                var role = username.val().role;
+                if (role === "council") {
+                    councils++;
+                }
+            })
+            if (object.val().role == "citizen") {
+                if (councils >= 3) {
+                    alert("Max amount of council members");
+                    return;
+                }
+                if (object.val().money >= 20000000) {
+                    db.ref(`users/${getUsername()}`).update({
+                        role: "council",
+                        money: firebase.database.ServerValue.increment(-20000000),
+                    })
+                }
+            } else if (object.val().role == "council") {
+                document.getElementById("popupHeading").innerHTML = "Congress";
+                document.getElementById("popupBody").innerHTML = `
+                    <h2>Current Policies</h2>
+                    <div>
+                        <ol id="policy_view">
+                        </ol>
+                    </div>
+                    <hr>
+
+                    <h2>Vote on Policies</h2>
+                    <hr>
+                    Time remaining until next policy: <span id="policyTimeRemaining"></span><br>
+                    <br>
+                    <div style="border-style:solid;padding:5px;border-width: 2px" id="policyInfo"></div><br>
+                    <br>
+                    <div>
+                        <div style="float:left">
+                            <button style="padding:5px" onclick="policy_vote(true)">YES</button>
+                            <ul id="no_voters">
+                            </ul>
+                        </div>
+
+                        <div style="float:right">
+                            <button style="padding:5px" onclick="policy_vote(false)">NO</button>
+                            <ul id="yes_voters">
+                            </ul>
+                        </div>
+                    </div`;
+
+                policyClock();
+
+                db.ref(`other/policy`).off();
+
+                db.ref(`other/policy`).on("value", function(policy_object) {
+                    document.getElementById("policyInfo").innerHTML = policy_list[policy_object.val().current - 1];
+
+                    document.getElementById("no_voters").innerHTML = "";
+                    document.getElementById("yes_voters").innerHTML = "";
+
+                    var index = 0;
+
+                    if (policy_object.val().voters) {
+                        Object.values(policy_object.val().voters).forEach(function(voters) {
+                            var voter = document.createElement("li");
+
+                            index++;
+
+                            if (voters[0]) {
+                                if (policy_object.val().list[9] && voters[1] !== getUsername()) {
+                                    voter.innerHTML = `Voter ${index}`;
+                                } else {
+                                    voter.innerHTML = voters[1];
+                                }
+                                
+                                document.getElementById("no_voters").appendChild(voter);
+                            } else {
+                                if (policy_object.val().list[9] && voters[1] !== getUsername()) {
+                                    voter.innerHTML = `Voter ${index}`;
+                                } else {
+                                    voter.innerHTML = voters[1];
+                                }
+
+                                document.getElementById("yes_voters").appendChild(voter);
+                            }
+                        })
+                    }
+
+                    index = 0;
+                    document.getElementById("policy_view").innerHTML = "";
+                    policy_list.forEach(function(policies) {
+                        var policy = document.createElement("li");
+
+                        policy.innerHTML = policies + (policy_object.val().list[index] ? " ✓" : " ✖");
+                        index++;
+
+                        document.getElementById("policy_view").appendChild(policy);
+                    })
+                })
+            }
+        })
+    })
+}
+
+function policy_vote(vote) {
+    db.ref(`other/policy/list/8`).once("value", function(policy_object) {
+        db.ref(`users/${getUsername()}/id`).once("value", function(user_id) {
+            const time = new Date();
+            let m = time.getMinutes();
+
+            if (policy_object.val() || ((59 - m) >= 15 && m > 0)) { // m > 0 done to account for backend function delays. This function immediately allows for the user to vote once it turns 00 minutes, but it might take ~10 seconds or so for the backend function to start and finish running.
+                db.ref(`other/policy/voters`).update({
+                    [user_id.val()]: [vote, getUsername()]
+                })
+            } else {
+                alert("Cannot vote 15 minutes before the end of the policy");
+            }
+        })
+    })
+}
+
+function currentPolicies() {
+    db.ref(`other/policy`).off();
+    
+    db.ref(`other/policy`).on("value", function(policy_object) {
+        document.getElementById("popupHeading").innerHTML = "View Policies";
+        document.getElementById("popupBody").innerHTML = `
+            <h2>Current Policies</h2>
+            <div>
+                <ol id="policy_view">
+                </ol>
+            </div>
+            <hr>
+
+            <h2>Current Votes</h2>
+            <hr>
+            Time remaining until next policy: <span id="policyTimeRemaining"></span><br>
+            <br>
+            <div style="border-style:solid;padding:5px;border-width: 2px" id="policyInfo"></div><br>
+            <br>
+            <div>
+                <div style="float:left">
+                    <ul id="no_voters">
+                    </ul>
+                </div>
+
+                <div style="float:right">
+                    <ul id="yes_voters">
+                    </ul>
+                </div>
+            </div`;
+
+        policyClock();
+
+
+        var index = 0;
+
+        if (policy_object.val().list[7] && policy_object.val().voters) {
+            document.getElementById("policyInfo").innerHTML = policy_list[policy_object.val().current - 1];
+            Object.values(policy_object.val().voters).forEach(function(voters) {
+                var voter = document.createElement("li");
+
+                index++;
+
+                if (voters[0]) {
+                    if (policy_object.val().list[9] && voters[1] !== getUsername()) {
+                        voter.innerHTML = `Voter ${index}`;
+                    } else {
+                        voter.innerHTML = voters[1];
+                    }
+                    
+                    document.getElementById("no_voters").appendChild(voter);
+                } else {
+                    if (policy_object.val().list[9] && voters[1] !== getUsername()) {
+                        voter.innerHTML = `Voter ${index}`;
+                    } else {
+                        voter.innerHTML = voters[1];
+                    }
+
+                    document.getElementById("yes_voters").appendChild(voter);
+                }
+            })
+        }
+
+        index = 0;
+        document.getElementById("policy_view").innerHTML = "";
+        policy_list.forEach(function(policies) {
+            var policy = document.createElement("li");
+
+            policy.innerHTML = policies + (policy_object.val().list[index] ? " ✓" : " ✖");
+            index++;
+
+            document.getElementById("policy_view").appendChild(policy);
+        })
+    })
+
+}
+
+function policyClock() {
+    if (document.getElementById('policyTimeRemaining')) {
+        const time = new Date();
+        let m = time.getMinutes();
+        let s = time.getSeconds();
+        document.getElementById('policyTimeRemaining').innerHTML =  ((59 - m) < 10 ? "0" + (59 - m) : 59 - m) + ":" + ((59 - s) < 10 ? "0" + (59 - s) : 59 - s);
+        setTimeout(policyClock, 1000);
+    }
+}
+
 function minusAuto() {
     const autoselector = document.getElementById("autoselect");
 
-    db.ref(`users/${getUsername()}`).once("value", (attacker_object) => {
-        db.ref(`users/${autoselector.value}`).once("value", (victim_object) => {
-            attacker = attacker_object.val();
-            victim = victim_object.val();
+    db.ref(`other/policy/list/4`).once("value", function(policy_object) {
+        db.ref(`users/${getUsername()}`).once("value", (attacker_object) => {
+            db.ref(`users/${autoselector.value}`).once("value", (victim_object) => {
+                attacker = attacker_object.val();
+                victim = victim_object.val();
 
-            if (attacker.role == "angel") {
-                alert("Angels should not sin");
-                return;
-            }
-
-            var price = Math.round(1000 + (0.2 * (victim.money || 0)) + (100 * 1.2 ** (victim.autoclicker || 0)));
-            var autoclicker = victim.autoclicker || 0;
-
-            if (attacker.money >= price && autoclicker != 0 && attacker.username != victim.username) {
-                db.ref(`users/${getUsername()}`).update({
-                    money: attacker.money - price,
-                    deeds: (attacker.deeds || 0) - Math.round(price * 0.001),
-                })
-                db.ref(`users/${autoselector.value}`).update({
-                    autoclicker: victim.autoclicker - 1,
-                })
-
-                if (price >= attacker.money * 0.5 && price >= 10000000) {
-                    sendNotification(`${attacker.username} has just removed an Auto-Clicker from ${victim.username}!`);
+                if (attacker.role == "angel") {
+                    alert("Angels should not sin");
+                    return;
                 }
-            }
+
+                var price = Math.round(1000 + (0.2 * (victim.money || 0)) + (100 * 1.2 ** (victim.autoclicker || 0)));
+                var autoclicker = victim.autoclicker || 0;
+
+                if (attacker.money >= price && autoclicker != 0 && attacker.username != victim.username) {
+                    db.ref(`users/${getUsername()}`).update({
+                        money: attacker.money - price,
+                        deeds: firebase.database.ServerValue.increment(policy_object.val() ? -Math.round(price * 0.001) : 0),
+                    })
+                    db.ref(`users/${autoselector.value}`).update({
+                        autoclicker: firebase.database.ServerValue.increment(-1),
+                    })
+
+                    if (price >= attacker.money * 0.5 && price >= 10000000) {
+                        sendNotification(`${attacker.username} has just removed an Auto-Clicker from ${victim.username}!`);
+                    }
+                }
+            })
         })
     })
 }
@@ -1717,32 +1889,34 @@ function minusAuto() {
 function minusMult() {
     const multselector = document.getElementById("multselect");
 
-    db.ref(`users/${getUsername()}`).once("value", (attacker_object) => {
-        db.ref(`users/${multselector.value}`).once("value", (victim_object) => {
-            attacker = attacker_object.val();
-            victim = victim_object.val();
+    db.ref(`other/policy/list/4`).once("value", function(policy_object) {
+        db.ref(`users/${getUsername()}`).once("value", (attacker_object) => {
+            db.ref(`users/${multselector.value}`).once("value", (victim_object) => {
+                attacker = attacker_object.val();
+                victim = victim_object.val();
 
-            if (attacker.role == "angel") {
-                alert("Angels should not sin");
-                return;
-            }
-
-            var price = Math.round(1000 + (0.2 * (victim.money || 0)) + (250 * 1.4 ** (victim.mult - 1 || 0)));
-            var mult = victim.mult || 1;
-
-            if (attacker.money >= price && mult != 1 && attacker.username != victim.username) {
-                db.ref(`users/${getUsername()}`).update({
-                    money: attacker.money - price,
-                    deeds: (attacker.deeds || 0) - Math.round(price * 0.001),
-                })
-                db.ref(`users/${multselector.value}`).update({
-                    mult: victim.mult - 1,
-                })
-
-                if (price >= attacker.money * 0.5 && price >= 10000000) {
-                    sendNotification(`${attacker.username} has just removed one Mult from ${victim.username}!`);
+                if (attacker.role == "angel") {
+                    alert("Angels should not sin");
+                    return;
                 }
-            }
+
+                var price = Math.round(1000 + (0.2 * (victim.money || 0)) + (250 * 1.4 ** (victim.mult - 1 || 0)));
+                var mult = victim.mult || 1;
+
+                if (attacker.money >= price && mult != 1 && attacker.username != victim.username) {
+                    db.ref(`users/${getUsername()}`).update({
+                        money: attacker.money - price,
+                        deeds: firebase.database.ServerValue.increment(policy_object.val() ? -Math.round(price * 0.001) : 0),
+                    })
+                    db.ref(`users/${multselector.value}`).update({
+                        mult: firebase.database.ServerValue.increment(-1),
+                    })
+
+                    if (price >= attacker.money * 0.5 && price >= 10000000) {
+                        sendNotification(`${attacker.username} has just removed one Mult from ${victim.username}!`);
+                    }
+                }
+            })
         })
     })
 }
@@ -1751,31 +1925,33 @@ function minusMoney() {
     const moneyselector = document.getElementById("moneyselect");
     const moneyinput = document.getElementById("moneyminusAmount");
 
-    db.ref(`users/${getUsername()}`).once("value", (attacker_object) => {
-        db.ref(`users/${moneyselector.value}`).once("value", (victim_object) => {
-            attacker = attacker_object.val();
-            victim = victim_object.val();
+    db.ref(`other/policy/list/4`).once("value", function(policy_object) {
+        db.ref(`users/${getUsername()}`).once("value", (attacker_object) => {
+            db.ref(`users/${moneyselector.value}`).once("value", (victim_object) => {
+                attacker = attacker_object.val();
+                victim = victim_object.val();
 
-            if (attacker.role == "angel") {
-                alert("Angels should not sin");
-                return;
-            }
-
-            var price = Math.abs(Math.round(moneyinput.value * 3));
-            var money = victim.money || 0;
-
-            if (attacker.money >= price && attacker.username != victim.username && moneyselector.value) {
-                db.ref(`users/${getUsername()}`).update({
-                    money: firebase.database.ServerValue.increment(price > money ? -money : -price),
-                    deeds: (attacker.deeds || 0) - Math.round(moneyinput.value * 0.001),
-                })
-                db.ref(`users/${moneyselector.value}/money`).set(
-                    (money - Math.abs(Math.round(moneyinput.value)) < 0 ? 0 : money - Math.abs(Math.round(moneyinput.value)))
-                )
-                if (price >= attacker.money * 0.5 && price >= 10000000) {
-                    sendNotification(`${attacker.username} has just removed $${Math.abs(Math.round(moneyinput.value))} from ${victim.username}!`);
+                if (attacker.role == "angel") {
+                    alert("Angels should not sin");
+                    return;
                 }
-            }
+
+                var price = Math.abs(Math.round(moneyinput.value * 3));
+                var money = victim.money || 0;
+
+                if (attacker.money >= price && attacker.username != victim.username && moneyselector.value) {
+                    db.ref(`users/${getUsername()}`).update({
+                        money: firebase.database.ServerValue.increment(price > money ? -money : -price),
+                        deeds: firebase.database.ServerValue.increment(policy_object.val() ? -Math.round(price * 0.001) : 0),
+                    })
+                    db.ref(`users/${moneyselector.value}/money`).update(
+                        (money - Math.abs(Math.round(moneyinput.value)) < 0 ? 0 : money - Math.abs(Math.round(moneyinput.value)))
+                    )
+                    if (price >= attacker.money * 0.5 && price >= 10000000) {
+                        sendNotification(`${attacker.username} has just removed $${Math.abs(Math.round(moneyinput.value))} from ${victim.username}!`);
+                    }
+                }
+            })
         })
     })
 }
@@ -1866,56 +2042,55 @@ function showInstructions() {
     showPopUp(`PVP Donations`, `
         <h2>Update Log</h2>
         <ul>
-            <li>Added new role: Diviner</li>
-            <li>Boss week</li>
-            <li>Max jesters 1 --> 2</li>
-            <li>Added 3 new pieces of music</li>
-        </ul>`)
+            <li>Added new role: Council Member</li>
+            <li>Lowered price of Citizen $10,000,000 ---> $2,500,000</li>
+            <li>Lowered price of Angel $20,000,000 ---> $15,000,000</li>
+            <li>Bank tellers will now potentially pay taxes</li>
+        </ul><br>
+        <h3><b>READ THIS IF YOU WANT TO CATCH UP WITH THE LATEST META: if you're wondering why bank tellers will "potentially" pay taxes, that is because the new role, Council Member, can decide if certain roles will pay taxes. With the introduction of roles such as Diviner, Jester, and Council Member, communication in PVP Donations has become more important than ever. I am saying this because I also want to promote the Pebble side of this website. In conclusion, please use Pebble to sell your services as a Diviner, talk amongst yourselves and sus out who the Jester is, advocate for certain policies, etc.</b></h3>`)
 }
 
 function checkAutoclickerActive() {
     db.ref(".info/connected").on("value", (snapshot) => {
-        db.ref(`users/${getUsername()}`).once("value", function(object) {
-            if (snapshot.val()) {
-                var time = Date.now() - object.val().autosleep
-                days = Math.floor(time / 86400000)
-                hours = Math.floor((time - days * 86400000) / 3600000)
-                minutes = Math.floor((time - days * 86400000 - hours * 3600000) / 60000)
-                seconds = Math.floor((time - days * 86400000 - hours * 3600000 - minutes * 60000) / 1000)
-                money = Math.floor(time / 1000) * (object.val().autoclicker * (object.val().mult || 1))
-                if (time > 600000 && object.val().autoclicker > 0) { // 10 minutes
-                    if (object.val().role && (object.val().role !== "bank" && object.val().role !== "pacifist")) {
-                        if (localStorage.getItem("agree") !== null) {
+        db.ref(`other/policy/list`).once("value", function(policy_object) {
+            db.ref(`users/${getUsername()}`).once("value", function(object) {
+                if (snapshot.val()) {
+                    var time = Date.now() - object.val().autosleep
+                    days = Math.floor(time / 86400000)
+                    hours = Math.floor((time - days * 86400000) / 3600000)
+                    minutes = Math.floor((time - days * 86400000 - hours * 3600000) / 60000)
+                    seconds = Math.floor((time - days * 86400000 - hours * 3600000 - minutes * 60000) / 1000)
+                    money = Math.floor(time / 1000) * (object.val().autoclicker * (object.val().mult || 1))
+                    if (time > 600000 && object.val().autoclicker > 0) { // 10 minutes
+                        if (object.val().role && ((object.val().role !== "bank" || policy_object.val()[2]) && (object.val().role !== "police" || policy_object.val()[1]) && (object.val().role !== "council" || policy_object.val()[6]) && object.val().role !== "pacifist")) {
                             showPopUp(
                                 "Welcome Back!",
                                 `While you were away for ${days} days, ${hours} hours, ${minutes} minutes, and ${seconds} seconds, you gained $${money}. However, you had to pay $${Math.round(money * 0.1)} due to taxes`
                             )
-                        }
-                        db.ref(`users/${getUsername()}`).update({
-                            money: firebase.database.ServerValue.increment(money - Math.round(money * 0.1)),
-                            autosleep: firebase.database.ServerValue.TIMESTAMP,
-                        })
-                        db.ref(`other/Casino/`).update({
-                            money: firebase.database.ServerValue.increment(Math.round(money * 0.1)),
-                        })
-                    } else {
-                        if (localStorage.getItem("agree") !== null) {
+                            db.ref(`users/${getUsername()}`).update({
+                                money: firebase.database.ServerValue.increment(money - Math.round(money * 0.1)),
+                                autosleep: firebase.database.ServerValue.TIMESTAMP,
+                            })
+                            db.ref(`other/Casino/`).update({
+                                money: firebase.database.ServerValue.increment(Math.round(money * 0.1)),
+                            })
+                        } else {
                             showPopUp(
                                 "Welcome Back!",
                                 `While you were away for ${days} days, ${hours} hours, ${minutes} minutes, and ${seconds} seconds, you gained $${money}`
                             )
+                            db.ref(`users/${getUsername()}`).update({
+                                money: firebase.database.ServerValue.increment(money),
+                                autosleep: firebase.database.ServerValue.TIMESTAMP,
+                            })
                         }
-                        db.ref(`users/${getUsername()}`).update({
-                            money: firebase.database.ServerValue.increment(money),
-                            autosleep: firebase.database.ServerValue.TIMESTAMP,
-                        })
                     }
+                    db.ref("users/" + getUsername()).onDisconnect().update({
+                        autoactive: false,
+                        autosleep: firebase.database.ServerValue.TIMESTAMP,
+                    })
                 }
-                db.ref("users/" + getUsername()).onDisconnect().update({
-                    autoactive: false,
-                    autosleep: firebase.database.ServerValue.TIMESTAMP,
-                })
-            }
+            })
         })
     })
 }
@@ -2141,7 +2316,7 @@ function setup() {
     })
 
     db.ref(`users/${getUsername()}/admin`).once("value", function(object) {
-        if (object.val() > 0) {
+        if (object.val() >= 9000) {
             document.getElementById("clear").style.display = "block";
         }
     })
