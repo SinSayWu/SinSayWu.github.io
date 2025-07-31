@@ -1177,6 +1177,7 @@ function sendMessage() {
                             db.ref("other/Casino").update({
                                 money: 10000000
                             });
+                            db.ref("other/clickernotifications").remove();
                             sendServerMessage(`${getUsername()} has cleared the data of donations`);
                         })
                     }
