@@ -301,170 +301,174 @@ function refreshChat(user_data, change_channel = false) {
 function displayMembers() {
     var members = document.getElementById('members');
 
-    db.ref('users/').orderByChild("admin").once('value', function(membersList) {
-        active_users = [];
-        inactive_users = [];
+    db.ref(`other/admin_list`).once("value", function(admin_object) {
+        db.ref('users/').orderByChild("admin").once('value', function(membersList) {
+            active_users = [];
+            inactive_users = [];
 
-        membersList.forEach((member_child) => {
-            if (member_child.val().active) {
-                active_users.push(member_child.val());
-            } else {
-                inactive_users.push(member_child.val());
-            }
-
-            db.ref(`users/${member_child.val().username}/active`).on("value", function(active_object) {
-                if (active_users.some(obj => obj.username === member_child.val().username) && !active_object.val()) {
-                    const index = active_users.findIndex(obj => obj.username === member_child.val().username);
-                    if (index !== -1) {
-                        inactive_users.push(active_users.splice(index, 1)[0]);
-                        redisplayMembers();
+            membersList.forEach((member_child) => {
+                if (!Object.hasOwn(admin_object.val(), member_child.val().id)) {
+                    if (member_child.val().active) {
+                        active_users.push(member_child.val());
+                    } else {
+                        inactive_users.push(member_child.val());
                     }
-                } else if (inactive_users.some(obj => obj.username === member_child.val().username) && active_object.val()) {
-                    const index = inactive_users.findIndex(obj => obj.username === member_child.val().username);
-                    if (index !== -1) {
-                        active_users.push(inactive_users.splice(index, 1)[0]);
-                        redisplayMembers();
+
+                    db.ref(`users/${member_child.val().username}/active`).on("value", function(active_object) {
+                        if (active_users.some(obj => obj.username === member_child.val().username) && !active_object.val()) {
+                            const index = active_users.findIndex(obj => obj.username === member_child.val().username);
+                            if (index !== -1) {
+                                inactive_users.push(active_users.splice(index, 1)[0]);
+                                redisplayMembers();
+                            }
+                        } else if (inactive_users.some(obj => obj.username === member_child.val().username) && active_object.val()) {
+                            const index = inactive_users.findIndex(obj => obj.username === member_child.val().username);
+                            if (index !== -1) {
+                                active_users.push(inactive_users.splice(index, 1)[0]);
+                                redisplayMembers();
+                            }
+                        }
+                    })
+                }
+            })
+
+            active_users.reverse();
+            inactive_users.reverse();
+
+            active_users.forEach((username) => {
+                var mainElement = document.createElement("div");
+                var memberElement = document.createElement("div");
+                memberElement.setAttribute("class", "member");
+                var inner = "";
+                if (everyoneRevealed) {
+                    inner += username.name;
+                } else {
+                    inner += username.username;
+                }
+                memberElement.innerHTML = inner;
+
+                mainElement.appendChild(memberElement);
+
+                if (username.admin > 0) {
+                    memberElement.style.color = "SkyBlue";
+                } else {
+                    memberElement.style.color = "White";
+                }
+
+                var adminLevel = document.createElement("div");
+
+                db.ref(`users/${username.username}/admin`).on("value", function(admin_object) {
+                    adminLevel.setAttribute("id", "admin-level");
+                    adminLevel.setAttribute("class", "member");
+                    adminLevel.innerHTML = `(${admin_object.val()})`;
+                })
+
+                mainElement.appendChild(adminLevel);
+
+                var mutedElement = document.createElement("span");
+                var timedElement = document.createElement("span");
+                var trappedElement = document.createElement("span");
+
+                db.ref(`users/${username.username}/muted`).on("value", function(muted_object) {
+                    if (muted_object.val()) {
+                        mutedElement.style.color = "Red";
+                        mutedElement.innerHTML = "&nbsp;[Muted]";
+                    } else {
+                        mutedElement.innerHTML = "";
                     }
-                }
-            })
-        })
+                })
 
-        active_users.reverse();
-        inactive_users.reverse();
+                db.ref(`users/${username.username}/trapped`).on("value", function(trapped_object) {
+                    if (trapped_object.val()) {
+                        trappedElement.style.color = "rgb(145, 83, 196)";
+                        trappedElement.innerHTML = "&nbsp;[Trapped]";
+                    } else {
+                        trappedElement.innerHTML = "";
+                    }
+                })
 
-        active_users.forEach((username) => {
-            var mainElement = document.createElement("div");
-            var memberElement = document.createElement("div");
-            memberElement.setAttribute("class", "member");
-            var inner = "";
-            if (everyoneRevealed) {
-                inner += username.name;
-            } else {
-                inner += username.username;
-            }
-            memberElement.innerHTML = inner;
+                db.ref(`users/${username.username}/sleep`).on("value", function(timed_object) {
+                    if ((Date.now() - (timed_object.val() || 0) + messageSleep + 200 < 0) && username.admin == 0) {
+                        timedElement.style.color = "rgb(145, 83, 196)";
+                        timedElement.innerHTML = "&nbsp;[Timed Out]";
+                    } else {
+                        timedElement.innerHTML = "";
+                    }
+                })
 
-            mainElement.appendChild(memberElement);
+                memberElement.appendChild(mutedElement);
+                memberElement.appendChild(timedElement);
+                memberElement.appendChild(trappedElement);
 
-            if (username.admin > 0) {
-                memberElement.style.color = "SkyBlue";
-            } else {
-                memberElement.style.color = "White";
-            }
-
-            var adminLevel = document.createElement("div");
-
-            db.ref(`users/${username.username}/admin`).on("value", function(admin_object) {
-                adminLevel.setAttribute("id", "admin-level");
-                adminLevel.setAttribute("class", "member");
-                adminLevel.innerHTML = `(${admin_object.val()})`;
+                members.appendChild(mainElement);
             })
 
-            mainElement.appendChild(adminLevel);
+            var hr = document.createElement("hr");
+            hr.style.borderColor = "rgb(0, 0, 0)";
+            members.appendChild(hr);
 
-            var mutedElement = document.createElement("span");
-            var timedElement = document.createElement("span");
-            var trappedElement = document.createElement("span");
-
-            db.ref(`users/${username.username}/muted`).on("value", function(muted_object) {
-                if (muted_object.val()) {
-                    mutedElement.style.color = "Red";
-                    mutedElement.innerHTML = "&nbsp;[Muted]";
+            inactive_users.forEach((username) => {
+                var mainElement = document.createElement("div");
+                var memberElement = document.createElement("div");
+                memberElement.setAttribute("class", "member");
+                var inner = "";
+                if (everyoneRevealed) {
+                    inner += username.name;
                 } else {
-                    mutedElement.innerHTML = "";
+                    inner += username.username;
                 }
+                memberElement.innerHTML = inner;
+                memberElement.style.color = "gray";
+
+                mainElement.appendChild(memberElement);
+
+                var adminLevel = document.createElement("div");
+
+                db.ref(`users/${username.username}/admin`).on("value", function(admin_object) {
+                    adminLevel.setAttribute("id", "admin-level");
+                    adminLevel.setAttribute("class", "member");
+                    adminLevel.innerHTML = `(${admin_object.val()})`;
+                })
+
+                mainElement.appendChild(adminLevel);
+
+                var mutedElement = document.createElement("span");
+                var timedElement = document.createElement("span");
+                var trappedElement = document.createElement("span");
+
+                db.ref(`users/${username.username}/muted`).on("value", function(muted_object) {
+                    if (muted_object.val()) {
+                        mutedElement.style.color = "Red";
+                        mutedElement.innerHTML = "&nbsp;[Muted]";
+                    } else {
+                        mutedElement.innerHTML = "";
+                    }
+                })
+
+                db.ref(`users/${username.username}/trapped`).on("value", function(trapped_object) {
+                    if (trapped_object.val()) {
+                        trappedElement.style.color = "rgb(145, 83, 196)";
+                        trappedElement.innerHTML = "&nbsp;[Trapped]";
+                    } else {
+                        trappedElement.innerHTML = "";
+                    }
+                })
+
+                db.ref(`users/${username.username}/sleep`).on("value", function(timed_object) {
+                    if ((Date.now() - (timed_object.val() || 0) + messageSleep + 200 < 0) && username.admin == 0) {
+                        timedElement.style.color = "rgb(145, 83, 196)";
+                        timedElement.innerHTML = "&nbsp;[Timed Out]";
+                    } else {
+                        timedElement.innerHTML = "";
+                    }
+                })
+
+                memberElement.appendChild(mutedElement);
+                memberElement.appendChild(timedElement);
+                memberElement.appendChild(trappedElement);
+
+                members.appendChild(mainElement);
             })
-
-            db.ref(`users/${username.username}/trapped`).on("value", function(trapped_object) {
-                if (trapped_object.val()) {
-                    trappedElement.style.color = "rgb(145, 83, 196)";
-                    trappedElement.innerHTML = "&nbsp;[Trapped]";
-                } else {
-                    trappedElement.innerHTML = "";
-                }
-            })
-
-            db.ref(`users/${username.username}/sleep`).on("value", function(timed_object) {
-                if ((Date.now() - (timed_object.val() || 0) + messageSleep + 200 < 0) && username.admin == 0) {
-                    timedElement.style.color = "rgb(145, 83, 196)";
-                    timedElement.innerHTML = "&nbsp;[Timed Out]";
-                } else {
-                    timedElement.innerHTML = "";
-                }
-            })
-
-            memberElement.appendChild(mutedElement);
-            memberElement.appendChild(timedElement);
-            memberElement.appendChild(trappedElement);
-
-            members.appendChild(mainElement);
-        })
-
-        var hr = document.createElement("hr");
-        hr.style.borderColor = "rgb(0, 0, 0)";
-        members.appendChild(hr);
-
-        inactive_users.forEach((username) => {
-            var mainElement = document.createElement("div");
-            var memberElement = document.createElement("div");
-            memberElement.setAttribute("class", "member");
-            var inner = "";
-            if (everyoneRevealed) {
-                inner += username.name;
-            } else {
-                inner += username.username;
-            }
-            memberElement.innerHTML = inner;
-            memberElement.style.color = "gray";
-
-            mainElement.appendChild(memberElement);
-
-            var adminLevel = document.createElement("div");
-
-            db.ref(`users/${username.username}/admin`).on("value", function(admin_object) {
-                adminLevel.setAttribute("id", "admin-level");
-                adminLevel.setAttribute("class", "member");
-                adminLevel.innerHTML = `(${admin_object.val()})`;
-            })
-
-            mainElement.appendChild(adminLevel);
-
-            var mutedElement = document.createElement("span");
-            var timedElement = document.createElement("span");
-            var trappedElement = document.createElement("span");
-
-            db.ref(`users/${username.username}/muted`).on("value", function(muted_object) {
-                if (muted_object.val()) {
-                    mutedElement.style.color = "Red";
-                    mutedElement.innerHTML = "&nbsp;[Muted]";
-                } else {
-                    mutedElement.innerHTML = "";
-                }
-            })
-
-            db.ref(`users/${username.username}/trapped`).on("value", function(trapped_object) {
-                if (trapped_object.val()) {
-                    trappedElement.style.color = "rgb(145, 83, 196)";
-                    trappedElement.innerHTML = "&nbsp;[Trapped]";
-                } else {
-                    trappedElement.innerHTML = "";
-                }
-            })
-
-            db.ref(`users/${username.username}/sleep`).on("value", function(timed_object) {
-                if ((Date.now() - (timed_object.val() || 0) + messageSleep + 200 < 0) && username.admin == 0) {
-                    timedElement.style.color = "rgb(145, 83, 196)";
-                    timedElement.innerHTML = "&nbsp;[Timed Out]";
-                } else {
-                    timedElement.innerHTML = "";
-                }
-            })
-
-            memberElement.appendChild(mutedElement);
-            memberElement.appendChild(timedElement);
-            memberElement.appendChild(trappedElement);
-
-            members.appendChild(mainElement);
         })
     })
 }
@@ -702,7 +706,7 @@ function sendMessage() {
                 } else if (message.startsWith("!mute @")) {
                     var muted_user = message.substring(7);
                     db.ref("users/" + muted_user).once('value', function(mutedUser) {
-                        if (!mutedUser.exists() && muted_user != "everyone") {
+                        if ((!mutedUser.exists() || Object.hasOwn(admin_object.val(), mutedUser.val().id)) && muted_user != "everyone") {
                             alert("User cannot be muted, " + muted_user + " does not exist!");
                             return;
                         }
@@ -760,7 +764,7 @@ function sendMessage() {
                 } else if (message.startsWith("!unmute @")) {
                     var unmuted_user = message.substring(9);
                     db.ref("users/" + unmuted_user).once('value', function(unmutedUser) {
-                        if (!unmutedUser.exists() && unmuted_user != "everyone") {
+                        if ((!unmutedUser.exists() || Object.hasOwn(admin_object.val(), unmutedUser.val().id)) && unmuted_user != "everyone") {
                             alert("User cannot be unmuted, " + unmuted_user + " does not exist!");
                             return;
                         }
@@ -810,6 +814,10 @@ function sendMessage() {
                         revealedUser = revealedUser.val();
                         var revealingUser = obj;
 
+                        if ((!revealedUser.exists() || Object.hasOwn(admin_object.val(), revealedUser.val().id)) && revealed_user != "everyone") {
+                            alert("User cannot be revealed, " + revealed_user + " does not exist!");
+                            return;
+                        }
                         if (revealed_user == 'everyone') {
                             everyoneRevealed = true;
                             return;
@@ -844,7 +852,7 @@ function sendMessage() {
                 } else if (message.startsWith("!remove @")){
                     var removed_user = message.substring(9);
                     db.ref("users/" + removed_user).once('value', function(removedUser) {
-                        if (!removedUser.exists()) {
+                        if (!removedUser.exists() || Object.hasOwn(admin_object.val(), removedUser.val().id)) {
                             alert("User cannot be removed, " + removed_user + " does not exist!");
                             return;
                         }
@@ -878,7 +886,7 @@ function sendMessage() {
                 } else if (message.startsWith("!trap @")){
                     var trapped_user = message.substring(7);
                     db.ref("users/" + trapped_user).once('value', function(trappedUser) {
-                        if (!trappedUser.exists()) {
+                        if (!trappedUser.exists() || Object.hasOwn(admin_object.val(), trappedUser.val().id)) {
                             alert("User cannot be trapped, " + trapped_user + " does not exist!");
                             return;
                         }
@@ -898,7 +906,7 @@ function sendMessage() {
                 } else if (message.startsWith("!release @")){
                     var untrapped_user = message.substring(10);
                     db.ref("users/" + untrapped_user).once('value', function(untrappedUser) {
-                        if (!untrappedUser.exists() && untrapped_user != 'everyone') {
+                        if ((!untrappedUser.exists() || Object.hasOwn(admin_object.val(), untrappedUser.val().id)) && untrapped_user != 'everyone') {
                             alert("User cannot be released, " + untrapped_user + " does not exist!");
                             return;
                         }
@@ -940,7 +948,7 @@ function sendMessage() {
                         return;
                     }
                     db.ref("users/" + timed_user).once('value', function(timedUser) {
-                        if (!timedUser.exists()) {
+                        if (!timedUser.exists() || Object.hasOwn(admin_object.val(), timedUser.val().id)) {
                             alert("User cannot be timed out, " + timed_user + " does not exist!");
                             return;
                         }
@@ -959,7 +967,7 @@ function sendMessage() {
                 } else if (message.startsWith("!removetimeout @")){
                     var removetimed_user = message.split(" ")[1].substring(1);
                     db.ref("users/" + removetimed_user).once('value', function(removetimedUser) {
-                        if (!removetimedUser.exists()) {
+                        if (!removetimedUser.exists() || Object.hasOwn(admin_object.val(), removetimedUser.val().id)) {
                             alert("User's timeout cannot be removed, " + timed_user + " does not exist!");
                             return;
                         }
@@ -1024,7 +1032,7 @@ function sendMessage() {
                 } else if (message.startsWith("!disableimage @")) {
                     var disabled_user = message.substring(15);
                     db.ref("users/" + disabled_user).once('value', function(disabledUser) {
-                        if (!disabledUser.exists()) {
+                        if (!disabledUser.exists() || Object.hasOwn(admin_object.val(), disabledUser.val().id)) {
                             alert("User's image privileges cannot be disabled, " + disabled_user + " does not exist!");
                             return;
                         }
@@ -1044,7 +1052,7 @@ function sendMessage() {
                 } else if (message.startsWith("!enableimage @")) {
                     var disabled_user = message.substring(14);
                     db.ref("users/" + disabled_user).once('value', function(disabledUser) {
-                        if (!disabledUser.exists()) {
+                        if (!disabledUser.exists() || Object.hasOwn(admin_object.val(), disabledUser.val().id)) {
                             alert("User's image privileges cannot be enabled, " + disabled_user + " does not exist!");
                             return;
                         }
