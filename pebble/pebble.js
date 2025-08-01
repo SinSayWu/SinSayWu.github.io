@@ -335,6 +335,9 @@ function displayMembers() {
             active_users.reverse();
             inactive_users.reverse();
 
+            var members = document.getElementById('members');
+            members.innerHTML = "";
+
             active_users.forEach((username) => {
                 var mainElement = document.createElement("div");
                 var memberElement = document.createElement("div");
@@ -361,6 +364,12 @@ function displayMembers() {
                     adminLevel.setAttribute("id", "admin-level");
                     adminLevel.setAttribute("class", "member");
                     adminLevel.innerHTML = `(${admin_object.val()})`;
+
+                    if (admin_object.val() > 0) {
+                        memberElement.style.color = "SkyBlue";
+                    } else {
+                        memberElement.style.color = "White";
+                    }
                 })
 
                 mainElement.appendChild(adminLevel);
