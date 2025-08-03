@@ -12,16 +12,17 @@ function App() {
           <img src='./src/assets/images/Blockrieg.png' />
         </div>
         <Link to='/' className='navBtn'>Home</Link>
-        <Link to='/Blockrieg' className='navBtn'>Play Game!</Link>
+        <Link to='/Game' className='navBtn'>Play Game!</Link>
         <Link to='/Guide' className='navBtn'>Guide</Link>
         <Link to='/LoremIpsum' className='navBtn'>Lorem Ipsum</Link>
       </nav>
 
       <Routes>
         <Route path='/' element={<Home />} />
+        <Route path='/Home' element={<Home />} />
         <Route path='/Guide' element={<Guide />} />
         <Route path='/LoremIpsum' element={<LoremIpsum />} />
-        <Route path='/Blockrieg' element={<Blockrieg />} />
+        <Route path='/Game' element={<Blockrieg />} />
       </Routes>
     </>
   )
