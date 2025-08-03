@@ -1,0 +1,87 @@
+.block {
+    display: inline-block;
+    width: 200px;
+    height: 200px;
+}
+
+img {
+    max-width: 100%;
+    max-height: 100%;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+}
+
+.spawner {
+    position: relative;
+}
+
+.insideRightSpawner {
+    position: absolute;
+    width: 25%;
+    top: 50%;
+    left: 17%;
+    transform: translateY(-50%);
+}
+
+.insideLeftSpawner {
+    position: absolute;
+    width: 25%;
+    top: 50%;
+    right: 17%;
+    transform: translateY(-50%);
+}
+
+.insideUpSpawner {
+    position: absolute;
+    width: 25%;
+    left: 50%;
+    top: 23%;
+    transform: translateX(-53%);
+}
+
+.insideDownSpawner {
+    position: absolute;
+    width: 25%;
+    left: 50%;
+    bottom: 20%;
+    transform: translateX(-53%);
+}
+
+.teleporter {
+    position: relative;
+}
+
+.teleportCircle {
+    height: 13%;
+    width: 13%;
+    border-radius: 50%;
+    border: 1px solid black;
+    position: absolute;
+    aspect-ratio: 1;
+}
+
+.upTeleportCircle {
+    top: 14%;
+    right: 50%;
+    transform: translateX(47%);
+}
+
+.downTeleportCircle {
+    bottom: 14%;
+    right: 50%;
+    transform: translateX(47%);
+}
+
+.rightTeleportCircle {
+    right: 15%;
+    bottom: 50%;
+    transform: translateY(42%);
+}
+
+.leftTeleportCircle {
+    left: 15%;
+    bottom: 50%;
+    transform: translateY(42%);
+}
