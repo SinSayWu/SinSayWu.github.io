@@ -10,6 +10,7 @@ let inactive_users;
 var globalMessages = [];
 var loadSubsequentMessages = false;
 var firstLoad = true;
+var timeoutId = false;
 let images
 let db;
 
@@ -1387,7 +1388,11 @@ function checkMute() {
                         document.getElementById("text-box").placeholder = "Slow mode active";
                     }
 
-                    setTimeout(() => {
+                    if (timeoutId) {
+                        clearTimeout(timeoutId);
+                    }
+                    
+                    timeoutId = setTimeout(() => {
                         document.getElementById("text-box").disabled = false;
                         document.getElementById("text-box").placeholder = "Message"
                     }, messageSleep - timePassed)
@@ -1538,11 +1543,6 @@ function setup() {
         obj = obj.val();
         document.getElementById("medianAdmin").innerHTML = obj;
     })
-    
-    var textarea = document.getElementById("textarea");
-    setTimeout(() => {
-        textarea.scrollTop = textarea.scrollHeight;
-    }, 500);
 
     if (localStorage.getItem("terms") == null) {
         showPopUp("Additional Note (VERY IMPORTANT, MUST READ)", "I am legally obligated to say that we, the creators and/or owners of feynmansums.com, pebble, or any sites associated with it, do not condone the use of this website during instructional time, or to disrupt it. Any violation of this is not tolerated by us. Continue using the website if you understand these conditions.");
