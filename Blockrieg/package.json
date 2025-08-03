@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "Blockrieg",
+  "homepage": "https://SinSayWu.github.io/Blockrieg",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
