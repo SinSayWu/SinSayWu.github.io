@@ -9,6 +9,7 @@ let active_users;
 let inactive_users;
 var globalMessages = [];
 var loadSubsequentMessages = false;
+var firstLoad = true;
 let images
 let db;
 
@@ -29,7 +30,8 @@ function getChats() {
                 }
 
                 if (loadSubsequentMessages) {
-                    refreshChat(user_object);
+                    refreshChat(user_object, false, firstLoad);
+                    firstLoad = false;
                 }
             })
         })
@@ -86,9 +88,12 @@ function checkVoting() {
     })
 }
 
-function refreshChat(user_data, change_channel = false) {
+function refreshChat(user_data, change_channel = false, first = false) {
     // alert("Refresh Chat");
     var textarea = document.getElementById('textarea');
+
+    var y_scroll = textarea.scrollTop;
+    var message_height
 
     // When we get the data clear chat_content_container
     textarea.innerHTML = '';
@@ -251,6 +256,8 @@ function refreshChat(user_data, change_channel = false) {
 
             textarea.appendChild(messageElement);
 
+            message_height = messageElement.offsetHeight;
+
             if (data.val().name == "[VOTING]") {
                 checkVoting();
             }
@@ -295,7 +302,12 @@ function refreshChat(user_data, change_channel = false) {
 
         notif.innerHTML = `(${(parseInt(notif.innerHTML.substring(1,2)) || 0) + 1})`;
     }
-    textarea.scrollTop = textarea.scrollHeight;
+
+    if (first || (y_scroll + message_height - 15) > textarea.scrollHeight - textarea.clientHeight * 1.5 || prevMessage.val().name == getUsername()) {
+        textarea.scrollTop = textarea.scrollHeight;
+    } else {
+        textarea.scrollTop = y_scroll + message_height - 15;
+    }
 }
 
 function displayMembers() {
@@ -1361,26 +1373,25 @@ function checkMute() {
                     document.getElementById("text-box").disabled = false;
                     document.getElementById("text-box").placeholder = "Message"
                 }
-            }).then(() => {
-                db.ref(`users/${getUsername()}/sleep`).on("value", function(sleep_object) {
-                    const lastMessageTime = sleep_object.val() || 0;
-                    const timePassed = Date.now() - lastMessageTime;
+            })
+            db.ref(`users/${getUsername()}/sleep`).on("value", function(sleep_object) {
+                const lastMessageTime = sleep_object.val() || 0;
+                const timePassed = Date.now() - lastMessageTime;
 
-                    if (timePassed < messageSleep && (user_object.val().admin == 0 && !Object.hasOwn(admin_object.val(), user_object.val().id))) {
-                        if (timePassed + messageSleep < 0) {
-                            document.getElementById("text-box").disabled = true;
-                            document.getElementById("text-box").placeholder = "You are timed out";
-                        } else {
-                            document.getElementById("text-box").disabled = true;
-                            document.getElementById("text-box").placeholder = "Slow mode active";
-                        }
-
-                        setTimeout(() => {
-                            document.getElementById("text-box").disabled = false;
-                            document.getElementById("text-box").placeholder = "Message"
-                        }, messageSleep - timePassed)
+                if (timePassed < messageSleep && (user_object.val().admin == 0 && !Object.hasOwn(admin_object.val(), user_object.val().id))) {
+                    if (timePassed + messageSleep < 0) {
+                        document.getElementById("text-box").disabled = true;
+                        document.getElementById("text-box").placeholder = "You are timed out";
+                    } else {
+                        document.getElementById("text-box").disabled = true;
+                        document.getElementById("text-box").placeholder = "Slow mode active";
                     }
-                })
+
+                    setTimeout(() => {
+                        document.getElementById("text-box").disabled = false;
+                        document.getElementById("text-box").placeholder = "Message"
+                    }, messageSleep - timePassed)
+                }
             })
         })
     })
