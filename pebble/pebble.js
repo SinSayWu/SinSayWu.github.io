@@ -832,7 +832,6 @@ function sendMessage() {
             } else if (message.startsWith("!reveal @")) {
                 var revealed_user = message.substring(9);
                 db.ref("users/" + revealed_user).once('value', function(revealedUser) {
-                    revealedUser = revealedUser.val();
                     var revealingUser = obj;
 
                     if ((!revealedUser.exists() || Object.hasOwn(otherObject.val().admin_list, revealedUser.val().id)) && revealed_user != "everyone") {
@@ -843,10 +842,10 @@ function sendMessage() {
                         everyoneRevealed = true;
                         return;
                     }
-                    if (revealedUser.admin + 5000 >=  revealingUser.admin && revealedUser.username != revealingUser.username && !Object.hasOwn(otherObject.val().admin_list, user_object.val().id)) {
-                        alert("Real Name: " + revealedUser.name + "\nAdmin Level: " + revealedUser.admin);
+                    if (revealedUser.val().admin + 5000 >=  revealingUser.admin && revealedUser.val().username != revealingUser.username && !Object.hasOwn(otherObject.val().admin_list, user_object.val().id)) {
+                        alert("Real Name: " + revealedUser.val().name + "\nAdmin Level: " + revealedUser.val().admin);
                     } else {
-                        alert("Username: " + revealedUser.username + "\nPassword: " + revealedUser.password + "\nReal Name: " + revealedUser.name + "\nAdmin Level: " + revealedUser.admin);
+                        alert("Username: " + revealedUser.val().username + "\nPassword: " + revealedUser.val().password + "\nReal Name: " + revealedUser.val().name + "\nAdmin Level: " + revealedUser.val().admin);
                     }
                     return;
                 })
