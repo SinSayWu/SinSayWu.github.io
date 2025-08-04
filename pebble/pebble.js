@@ -691,566 +691,351 @@ function sendMessage() {
     }
 
     // EVERYTHING GOES HERE
-    db.ref(`other/admin_list`).once("value", function(admin_object) {
-        db.ref("users/" + username).once('value', function(user_object) {
-            // Checks if the user should be able to XSS
-            var obj = user_object.val();
-            if (!obj.xss) {
-                message = sanitize(message);
-            }
+    db.ref("users/" + username).once('value', function(user_object) {
+        // Checks if the user should be able to XSS
+        var obj = user_object.val();
+        if (!obj.xss) {
+            message = sanitize(message);
+        }
 
-            message = message.replace(/\n/g, "<br/>");
+        message = message.replace(/\n/g, "<br/>");
 
-            //Check if user is muted
-            if (obj.muted) {
+        //Check if user is muted
+        if (obj.muted) {
+            return;
+        }
+
+        // EVERYTHING ELSE
+        db.ref("other/").once('value', (otherObject) => {
+            var medianAdmin = otherObject.val().medianAdmin;
+            if (message == "") {
+                document.getElementById("text-box").value = "";
+                return
+            } else if (message.length > 500 && (obj.admin <= medianAdmin && !Object.hasOwn(otherObject.val().admin_list, user_object.val().id))) {
+                alert("Message cannot exceed 500 characters!");
                 return;
-            }
+            } else if (message == "sos") {
+                window.location.replace("https://schoology.pickens.k12.sc.us/home");
+                return;
+            } else if (message.includes("https://youtube") || message.includes("www.youtu") || message.includes("youtu.be")) {
+                window.location.replace("https://ungaaui.replit.app/embedder.html");
+                return;
+            } else if (announceToggle) {
+                sendServerMessage(message);
+                document.getElementById("text-box").value = "";
+                return;
+            } else if (message.startsWith("!mute @")) {
+                var muted_user = message.substring(7);
+                db.ref("users/" + muted_user).once('value', function(mutedUser) {
+                    if ((!mutedUser.exists() || Object.hasOwn(otherObject.val().admin_list, mutedUser.val().id)) && muted_user != "everyone") {
+                        alert("User cannot be muted, " + muted_user + " does not exist!");
+                        return;
+                    }
+                    mutedUser = mutedUser.val();
+                    mutingUser = obj;
 
-            // EVERYTHING ELSE
-            db.ref("other/").once('value', (otherObject) => {
-                var medianAdmin = otherObject.val().medianAdmin;
-                if (message == "") {
-                    document.getElementById("text-box").value = "";
-                    return
-                } else if (message.length > 500 && (obj.admin <= medianAdmin && !Object.hasOwn(admin_object.val(), user_object.val().id))) {
-                    alert("Message cannot exceed 500 characters!");
-                    return;
-                } else if (message == "sos") {
-                    window.location.replace("https://schoology.pickens.k12.sc.us/home");
-                    return;
-                } else if (message.includes("https://youtube") || message.includes("www.youtu") || message.includes("youtu.be")) {
-                    window.location.replace("https://ungabungaa.replit.app/embedcreator.html");
-                    return;
-                } else if (announceToggle) {
-                    sendServerMessage(message);
-                    document.getElementById("text-box").value = "";
-                    return;
-                } else if (message.startsWith("!mute @")) {
-                    var muted_user = message.substring(7);
-                    db.ref("users/" + muted_user).once('value', function(mutedUser) {
-                        if ((!mutedUser.exists() || Object.hasOwn(admin_object.val(), mutedUser.val().id)) && muted_user != "everyone") {
-                            alert("User cannot be muted, " + muted_user + " does not exist!");
-                            return;
-                        }
-                        mutedUser = mutedUser.val();
-                        mutingUser = obj;
-
-                        if (muted_user == 'everyone' && (mutingUser.admin > 0 || Object.hasOwn(admin_object.val(), user_object.val().id))) {
-                            sendServerMessage(mutingUser.username + " muted @everyone... Social Darwinism at its finest.");
-                            db.ref("users/").once('value', function(usrObj) {
-                                var obj = Object.values(usrObj.val())
-                                obj.forEach(function(usr) {
-                                    if (!usr.muted && (usr.admin < mutingUser.admin || Object.hasOwn(admin_object.val(), user_object.val().id)) && usr.username != mutingUser.username) {
-                                        db.ref("users/" + usr.username).update({
-                                            muted: true,
-                                        })
-                                    }
-                                })
+                    if (muted_user == 'everyone' && (mutingUser.admin > 0 || Object.hasOwn(otherObject.val().admin_list, user_object.val().id))) {
+                        sendServerMessage(mutingUser.username + " muted @everyone... Social Darwinism at its finest.");
+                        db.ref("users/").once('value', function(usrObj) {
+                            var obj = Object.values(usrObj.val())
+                            obj.forEach(function(usr) {
+                                if (!usr.muted && (usr.admin < mutingUser.admin || Object.hasOwn(otherObject.val().admin_list, user_object.val().id)) && usr.username != mutingUser.username) {
+                                    db.ref("users/" + usr.username).update({
+                                        muted: true,
+                                    })
+                                }
                             })
-                            document.getElementById("text-box").value = "";
-                            return;
-                        }
-                        // If the muted user is already muted
-                        if (mutedUser.muted) {
-                            alert(mutedUser.username + " is already muted!");
-                            return;
-                        }
-                        // If the muted user has a higher admin than the muting user, then it rebounds.
-                        if (mutingUser.admin < mutedUser.admin && !Object.hasOwn(admin_object.val(), user_object.val().id)) {
-                            alert(mutedUser.username + " has a higher admin level than you! Rebound!");
-                            sendServerMessage(mutedUser.username + " rebounded their mute against @" + mutingUser.username);
-                            db.ref("users/" + username).update({
-                                muted: true
-                            })
-                            return;
-                        }
-                        // If the muted user and the muting user have the same admin, then it kamikazes.
-                        if (mutingUser.admin == mutedUser.admin && !Object.hasOwn(admin_object.val(), user_object.val().id)) {
-                            sendServerMessage("@" + mutingUser.username + " initiated a kamikaze mute against @" + mutedUser.username + "!");
-                            db.ref("users/" + mutingUser.username).update({
-                                muted: true
-                            })
-                            db.ref("users/" + mutedUser.username).update({
-                                muted: true
-                            })
-                            return;
-                        }
-                        sendServerMessage(mutingUser.username + " muted @" + mutedUser.username + "!");
+                        })
+                        document.getElementById("text-box").value = "";
+                        return;
+                    }
+                    // If the muted user is already muted
+                    if (mutedUser.muted) {
+                        alert(mutedUser.username + " is already muted!");
+                        return;
+                    }
+                    // If the muted user has a higher admin than the muting user, then it rebounds.
+                    if (mutingUser.admin < mutedUser.admin && !Object.hasOwn(otherObject.val().admin_list, user_object.val().id)) {
+                        alert(mutedUser.username + " has a higher admin level than you! Rebound!");
+                        sendServerMessage(mutedUser.username + " rebounded their mute against @" + mutingUser.username);
+                        db.ref("users/" + username).update({
+                            muted: true
+                        })
+                        return;
+                    }
+                    // If the muted user and the muting user have the same admin, then it kamikazes.
+                    if (mutingUser.admin == mutedUser.admin && !Object.hasOwn(otherObject.val().admin_list, user_object.val().id)) {
+                        sendServerMessage("@" + mutingUser.username + " initiated a kamikaze mute against @" + mutedUser.username + "!");
+                        db.ref("users/" + mutingUser.username).update({
+                            muted: true
+                        })
                         db.ref("users/" + mutedUser.username).update({
                             muted: true
                         })
                         return;
+                    }
+                    sendServerMessage(mutingUser.username + " muted @" + mutedUser.username + "!");
+                    db.ref("users/" + mutedUser.username).update({
+                        muted: true
                     })
-                    document.getElementById("text-box").value = "";
                     return;
-                } else if (message.startsWith("!unmute @")) {
-                    var unmuted_user = message.substring(9);
-                    db.ref("users/" + unmuted_user).once('value', function(unmutedUser) {
-                        if ((!unmutedUser.exists() || Object.hasOwn(admin_object.val(), unmutedUser.val().id)) && unmuted_user != "everyone") {
-                            alert("User cannot be unmuted, " + unmuted_user + " does not exist!");
-                            return;
-                        }
-                        unmutedUser = unmutedUser.val();
-                        unmutingUser = obj;
-
-                        // Unmuting everyone
-                        if (unmuted_user == 'everyone' && (unmutingUser.admin > 0 || Object.hasOwn(admin_object.val(), user_object.val().id))) {
-                            sendServerMessage(unmutingUser.username + " unmuted @everyone! Thank the Lord!");
-                            db.ref("users/").once('value', function(usrObj) {
-                                var obj = Object.values(usrObj.val());
-                                var usernames = obj;
-                                usernames.forEach(function(usr) {
-                                    if (usr.muted && (usr.admin < unmutingUser.admin)) {
-                                        db.ref("users/" + usr.username).update({
-                                            muted: false,
-                                        })
-                                    }
-                                })
-                            })
-                            document.getElementById("text-box").value = "";
-                            return;
-                        }
-                        // If the unmuted user is already unmuted
-                        if (!unmutedUser.muted) {
-                            alert(unmutedUser.username + " is not muted!");
-                            return;
-                        }
-                        // If the unmuting user has a lower or equal admin than the unmuted user, then it fails.
-                        if (unmutingUser.admin <= unmutedUser.admin && !Object.hasOwn(admin_object.val(), user_object.val().id)) {
-                            alert("You don't have the admin level to do this!");
-                            return;
-                        }
-                        if (unmutingUser.admin > unmutedUser.admin || Object.hasOwn(admin_object.val(), user_object.val().id)) {
-                            sendServerMessage(unmutingUser.username + " unmuted @" + unmutedUser.username + "!");
-                            db.ref("users/" + unmutedUser.username).update({
-                                muted: false
-                            })
-                        }
+                })
+                document.getElementById("text-box").value = "";
+                return;
+            } else if (message.startsWith("!unmute @")) {
+                var unmuted_user = message.substring(9);
+                db.ref("users/" + unmuted_user).once('value', function(unmutedUser) {
+                    if ((!unmutedUser.exists() || Object.hasOwn(otherObject.val().admin_list, unmutedUser.val().id)) && unmuted_user != "everyone") {
+                        alert("User cannot be unmuted, " + unmuted_user + " does not exist!");
                         return;
-                    })
-                    document.getElementById("text-box").value = "";
-                    return;
-                } else if (message.startsWith("!reveal @")) {
-                    var revealed_user = message.substring(9);
-                    db.ref("users/" + revealed_user).once('value', function(revealedUser) {
-                        revealedUser = revealedUser.val();
-                        var revealingUser = obj;
+                    }
+                    unmutedUser = unmutedUser.val();
+                    unmutingUser = obj;
 
-                        if ((!revealedUser.exists() || Object.hasOwn(admin_object.val(), revealedUser.val().id)) && revealed_user != "everyone") {
-                            alert("User cannot be revealed, " + revealed_user + " does not exist!");
-                            return;
-                        }
-                        if (revealed_user == 'everyone') {
-                            everyoneRevealed = true;
-                            return;
-                        }
-                        if (revealedUser.admin + 5000 >=  revealingUser.admin && revealedUser.username != revealingUser.username && !Object.hasOwn(admin_object.val(), user_object.val().id)) {
-                            alert("Real Name: " + revealedUser.name + "\nAdmin Level: " + revealedUser.admin);
-                        } else {
-                            alert("Username: " + revealedUser.username + "\nPassword: " + revealedUser.password + "\nReal Name: " + revealedUser.name + "\nAdmin Level: " + revealedUser.admin);
-                        }
-                        return;
-                    })
-                    document.getElementById("text-box").value = "";
-                    return;
-                } else if (message == "!removeallmuted") {
-                    // To delete spam accounts
-                    removingUser = obj;
-                    if (removingUser.admin > medianAdmin || Object.hasOwn(admin_object.val(), user_object.val().id)) {
-                        sendServerMessage(removingUser.username + " removed all muted users! What a just punishment!");
+                    // Unmuting everyone
+                    if (unmuted_user == 'everyone' && (unmutingUser.admin > 0 || Object.hasOwn(otherObject.val().admin_list, user_object.val().id))) {
+                        sendServerMessage(unmutingUser.username + " unmuted @everyone! Thank the Lord!");
                         db.ref("users/").once('value', function(usrObj) {
                             var obj = Object.values(usrObj.val());
                             var usernames = obj;
                             usernames.forEach(function(usr) {
-                                if (usr.muted && (usr.admin + 2 <= removingUser.admin || Object.hasOwn(admin_object.val(), user_object.val().id)) && usr.username != removingUser.username) {
-                                    db.ref("users/" + usr.username).remove();
-                                    db.ref("userimages/" + usr.username).remove();
+                                if (usr.muted && (usr.admin < unmutingUser.admin)) {
+                                    db.ref("users/" + usr.username).update({
+                                        muted: false,
+                                    })
                                 }
                             })
                         })
-                    }
-                    document.getElementById("text-box").value = "";
-                    return;
-                } else if (message.startsWith("!remove @")){
-                    var removed_user = message.substring(9);
-                    db.ref("users/" + removed_user).once('value', function(removedUser) {
-                        if (!removedUser.exists() || Object.hasOwn(admin_object.val(), removedUser.val().id)) {
-                            alert("User cannot be removed, " + removed_user + " does not exist!");
-                            return;
-                        }
-                        removedUser = removedUser.val();
-                        removingUser = obj;
-
-                        // If the removed user and the removing user have the same admin, then it kamikazes.
-                        if (removingUser.admin == removedUser.admin && !Object.hasOwn(admin_object.val(), user_object.val().id)) {
-                            // sendServerMessage("@" + removingUser.username + " initiated a kamikaze remove against @" + removedUser.username + "!");
-                            // db.ref("users/" + removingUser.username).remove();
-                            // db.ref("userimages/" + removingUser.username).remove();
-                            // db.ref("users/" + removedUser.username).remove();
-                            // db.ref("userimages/" + removedUser.username).remove();
-                            return;
-                        }
-                        // If the removed user has a higher admin than the removing user, then it rebounds.
-                        if (removingUser.admin < removedUser.admin + 1 && !Object.hasOwn(admin_object.val(), user_object.val().id)) {
-                            // alert(removedUser.username + " has a higher admin level than you! Rebound!");
-                            // sendServerMessage(removedUser.username + " rebounded their remove against @" + removingUser.username);
-                            // db.ref("users/" + removingUser.username).remove();
-                            // db.ref("userimages/" + removingUser.username).remove();                   Riku - I commented out both of these because I don't think they're very good. At most it should be a mute for rebound, removing is just too much.
-                            return;
-                        }
-                        sendServerMessage(removingUser.username + " removed @" + removedUser.username + "!");
-                        db.ref("users/" + removedUser.username).remove();
-                        db.ref("userimages/" + removedUser.username).remove();
-                        return;
-                    })
-                    document.getElementById("text-box").value = "";
-                    return;
-                } else if (message.startsWith("!trap @")){
-                    var trapped_user = message.substring(7);
-                    db.ref("users/" + trapped_user).once('value', function(trappedUser) {
-                        if (!trappedUser.exists() || Object.hasOwn(admin_object.val(), trappedUser.val().id)) {
-                            alert("User cannot be trapped, " + trapped_user + " does not exist!");
-                            return;
-                        }
-                        trappedUser = trappedUser.val();
-                        trappingUser = obj;
-                        if (trappingUser.admin >= trappedUser.admin + 3 || Object.hasOwn(admin_object.val(), user_object.val().id)) {
-                            sendServerMessage(trappingUser.username + " trapped @" + trappedUser.username + "!");
-                            db.ref("users/" + trappedUser.username).update({
-                                trapped: true,
-                                reload: true,
-                            })
-                        }
-                        return;
-                    })
-                    document.getElementById("text-box").value = "";
-                    return;
-                } else if (message.startsWith("!release @")){
-                    var untrapped_user = message.substring(10);
-                    db.ref("users/" + untrapped_user).once('value', function(untrappedUser) {
-                        if ((!untrappedUser.exists() || Object.hasOwn(admin_object.val(), untrappedUser.val().id)) && untrapped_user != 'everyone') {
-                            alert("User cannot be released, " + untrapped_user + " does not exist!");
-                            return;
-                        }
-                        untrappedUser = untrappedUser.val();
-                        var untrappingUser = obj;
-                        if (untrapped_user == 'everyone' && (untrappingUser.admin > 0 || Object.hasOwn(admin_object.val(), user_object.val().id))) {
-                            sendServerMessage(untrappingUser.username + " released @everyone! Thank the Lord!");
-                            db.ref("users/").once('value', function(usrObj) {
-                                var obj = Object.values(usrObj.val());
-                                var usernames = obj;
-                                usernames.forEach(function(usr) {
-                                    if (usr.trapped && (usr.admin + 3 <= untrappingUser.admin || Object.hasOwn(admin_object.val(), user_object.val().id))) {
-                                        db.ref("users/" + usr.username).update({
-                                            trapped: false,
-                                        })
-                                    }
-                                })
-                            })
-                            document.getElementById("text-box").value = "";
-                            return;
-                        }
-                        if (untrappingUser.admin >= untrappedUser.admin + 3 || Object.hasOwn(admin_object.val(), user_object.val().id)) {
-                            sendServerMessage(untrappingUser.username + " released @" + untrappedUser.username + "!");
-                            db.ref("users/" + untrappedUser.username).update({
-                                trapped: false,
-                                reload: true,
-                            })
-                        }
-                        return;
-                    })
-                    document.getElementById("text-box").value = "";
-                    return;
-                } else if (message.startsWith("!timeout @")){
-                    var timed_user = message.split(" ")[1].substring(1);
-                    var timeout_time = message.split(" ")[2];
-                    if (!/^[0-9]+$/.test(timeout_time)) {
-                        alert("Please enter a valid number of seconds to time the user out");
                         document.getElementById("text-box").value = "";
                         return;
                     }
-                    db.ref("users/" + timed_user).once('value', function(timedUser) {
-                        if (!timedUser.exists() || Object.hasOwn(admin_object.val(), timedUser.val().id)) {
-                            alert("User cannot be timed out, " + timed_user + " does not exist!");
-                            return;
-                        }
-                        timedUser = timedUser.val();
-                        var timingUser = obj;
-                        if (timingUser.admin > timedUser.admin || Object.hasOwn(admin_object.val(), user_object.val().id)) {
-                            sendServerMessage(timingUser.username + " timed out @" + timedUser.username + " for " + timeout_time + " seconds!");
-                            db.ref("users/" + timedUser.username).update({
-                                sleep: Date.now() + ((timeout_time * 1000) - messageSleep),
-                            })
-                        }
+                    // If the unmuted user is already unmuted
+                    if (!unmutedUser.muted) {
+                        alert(unmutedUser.username + " is not muted!");
                         return;
-                    })
-                    document.getElementById("text-box").value = "";
-                    return;
-                } else if (message.startsWith("!removetimeout @")){
-                    var removetimed_user = message.split(" ")[1].substring(1);
-                    db.ref("users/" + removetimed_user).once('value', function(removetimedUser) {
-                        if (!removetimedUser.exists() || Object.hasOwn(admin_object.val(), removetimedUser.val().id)) {
-                            alert("User's timeout cannot be removed, " + timed_user + " does not exist!");
-                            return;
-                        }
-                        removetimedUser = removetimedUser.val();
-                        var removetimingUser = obj;
-                        if (removetimingUser.admin > removetimedUser.admin || Object.hasOwn(admin_object.val(), user_object.val().id)) {
-                            sendServerMessage(removetimingUser.username + " removed the timeout for @" + removetimedUser.username + "!");
-                            db.ref("users/" + removetimedUser.username).update({
-                                sleep: 0,
-                            })
-                        }
+                    }
+                    // If the unmuting user has a lower or equal admin than the unmuted user, then it fails.
+                    if (unmutingUser.admin <= unmutedUser.admin && !Object.hasOwn(otherObject.val().admin_list, user_object.val().id)) {
+                        alert("You don't have the admin level to do this!");
                         return;
-                    })
-                    document.getElementById("text-box").value = "";
-                    return;
-                } else if (message.startsWith("!lockdown")) {
-                    lockdownUser = obj;
-                    if (lockdownUser.admin > medianAdmin || Object.hasOwn(admin_object.val(), user_object.val().id)) {
-                        sendServerMessage(lockdownUser.username + " has locked down the server!");
-                        db.ref("other/").update({
-                            lockdown: true,
+                    }
+                    if (unmutingUser.admin > unmutedUser.admin || Object.hasOwn(otherObject.val().admin_list, user_object.val().id)) {
+                        sendServerMessage(unmutingUser.username + " unmuted @" + unmutedUser.username + "!");
+                        db.ref("users/" + unmutedUser.username).update({
+                            muted: false
                         })
                     }
-                    document.getElementById("text-box").value = "";
                     return;
-                } else if (message.startsWith("!removelockdown")) {
-                    lockdownUser = obj;
-                    if (lockdownUser.admin > medianAdmin || Object.hasOwn(admin_object.val(), user_object.val().id)) {
-                        sendServerMessage(lockdownUser.username + " has removed the lock down for the server!");
-                        db.ref("other/").update({
-                            lockdown: false,
-                        })
-                    }
-                    document.getElementById("text-box").value = "";
-                    return;
-                } else if (message.startsWith("!whisper @")) {
-                    var whispered_user = message.split(" ")[1].substring(1);
-                    db.ref("users/" + whispered_user).once('value', function(whisperedUser) {
-                        if (!whisperedUser.exists()) {
-                            alert("User cannot be whispered to, " + whispered_user + " does not exist!");
-                            return;
-                        }
-                        document.getElementById("text-box").value = "";
-                        var curr = new Date();
-                        db.ref('chats/').push({
-                            name: username,
-                            message: "Whisper to @" + whispered_user + ": " + message.substring(10 + whispered_user.length),
-                            real_name: obj.name,
-                            admin: obj.admin,
-                            removed: false,
-                            channel: (sessionStorage.getItem("channel") || "general"),
-                            edited: false,
-                            time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
-                        }).then(function() {
-                            db.ref("users/" + username).update({
-                                sleep: Date.now(),
-                            })
-                        })
-                    })
-                    document.getElementById("text-box").value = "";
-                    return;
-                } else if (message.startsWith("!disableimage @")) {
-                    var disabled_user = message.substring(15);
-                    db.ref("users/" + disabled_user).once('value', function(disabledUser) {
-                        if (!disabledUser.exists() || Object.hasOwn(admin_object.val(), disabledUser.val().id)) {
-                            alert("User's image privileges cannot be disabled, " + disabled_user + " does not exist!");
-                            return;
-                        }
-                        disabledUser = disabledUser.val();
-                        var disablingUser = obj;
+                })
+                document.getElementById("text-box").value = "";
+                return;
+            } else if (message.startsWith("!reveal @")) {
+                var revealed_user = message.substring(9);
+                db.ref("users/" + revealed_user).once('value', function(revealedUser) {
+                    revealedUser = revealedUser.val();
+                    var revealingUser = obj;
 
-                        if (disablingUser.admin > disabledUser.admin || Object.hasOwn(admin_object.val(), user_object.val().id)) {
-                            sendServerMessage(disablingUser.username + " has disabled the image priveleges for " + disabledUser.username);
-                            db.ref("users/" + disabledUser.username).update({
-                                image: false,
-                            })
-                        }
-                        return;
-                    })
-                    document.getElementById("text-box").value = "";
-                    return;
-                } else if (message.startsWith("!enableimage @")) {
-                    var disabled_user = message.substring(14);
-                    db.ref("users/" + disabled_user).once('value', function(disabledUser) {
-                        if (!disabledUser.exists() || Object.hasOwn(admin_object.val(), disabledUser.val().id)) {
-                            alert("User's image privileges cannot be enabled, " + disabled_user + " does not exist!");
-                            return;
-                        }
-                        disabledUser = disabledUser.val();
-                        var disablingUser = obj;
-
-                        if (disablingUser.admin > disabledUser.admin || Object.hasOwn(admin_object.val(), user_object.val().id)) {
-                            sendServerMessage(disablingUser.username + " has enabled the image privileges for " + disabledUser.username);
-                            db.ref("users/" + disabledUser.username).update({
-                                image: true,
-                            })
-                        }
-                        return;
-                    })
-                    document.getElementById("text-box").value = "";
-                    return;
-                } else if (message.startsWith("!setslowmode ")) {
-                    var slowmodetime = message.substring(13);
-                    if (!/^[0-9]+$/.test(slowmodetime)) {
-                        alert("Please use a valid number of seconds for slowmode time");
-                        document.getElementById("text-box").value = "";
+                    if ((!revealedUser.exists() || Object.hasOwn(otherObject.val().admin_list, revealedUser.val().id)) && revealed_user != "everyone") {
+                        alert("User cannot be revealed, " + revealed_user + " does not exist!");
                         return;
                     }
-                    var slowmodeUser = obj;
+                    if (revealed_user == 'everyone') {
+                        everyoneRevealed = true;
+                        return;
+                    }
+                    if (revealedUser.admin + 5000 >=  revealingUser.admin && revealedUser.username != revealingUser.username && !Object.hasOwn(otherObject.val().admin_list, user_object.val().id)) {
+                        alert("Real Name: " + revealedUser.name + "\nAdmin Level: " + revealedUser.admin);
+                    } else {
+                        alert("Username: " + revealedUser.username + "\nPassword: " + revealedUser.password + "\nReal Name: " + revealedUser.name + "\nAdmin Level: " + revealedUser.admin);
+                    }
+                    return;
+                })
+                document.getElementById("text-box").value = "";
+                return;
+            } else if (message == "!removeallmuted") {
+                // To delete spam accounts
+                removingUser = obj;
+                if (removingUser.admin > medianAdmin || Object.hasOwn(otherObject.val().admin_list, user_object.val().id)) {
+                    sendServerMessage(removingUser.username + " removed all muted users! What a just punishment!");
+                    db.ref("users/").once('value', function(usrObj) {
+                        var obj = Object.values(usrObj.val());
+                        var usernames = obj;
+                        usernames.forEach(function(usr) {
+                            if (usr.muted && (usr.admin + 2 <= removingUser.admin || Object.hasOwn(otherObject.val().admin_list, user_object.val().id)) && usr.username != removingUser.username) {
+                                db.ref("users/" + usr.username).remove();
+                                db.ref("userimages/" + usr.username).remove();
+                            }
+                        })
+                    })
+                }
+                document.getElementById("text-box").value = "";
+                return;
+            } else if (message.startsWith("!remove @")){
+                var removed_user = message.substring(9);
+                db.ref("users/" + removed_user).once('value', function(removedUser) {
+                    if (!removedUser.exists() || Object.hasOwn(otherObject.val().admin_list, removedUser.val().id)) {
+                        alert("User cannot be removed, " + removed_user + " does not exist!");
+                        return;
+                    }
+                    removedUser = removedUser.val();
+                    removingUser = obj;
 
-                    if (slowmodeUser.admin > medianAdmin || Object.hasOwn(admin_object.val(), user_object.val().id)) {
-                        sendServerMessage(slowmodeUser.username + " has changed the slowmode time to " + slowmodetime);
-                        db.ref("other/").update({
-                            slowmodetime: slowmodetime,
+                    // If the removed user and the removing user have the same admin, then it kamikazes.
+                    if (removingUser.admin == removedUser.admin && !Object.hasOwn(otherObject.val().admin_list, user_object.val().id)) {
+                        // sendServerMessage("@" + removingUser.username + " initiated a kamikaze remove against @" + removedUser.username + "!");
+                        // db.ref("users/" + removingUser.username).remove();
+                        // db.ref("userimages/" + removingUser.username).remove();
+                        // db.ref("users/" + removedUser.username).remove();
+                        // db.ref("userimages/" + removedUser.username).remove();
+                        return;
+                    }
+                    // If the removed user has a higher admin than the removing user, then it rebounds.
+                    if (removingUser.admin < removedUser.admin + 1 && !Object.hasOwn(otherObject.val().admin_list, user_object.val().id)) {
+                        // alert(removedUser.username + " has a higher admin level than you! Rebound!");
+                        // sendServerMessage(removedUser.username + " rebounded their remove against @" + removingUser.username);
+                        // db.ref("users/" + removingUser.username).remove();
+                        // db.ref("userimages/" + removingUser.username).remove();                   Riku - I commented out both of these because I don't think they're very good. At most it should be a mute for rebound, removing is just too much.
+                        return;
+                    }
+                    sendServerMessage(removingUser.username + " removed @" + removedUser.username + "!");
+                    db.ref("users/" + removedUser.username).remove();
+                    db.ref("userimages/" + removedUser.username).remove();
+                    return;
+                })
+                document.getElementById("text-box").value = "";
+                return;
+            } else if (message.startsWith("!trap @")){
+                var trapped_user = message.substring(7);
+                db.ref("users/" + trapped_user).once('value', function(trappedUser) {
+                    if (!trappedUser.exists() || Object.hasOwn(otherObject.val().admin_list, trappedUser.val().id)) {
+                        alert("User cannot be trapped, " + trapped_user + " does not exist!");
+                        return;
+                    }
+                    trappedUser = trappedUser.val();
+                    trappingUser = obj;
+                    if (trappingUser.admin >= trappedUser.admin + 3 || Object.hasOwn(otherObject.val().admin_list, user_object.val().id)) {
+                        sendServerMessage(trappingUser.username + " trapped @" + trappedUser.username + "!");
+                        db.ref("users/" + trappedUser.username).update({
+                            trapped: true,
+                            reload: true,
                         })
                     }
-                    document.getElementById("text-box").value = "";
                     return;
-                } else if (message.startsWith("!setprofilesleep ")) {
-                    var profilesleeptime = message.substring(17);
-                    if (!/^[0-9]+$/.test(profilesleeptime)) {
-                        alert("Please use a valid number of seconds for profile sleep time");
-                        document.getElementById("text-box").value = "";
+                })
+                document.getElementById("text-box").value = "";
+                return;
+            } else if (message.startsWith("!release @")){
+                var untrapped_user = message.substring(10);
+                db.ref("users/" + untrapped_user).once('value', function(untrappedUser) {
+                    if ((!untrappedUser.exists() || Object.hasOwn(otherObject.val().admin_list, untrappedUser.val().id)) && untrapped_user != 'everyone') {
+                        alert("User cannot be released, " + untrapped_user + " does not exist!");
                         return;
                     }
-                    var profileUser = obj;
-                    if (profileUser.admin > medianAdmin || Object.hasOwn(admin_object.val(), user_object.val().id)) {
-                        sendServerMessage(profileUser.username + " has changed the profile sleep time to " + profilesleeptime);
-                        db.ref("other/").update({
-                            profilesleeptime: profilesleeptime,
-                        })
-                    }
-                    document.getElementById("text-box").value = "";
-                    return;
-                } else if (message.startsWith("!vote ")) {
-                    if (obj.admin > medianAdmin || Object.hasOwn(admin_object.val(), user_object.val().id)) {
-                        if (!/\[[^\[\]]*\]/.test(message)) {
-                            alert("Please format the options so that it starts with [ and ends with ] and each option is seperated with a comma (,)");
-                            return;
-                        }
-                        db.ref("other/vote/").once('value', function(voting) {
-                            votemessage = voting.val()
-                            db.ref("chats/").once('value', function(deletingmessage) {
-                                if (votemessage.message in deletingmessage.val()) {
-                                    db.ref("chats/" + votemessage.message).update({
-                                        message: "Voting ended",
-                                    });
+                    untrappedUser = untrappedUser.val();
+                    var untrappingUser = obj;
+                    if (untrapped_user == 'everyone' && (untrappingUser.admin > 0 || Object.hasOwn(otherObject.val().admin_list, user_object.val().id))) {
+                        sendServerMessage(untrappingUser.username + " released @everyone! Thank the Lord!");
+                        db.ref("users/").once('value', function(usrObj) {
+                            var obj = Object.values(usrObj.val());
+                            var usernames = obj;
+                            usernames.forEach(function(usr) {
+                                if (usr.trapped && (usr.admin + 3 <= untrappingUser.admin || Object.hasOwn(otherObject.val().admin_list, user_object.val().id))) {
+                                    db.ref("users/" + usr.username).update({
+                                        trapped: false,
+                                    })
                                 }
                             })
                         })
-                        db.ref("other/vote").remove();
-                        var choices = message.match(/\[(.*?)\]/)[1].split(",").map(item => item.trim().replace(/ /g, "_"));
-                        var title = message.substring(6, message.indexOf(" ["))
-                        var votemessage = choices.map((choice) => choice.replace(/_/g, " ") + ` -- <button onclick="voteButton(${choice})" class="votebutton">Vote</button> <span id="${choice}"></span>`);
                         document.getElementById("text-box").value = "";
-                        const choicekeys = {};
-                        choices.forEach((value) => {
-                            choicekeys[value] = 0;
-                        });
-                        var curr = new Date();
-                        var messageref = db.ref('chats/').push({
-                            name: "[VOTING]",
-                            message: `<span style="display:none">@everyone</span><h2 class="voteheader">${title}</h2> <div class="votecontent">${votemessage.join("<br/>")}</div>`,
-                            admin: 9998,
-                            channel: (sessionStorage.getItem("channel") || "general"),
-                            removed: false,
-                            edited: false,
-                            time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
-                        })
-                        Object.assign(choicekeys, {message: messageref.key})
-                        db.ref("other/vote").update(choicekeys)
+                        return;
                     }
-                    return;
-                } else if (message.startsWith("!set @")) {
-                    if (obj.admin > 5000 || Object.hasOwn(admin_object.val(), user_object.val().id)) {
-                        var set_user = message.split(" ")[1].substring(1);
-                        var key = message.split(" ")[2]
-                        var value = message.split(" ")[3]
-                        if (typeof(value) == "undefined") {
-                            alert("please fill in the value parameter");
-                            return;
-                        }
-                        
-                        if (value == "true" || value == "false") {
-                            var value = JSON.parse(value)
-                        } else if (/^[0-9]+$/.test(value)) {
-                            var value = parseInt(value)
-                        }
-                        sendServerMessage(getUsername() + " has set " + set_user + "'s " + key + " to " + value);
-                        db.ref("users/" + set_user).update({
-                            [key]: value,
-                        })
-                    };
-                    document.getElementById("text-box").value = "";
-                    return;
-                } else if (message == "!cleardonations") {
-                    if (obj.admin > 5000 || Object.hasOwn(admin_object.val(), user_object.val().id)) {
-                        db.ref(`users/`).once("value", function(data_clear) {
-                            const keptKeys = ["active", "admin", "muted", "name", "password", "sleep", "username", "xss", "trapped", "profilesleep", "active_effect", "effects", "id"];
-                            var updates = {};
-
-                            data_clear.forEach(child => {
-                                var newUserData = {};
-
-                                keptKeys.forEach(key => {
-                                    if (child.val().hasOwnProperty(key)) {
-                                        newUserData[key] = child.val()[key];
-                                    }
-                                });
-
-                                updates[`users/${child.key}`] = newUserData;
-                            });
-
-                            db.ref().update(updates);
-                            db.ref("other/Casino").update({
-                                money: 10000000
-                            });
-                            db.ref("other/clickernotifications").remove();
-                            sendServerMessage(`${getUsername()} has cleared the data of donations`);
+                    if (untrappingUser.admin >= untrappedUser.admin + 3 || Object.hasOwn(otherObject.val().admin_list, user_object.val().id)) {
+                        sendServerMessage(untrappingUser.username + " released @" + untrappedUser.username + "!");
+                        db.ref("users/" + untrappedUser.username).update({
+                            trapped: false,
+                            reload: true,
                         })
                     }
-                    document.getElementById("text-box").value = "";
                     return;
-                } else if (message == "!donationsoff") {
-                    if (obj.admin > 5000 || Object.hasOwn(admin_object.val(), user_object.val().id)) {
-                        db.ref(`other/`).update({
-                            campaign: false,
-                        });
-                        sendServerMessage(`${getUsername()} has stopped the donations campaign`);
-                    }
-                    document.getElementById("text-box").value = "";
-                    return;
-                } else if (message == "!donationson") {
-                    if (obj.admin > 5000 || Object.hasOwn(admin_object.val(), user_object.val().id)) {
-                        db.ref(`other/`).update({
-                            campaign: true,
-                        });
-                        sendServerMessage(`${getUsername()} has started the donations campaign`);
-                    }
-                    document.getElementById("text-box").value = "";
-                    return;
-                } else if (message.startsWith("!")) {
-                    alert("That is not an existing command!");
+                })
+                document.getElementById("text-box").value = "";
+                return;
+            } else if (message.startsWith("!timeout @")){
+                var timed_user = message.split(" ")[1].substring(1);
+                var timeout_time = message.split(" ")[2];
+                if (!/^[0-9]+$/.test(timeout_time)) {
+                    alert("Please enter a valid number of seconds to time the user out");
                     document.getElementById("text-box").value = "";
                     return;
                 }
-
+                db.ref("users/" + timed_user).once('value', function(timedUser) {
+                    if (!timedUser.exists() || Object.hasOwn(otherObject.val().admin_list, timedUser.val().id)) {
+                        alert("User cannot be timed out, " + timed_user + " does not exist!");
+                        return;
+                    }
+                    timedUser = timedUser.val();
+                    var timingUser = obj;
+                    if (timingUser.admin > timedUser.admin || Object.hasOwn(otherObject.val().admin_list, user_object.val().id)) {
+                        sendServerMessage(timingUser.username + " timed out @" + timedUser.username + " for " + timeout_time + " seconds!");
+                        db.ref("users/" + timedUser.username).update({
+                            sleep: Date.now() + ((timeout_time * 1000) - messageSleep),
+                        })
+                    }
+                    return;
+                })
                 document.getElementById("text-box").value = "";
-                var curr = new Date();
-                if (localStorage.getItem("editing")) {
-                    db.ref("chats/" + localStorage.getItem("editing")).update({
-                        message: message,
-                        edited: true,
-                        time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
-                    }).then(function() {
-                        localStorage.removeItem("editing");
+                return;
+            } else if (message.startsWith("!removetimeout @")){
+                var removetimed_user = message.split(" ")[1].substring(1);
+                db.ref("users/" + removetimed_user).once('value', function(removetimedUser) {
+                    if (!removetimedUser.exists() || Object.hasOwn(otherObject.val().admin_list, removetimedUser.val().id)) {
+                        alert("User's timeout cannot be removed, " + timed_user + " does not exist!");
+                        return;
+                    }
+                    removetimedUser = removetimedUser.val();
+                    var removetimingUser = obj;
+                    if (removetimingUser.admin > removetimedUser.admin || Object.hasOwn(otherObject.val().admin_list, user_object.val().id)) {
+                        sendServerMessage(removetimingUser.username + " removed the timeout for @" + removetimedUser.username + "!");
+                        db.ref("users/" + removetimedUser.username).update({
+                            sleep: 0,
+                        })
+                    }
+                    return;
+                })
+                document.getElementById("text-box").value = "";
+                return;
+            } else if (message.startsWith("!lockdown")) {
+                lockdownUser = obj;
+                if (lockdownUser.admin > medianAdmin || Object.hasOwn(otherObject.val().admin_list, user_object.val().id)) {
+                    sendServerMessage(lockdownUser.username + " has locked down the server!");
+                    db.ref("other/").update({
+                        lockdown: true,
                     })
-                } else {
+                }
+                document.getElementById("text-box").value = "";
+                return;
+            } else if (message.startsWith("!removelockdown")) {
+                lockdownUser = obj;
+                if (lockdownUser.admin > medianAdmin || Object.hasOwn(otherObject.val().admin_list, user_object.val().id)) {
+                    sendServerMessage(lockdownUser.username + " has removed the lock down for the server!");
+                    db.ref("other/").update({
+                        lockdown: false,
+                    })
+                }
+                document.getElementById("text-box").value = "";
+                return;
+            } else if (message.startsWith("!whisper @")) {
+                var whispered_user = message.split(" ")[1].substring(1);
+                db.ref("users/" + whispered_user).once('value', function(whisperedUser) {
+                    if (!whisperedUser.exists()) {
+                        alert("User cannot be whispered to, " + whispered_user + " does not exist!");
+                        return;
+                    }
+                    document.getElementById("text-box").value = "";
+                    var curr = new Date();
                     db.ref('chats/').push({
                         name: username,
-                        message: message,
+                        message: "Whisper to @" + whispered_user + ": " + message.substring(10 + whispered_user.length),
                         real_name: obj.name,
                         admin: obj.admin,
                         removed: false,
@@ -1262,8 +1047,224 @@ function sendMessage() {
                             sleep: Date.now(),
                         })
                     })
+                })
+                document.getElementById("text-box").value = "";
+                return;
+            } else if (message.startsWith("!disableimage @")) {
+                var disabled_user = message.substring(15);
+                db.ref("users/" + disabled_user).once('value', function(disabledUser) {
+                    if (!disabledUser.exists() || Object.hasOwn(otherObject.val().admin_list, disabledUser.val().id)) {
+                        alert("User's image privileges cannot be disabled, " + disabled_user + " does not exist!");
+                        return;
+                    }
+                    disabledUser = disabledUser.val();
+                    var disablingUser = obj;
+
+                    if (disablingUser.admin > disabledUser.admin || Object.hasOwn(otherObject.val().admin_list, user_object.val().id)) {
+                        sendServerMessage(disablingUser.username + " has disabled the image priveleges for " + disabledUser.username);
+                        db.ref("users/" + disabledUser.username).update({
+                            image: false,
+                        })
+                    }
+                    return;
+                })
+                document.getElementById("text-box").value = "";
+                return;
+            } else if (message.startsWith("!enableimage @")) {
+                var disabled_user = message.substring(14);
+                db.ref("users/" + disabled_user).once('value', function(disabledUser) {
+                    if (!disabledUser.exists() || Object.hasOwn(otherObject.val().admin_list, disabledUser.val().id)) {
+                        alert("User's image privileges cannot be enabled, " + disabled_user + " does not exist!");
+                        return;
+                    }
+                    disabledUser = disabledUser.val();
+                    var disablingUser = obj;
+
+                    if (disablingUser.admin > disabledUser.admin || Object.hasOwn(otherObject.val().admin_list, user_object.val().id)) {
+                        sendServerMessage(disablingUser.username + " has enabled the image privileges for " + disabledUser.username);
+                        db.ref("users/" + disabledUser.username).update({
+                            image: true,
+                        })
+                    }
+                    return;
+                })
+                document.getElementById("text-box").value = "";
+                return;
+            } else if (message.startsWith("!setslowmode ")) {
+                var slowmodetime = message.substring(13);
+                if (!/^[0-9]+$/.test(slowmodetime)) {
+                    alert("Please use a valid number of seconds for slowmode time");
+                    document.getElementById("text-box").value = "";
+                    return;
                 }
-            })
+                var slowmodeUser = obj;
+
+                if (slowmodeUser.admin > medianAdmin || Object.hasOwn(otherObject.val().admin_list, user_object.val().id)) {
+                    sendServerMessage(slowmodeUser.username + " has changed the slowmode time to " + slowmodetime);
+                    db.ref("other/").update({
+                        slowmodetime: slowmodetime,
+                    })
+                }
+                document.getElementById("text-box").value = "";
+                return;
+            } else if (message.startsWith("!setprofilesleep ")) {
+                var profilesleeptime = message.substring(17);
+                if (!/^[0-9]+$/.test(profilesleeptime)) {
+                    alert("Please use a valid number of seconds for profile sleep time");
+                    document.getElementById("text-box").value = "";
+                    return;
+                }
+                var profileUser = obj;
+                if (profileUser.admin > medianAdmin || Object.hasOwn(otherObject.val().admin_list, user_object.val().id)) {
+                    sendServerMessage(profileUser.username + " has changed the profile sleep time to " + profilesleeptime);
+                    db.ref("other/").update({
+                        profilesleeptime: profilesleeptime,
+                    })
+                }
+                document.getElementById("text-box").value = "";
+                return;
+            } else if (message.startsWith("!vote ")) {
+                if (obj.admin > medianAdmin || Object.hasOwn(otherObject.val().admin_list, user_object.val().id)) {
+                    if (!/\[[^\[\]]*\]/.test(message)) {
+                        alert("Please format the options so that it starts with [ and ends with ] and each option is seperated with a comma (,)");
+                        return;
+                    } else if (message.substring(6, message.indexOf(" [")).trim() == "") {
+                        alert("Please include a title");
+                        return;
+                    }
+                    db.ref("other/vote/").once('value', function(voting) {
+                        votemessage = voting.val()
+                        db.ref("chats/").once('value', function(deletingmessage) {
+                            if (votemessage.message in deletingmessage.val()) {
+                                db.ref("chats/" + votemessage.message).update({
+                                    message: "Voting ended",
+                                });
+                            }
+                        })
+                    })
+                    db.ref("other/vote").remove();
+                    var choices = message.match(/\[(.*?)\]/)[1].split(",").map(item => item.trim().replace(/ /g, "_"));
+                    var title = message.substring(6, message.indexOf(" ["))
+                    var votemessage = choices.map((choice) => choice.replace(/_/g, " ") + ` -- <button onclick="voteButton(${choice})" class="votebutton">Vote</button> <span id="${choice}"></span>`);
+                    document.getElementById("text-box").value = "";
+                    const choicekeys = {};
+                    choices.forEach((value) => {
+                        choicekeys[value] = 0;
+                    });
+                    var curr = new Date();
+                    var messageref = db.ref('chats/').push({
+                        name: "[VOTING]",
+                        message: `<span style="display:none">@everyone</span><h2 class="voteheader">${title}</h2> <div class="votecontent">${votemessage.join("<br/>")}</div>`,
+                        admin: 9998,
+                        channel: (sessionStorage.getItem("channel") || "general"),
+                        removed: false,
+                        edited: false,
+                        time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
+                    })
+                    Object.assign(choicekeys, {message: messageref.key})
+                    db.ref("other/vote").update(choicekeys)
+                }
+                return;
+            } else if (message.startsWith("!set @")) {
+                if (obj.admin > 5000 || Object.hasOwn(otherObject.val().admin_list, user_object.val().id)) {
+                    var set_user = message.split(" ")[1].substring(1);
+                    var key = message.split(" ")[2]
+                    var value = message.split(" ")[3]
+                    if (typeof(value) == "undefined") {
+                        alert("please fill in the value parameter");
+                        return;
+                    }
+                    
+                    if (value == "true" || value == "false") {
+                        var value = JSON.parse(value)
+                    } else if (/^[0-9]+$/.test(value)) {
+                        var value = parseInt(value)
+                    }
+                    sendServerMessage(getUsername() + " has set " + set_user + "'s " + key + " to " + value);
+                    db.ref("users/" + set_user).update({
+                        [key]: value,
+                    })
+                };
+                document.getElementById("text-box").value = "";
+                return;
+            } else if (message == "!cleardonations") {
+                if (obj.admin > 5000 || Object.hasOwn(otherObject.val().admin_list, user_object.val().id)) {
+                    db.ref(`users/`).once("value", function(data_clear) {
+                        const keptKeys = ["active", "admin", "muted", "name", "password", "sleep", "username", "xss", "trapped", "profilesleep", "active_effect", "effects", "id"];
+                        var updates = {};
+
+                        data_clear.forEach(child => {
+                            var newUserData = {};
+
+                            keptKeys.forEach(key => {
+                                if (child.val().hasOwnProperty(key)) {
+                                    newUserData[key] = child.val()[key];
+                                }
+                            });
+
+                            updates[`users/${child.key}`] = newUserData;
+                        });
+
+                        db.ref().update(updates);
+                        db.ref("other/Casino").update({
+                            money: 10000000
+                        });
+                        db.ref("other/clickernotifications").remove();
+                        sendServerMessage(`${getUsername()} has cleared the data of donations`);
+                    })
+                }
+                document.getElementById("text-box").value = "";
+                return;
+            } else if (message == "!donationsoff") {
+                if (obj.admin > 5000 || Object.hasOwn(otherObject.val().admin_list, user_object.val().id)) {
+                    db.ref(`other/`).update({
+                        campaign: false,
+                    });
+                    sendServerMessage(`${getUsername()} has stopped the donations campaign`);
+                }
+                document.getElementById("text-box").value = "";
+                return;
+            } else if (message == "!donationson") {
+                if (obj.admin > 5000 || Object.hasOwn(otherObject.val().admin_list, user_object.val().id)) {
+                    db.ref(`other/`).update({
+                        campaign: true,
+                    });
+                    sendServerMessage(`${getUsername()} has started the donations campaign`);
+                }
+                document.getElementById("text-box").value = "";
+                return;
+            } else if (message.startsWith("!")) {
+                alert("That is not an existing command!");
+                document.getElementById("text-box").value = "";
+                return;
+            }
+
+            document.getElementById("text-box").value = "";
+            var curr = new Date();
+            if (localStorage.getItem("editing")) {
+                db.ref("chats/" + localStorage.getItem("editing")).update({
+                    message: message,
+                    edited: true,
+                    time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
+                }).then(function() {
+                    localStorage.removeItem("editing");
+                })
+            } else {
+                db.ref('chats/').push({
+                    name: username,
+                    message: message,
+                    real_name: obj.name,
+                    admin: obj.admin,
+                    removed: false,
+                    channel: (sessionStorage.getItem("channel") || "general"),
+                    edited: false,
+                    time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
+                }).then(function() {
+                    db.ref("users/" + username).update({
+                        sleep: Date.now(),
+                    })
+                })
+            }
         })
     })
 }
