@@ -1395,6 +1395,7 @@ function checkMute() {
                     timeoutId = setTimeout(() => {
                         document.getElementById("text-box").disabled = false;
                         document.getElementById("text-box").placeholder = "Message"
+                        document.getElementById("text-box").focus();
                     }, messageSleep - timePassed)
                 }
             })
@@ -1508,7 +1509,7 @@ function setup() {
                 const lastMessageTime = obj.sleep || 0;
                 const timePassed = Date.now() - lastMessageTime;
                 let params = new URLSearchParams(document.location.search);
-                if (((!obj.muted && !(timePassed < messageSleep) && !obj.trapped) || obj.admin > 0) && !(JSON.parse(params.get("ignore")) || false) && !Object.hasOwn(admin.val(), obj.id)) {
+                if ((!obj.muted && !(timePassed < messageSleep) && !obj.trapped) && !(JSON.parse(params.get("ignore")) || false) && !Object.hasOwn(admin.val(), obj.id)) {
                     sendServerMessage(getUsername() + " has joined the chat<span style='visibility: hidden;'>@" + getUsername() + "</span>", true);
                 }
             })
