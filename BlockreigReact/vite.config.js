@@ -5,5 +5,8 @@ export default defineConfig(({ mode }) => {
   return {
     base: mode === 'production' ? '/Blockrieg/' : '/',
     plugins: [react()],
+    build: {
+      outDir: 'dist',
+    }
   };
 });
