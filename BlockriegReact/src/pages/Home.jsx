@@ -1,4 +1,7 @@
 import { Routes, Route, Link } from 'react-router-dom';
+import sampleGame from '../assets/images/sampleGame.png';
+import strategy from '../assets/images/strategy.png';
+import moverGuide from '../assets/images/moverGuide.png';
 
 function Home() {
   return (
@@ -12,7 +15,7 @@ function Home() {
         </header>
         <section className='mainSection'>
              <div className='card firstCard'>
-                <img src='./src/assets/images/sampleGame.png' />
+                <img src={sampleGame}/>
                 <div className='text'>
                      <div className='cardTextPart'>
                          <h3>
@@ -27,7 +30,7 @@ function Home() {
                              Try different strategies!
                          </h3>
                      </div>
-                     <img src='./src/assets/images/strategy.png' id='secondImage'/>
+                     <img src={strategy} id='secondImage'/>
                  </div>
              </div>
              <div className='card'>
@@ -38,7 +41,7 @@ function Home() {
                     <p>
                         We created a guide as to how to play, showing all the functions of all the blocks.
                     </p>
-                    <img src='./src/assets/images/moversGuide.png' id='moverGuide'/>
+                    <img src={moverGuide} id='moverGuide'/>
                     <Link to='/Guide' className='btn guideButton'>How to Play</Link>
                 </text>
             </div>
