@@ -3,13 +3,14 @@ import Home from "./pages/Home";
 import Guide from "./pages/Guide";
 import LoremIpsum from './pages/LoremIpsum';
 import Blockrieg from './pages/Blockrieg';
+import logo from './assets/images/Blockrieg.png';
 
 function App() {
   return (
     <>
       <nav>
         <div className="logo">
-          <img src='./src/assets/images/Blockrieg.png' />
+          <img src={logo} />
         </div>
         <Link to='/' className='navBtn'>Home</Link>
         <Link to='/Game' className='navBtn'>Play Game!</Link>
