@@ -11,10 +11,13 @@ var globalMessages = [];
 var loadSubsequentMessages = false;
 var firstLoad = true;
 var timeoutId = false;
+var clearchatId = false;
 let images
 let db;
 
 function getChats() {
+    document.getElementById("getChatsButton").remove();
+    
     db.ref(`users/${getUsername()}`).once("value", function(user_object) {
         db.ref('chats/').limitToLast(1).once("value", function(last_message) {
             db.ref('chats/').on('child_added', function(message_object) {
@@ -50,7 +53,14 @@ function checkDeletion() {
                 globalMessages.splice(index, 1);
             }
 
-            refreshChat(user_object);
+            if (clearchatId) {
+                clearTimeout(clearchatId);
+            }
+            
+            clearchatId = setTimeout(() => {
+                refreshChat(user_object);
+                alert("done")
+            }, 100)
         })
     })
 }
