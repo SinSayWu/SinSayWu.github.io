@@ -59,7 +59,6 @@ function checkDeletion() {
             
             clearchatId = setTimeout(() => {
                 refreshChat(user_object);
-                alert("done")
             }, 100)
         })
     })
