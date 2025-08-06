@@ -2,6 +2,7 @@ import { Routes, Route, Link } from 'react-router-dom';
 import sampleGame from '../assets/images/sampleGame.png';
 import strategy from '../assets/images/strategy.png';
 import moverGuide from '../assets/images/moverGuide.png';
+import './Home';
 
 function Home() {
   return (
@@ -11,10 +12,10 @@ function Home() {
             <p>
                 Blitzkrieg through your opponent's defenses with self-automated blocks!
             </p>
-            <Link to='/Blockrieg' className='btn'>Play Game!</Link>
+            <Link to='/play' className='btn'>Play Game!</Link>
         </header>
         <section className='mainSection'>
-             <div className='card firstCard'>
+             <div className='card firstHomeCard'>
                 <img src={sampleGame}/>
                 <div className='text'>
                      <div className='cardTextPart'>
@@ -33,7 +34,7 @@ function Home() {
                      <img src={strategy} id='secondImage'/>
                  </div>
              </div>
-             <div className='card'>
+             <div className='card secondHomeCard'>
                 <text className='secondSection'>
                     <h1>
                        Check out our Guide!
@@ -41,7 +42,7 @@ function Home() {
                     <p>
                         We created a guide as to how to play, showing all the functions of all the blocks.
                     </p>
-                    <img src={moverGuide} id='moverGuide'/>
+                    <img src={moverGuide} id='moversGuide'/>
                     <Link to='/Guide' className='btn guideButton'>How to Play</Link>
                 </text>
             </div>

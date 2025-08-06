@@ -77,6 +77,7 @@ img {
   transition: transform 0.25s;
   text-decoration: none;
   text-wrap-mode: nowrap;
+  border: 0px solid white;
 }
 
 .navBtn:hover {
@@ -85,6 +86,67 @@ img {
   border-radius: 8px;
   border: 1px solid var(--secondary-color);
   z-index: 100;
+}
+
+.profile {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.profile-name {
+  color: var(--primary-color)
+}
+
+/* Dropdown container */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropbtn{
+  color: var(--primary-color);
+  background-color: var(--secondary-background);
+  padding: 0.5rem;
+  border: 0px solid white;
+  border-radius: 50%;
+}
+
+/* Dropdown content (hidden by default) */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: var(--ternary-background);
+  min-width: 160px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+  flex-direction: column;
+}
+
+/* Dropdown links */
+.dropdown-content a {
+  color: var(--primary-color);
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+/* Show dropdown on hover */
+.dropdown:hover .dropdown-content {
+  display: flex;
+}
+
+/* Hover effects */
+.dropbtn:hover, .dropdown-content a:hover {
+  background-color: var(--secondary-background);
+  cursor: pointer;
+}
+
+.dropdown:hover .arrow {
+  transform: rotate(180deg);
 }
 
 .container {
@@ -133,7 +195,7 @@ footer {
   text-align: center;
   margin-top: 3rem;
   font-size: 0.9rem;
-  color: #666;
+  color: var(--secondary-background);
 }
 
 /* Buttons */
@@ -182,7 +244,7 @@ footer {
   border-image-slice: 1;
 }
 
-.firstCard {
+.firstHomeCard {
   max-width: 60%;
 }
 
@@ -243,7 +305,8 @@ footer {
 
 .guideButton {
   position: relative;
-  margin-bottom: 1vh;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
 }
 
 #moverGuide {
@@ -261,5 +324,5 @@ footer {
 .card h1 {
   color: var(--primary-color);
   margin-top: 0;
-  font-size: min(5vh, 2vw);
+  font-size: calc(0.5rem + 1vw);
 }

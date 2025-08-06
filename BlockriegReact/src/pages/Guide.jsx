@@ -1,5 +1,8 @@
 function Guide() {
-  return <h1>Guide Page</h1>;
+  return (
+    <>
+    </>
+  );
 }
 
 export default Guide;
