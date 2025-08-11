@@ -320,10 +320,7 @@ function refreshChat(user_data, change_channel = false, first = false) {
     }
 }
 
-function displayMembers() {
-    var members = document.getElementById('members');
-
-    db.ref(`other/admin_list`).once("value", function(admin_object) {
+function displayMembers() {db.ref(`other/admin_list`).once("value", function(admin_object) {
         db.ref('users/').orderByChild("admin").once('value', function(membersList) {
             active_users = [];
             inactive_users = [];

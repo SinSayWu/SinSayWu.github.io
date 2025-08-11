@@ -1944,9 +1944,9 @@ function minusMoney() {
                         money: firebase.database.ServerValue.increment(price > money ? -money : -price),
                         deeds: firebase.database.ServerValue.increment(policy_object.val() ? -Math.round(price * 0.001) : 0),
                     })
-                    db.ref(`users/${moneyselector.value}/money`).update(
-                        (money - Math.abs(Math.round(moneyinput.value)) < 0 ? 0 : money - Math.abs(Math.round(moneyinput.value)))
-                    )
+                    db.ref(`users/${moneyselector.value}`).update({
+                        money: firebase.database.ServerValue.increment(money - Math.abs(Math.round(moneyinput.value)) < 0 ? -money : -Math.abs(Math.round(moneyinput.value)))
+                    })
                     if (price >= attacker.money * 0.5 && price >= 10000000) {
                         sendNotification(`${attacker.username} has just removed $${Math.abs(Math.round(moneyinput.value))} from ${victim.username}!`);
                     }
