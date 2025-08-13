@@ -18,20 +18,20 @@ function Home() {
              <div className='card firstHomeCard'>
                 <img src={sampleGame}/>
                 <div className='text'>
-                     <div className='cardTextPart'>
-                         <h3>
-                             Automate War!
-                         </h3>
-                         <p>
-                             Automate your attacks with a strategic positioning of blocks.
-                         </p>
-                     </div>
-                     <div>
-                         <h3>
-                             Try different strategies!
-                         </h3>
-                     </div>
-                     <img src={strategy} id='secondImage'/>
+                        <div className='cardTextPart'>
+                            <h3>
+                                Automate War!
+                            </h3>
+                            <p>
+                            Automate your attacks with a strategic positioning of blocks.
+                            </p>
+                        </div>
+                        <div>
+                            <h3>
+                                Try different strategies!
+                            </h3>
+                        </div>
+                        <img src={strategy} id='secondImage'/>
                  </div>
              </div>
              <div className='card secondHomeCard'>
