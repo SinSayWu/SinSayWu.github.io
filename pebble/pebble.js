@@ -149,7 +149,7 @@ function refreshChat(user_data, change_channel = false, first = false) {
                 userElement.style.fontWeight = "bold";
                 userElement.style.color = "Yellow";
                 messageElement.appendChild(userElement);
-            } else if (prevItem == null || prevItem.val().name != data.val().name || data.val().edited) {
+            } else if (prevItem == null || prevItem.val().name != data.val().name || prevItem.val().channel != data.val().channel || data.val().edited) {
                 var userElement = document.createElement("div");
                 userElement.setAttribute("class", "username");
                 userElement.addEventListener("click", function(e) {
@@ -233,6 +233,13 @@ function refreshChat(user_data, change_channel = false, first = false) {
 
             var messageContent = document.createElement("div");
             messageContent.setAttribute("class", "message-text");
+
+            if (message.match(/src="([^"]+)"/)) {
+                var messageImage = document.createElement("img");
+                messageImage.src = message.match(/src="([^"]+)"/)[1];
+                messageContent.height = messageImage.height;
+            }
+
             messageContent.innerHTML = message;
 
             if (message.includes("@" + getUsername()) || message.includes("@everyone")) {
@@ -320,7 +327,8 @@ function refreshChat(user_data, change_channel = false, first = false) {
     }
 }
 
-function displayMembers() {db.ref(`other/admin_list`).once("value", function(admin_object) {
+function displayMembers() {
+    db.ref(`other/admin_list`).once("value", function(admin_object) {
         db.ref('users/').orderByChild("admin").once('value', function(membersList) {
             active_users = [];
             inactive_users = [];
@@ -1044,6 +1052,7 @@ function sendMessage() {
                         real_name: obj.name,
                         admin: obj.admin,
                         removed: false,
+                        whisper: whispered_user,
                         channel: (sessionStorage.getItem("channel") || "general"),
                         edited: false,
                         time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
