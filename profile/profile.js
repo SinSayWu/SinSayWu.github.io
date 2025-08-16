@@ -88,14 +88,20 @@ function submit() {
 }
 
 window.onload = function() {
-    fetch('https://us-central1-pebble-rocks.cloudfunctions.net/api/checkVersion')
+    fetch('https://us-central1-pebble-rocks.cloudfunctions.net/api/getInfo', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'text/plain'
+        },
+        body: typeof(window.APPCHECK) !== "undefined" ? window.APPCHECK : null
+    })
     .then(response => response.json())
     .then(data => {
-        if (data.value === curr_version) {
+        if (data.version === curr_version) {
             setup();
         } else {
             document.body.innerHTML = `An error has occured. You are most likely using an outdated version of the site. Fetch a new version by pressing "ctrl + shift + R" or "ctrl + f5<br>
-            Newest Version: ${data.value}<br>
+            Newest Version: ${data.version}<br>
             Your Version: ${curr_version}`;
         }
     })

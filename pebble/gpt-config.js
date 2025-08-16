@@ -29,7 +29,7 @@ const GPT_CONFIG = {
     
     // OpenAI Configuration (Paid but reliable)
     openai: {
-        apiKey: "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", // Replace with your API key
+        apiKey: "placeholder", // Replace with your API key
         model: "gpt-4.1-nano", // Options: gpt-3.5-turbo, gpt-4
         apiUrl: "https://api.openai.com/v1/chat/completions"
     },

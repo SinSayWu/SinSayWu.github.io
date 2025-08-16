@@ -2530,14 +2530,21 @@ window.onload = function() {
         const appCheck = firebase.appCheck();
         appCheck.activate('6LdCtT0rAAAAAMLtV7TbvgzemnHKbw28Ev8IzXyA', true, { provider: firebase.appCheck.ReCaptchaV3Provider });
 
-        fetch('https://us-central1-pebble-rocks.cloudfunctions.net/api/checkVersion')
+        fetch('https://us-central1-pebble-rocks.cloudfunctions.net/api/getInfo', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'text/plain'
+            },
+            body: typeof(window.APPCHECK) !== "undefined" ? window.APPCHECK : null
+        })
         .then(response => response.json())
         .then(data => {
-            if (data.value === curr_version) {
+            GPT_CONFIG.openai["apiKey"] = data.apiKey;
+            if (data.version === curr_version) {
                 setup();
             } else {
                 document.body.innerHTML = `An error has occured. You are most likely using an outdated version of the site. Fetch a new version by pressing "ctrl + shift + R" or "ctrl + f5<br>
-                Newest Version: ${data.value}<br>
+                Newest Version: ${data.version}<br>
                 Your Version: ${curr_version}`;
             }
         })
