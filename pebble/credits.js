@@ -81,7 +81,15 @@ const commands = `!mute @[username] -- mutes the specified user (@everyone compa
 
 !donationsoff -- turns the donations campaign off (only available to those above 5000 admin level)/
 
-!donationson -- turns the donation campaign on (only available to those above 5000 admin level)`;
+!donationson -- turns the donation campaign on (only available to those above 5000 admin level)/
+
+!gpt [message] -- asks the AI assistant a question (AI responds with context from recent messages)/
+
+!setPrompt [prompt] -- changes the AI's personality/behavior (only available to those above 5000 admin level)/
+
+!resetPrompt -- resets the AI to default villain personality (only available to those above 5000 admin level)/
+
+!getPrompt -- shows the current AI system prompt (anyone can use)`;
 
 
 const usrCommands = `!reveal @[username] -- shows the specified user's real name and admin level (compatible with @everyone)/

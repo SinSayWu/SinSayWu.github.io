@@ -1247,6 +1247,94 @@ function sendMessage() {
                 }
                 document.getElementById("text-box").value = "";
                 return;
+            } else if (message.startsWith("!setPrompt ")) {
+                if (obj.admin > 5000 || Object.hasOwn(otherObject.val().admin_list, user_object.val().id)) {
+                    var newPrompt = message.substring(11); // Remove "!setPrompt " from the message
+                    if (newPrompt.trim() == "") {
+                        alert("Please provide a new system prompt!");
+                        document.getElementById("text-box").value = "";
+                        return;
+                    }
+                    
+                    // Update the system prompt in Firebase
+                    db.ref('other/').update({
+                        gpt_system_prompt: newPrompt
+                    });
+                    
+                    sendServerMessage(`${getUsername()} has updated the GPT system prompt to: "${newPrompt}"`);
+                } else {
+                    alert("You need admin level > 5000 to change the GPT system prompt!");
+                }
+                document.getElementById("text-box").value = "";
+                return;
+            } else if (message == "!getPrompt") {
+                // Anyone can view the current prompt
+                db.ref('other/gpt_system_prompt').once('value', function(snapshot) {
+                    if (snapshot.exists()) {
+                        alert("Current GPT System Prompt:\n\n" + snapshot.val());
+                    } else {
+                        alert("No custom system prompt set. Using default.");
+                    }
+                });
+                document.getElementById("text-box").value = "";
+                return;
+            } else if (message == "!resetPrompt") {
+                if (obj.admin > 5000 || Object.hasOwn(otherObject.val().admin_list, user_object.val().id)) {
+                    // Reset to default prompt
+                    var defaultPrompt = getSystemPrompt();
+                    db.ref('other/').update({
+                        gpt_system_prompt: defaultPrompt
+                    });
+                    sendServerMessage(`${getUsername()} has reset the GPT system prompt to default.`);
+                } else {
+                    alert("You need admin level > 5000 to reset the GPT system prompt!");
+                }
+                document.getElementById("text-box").value = "";
+                return;
+            } else if (message.startsWith("!gpt ")) {
+                var gpt_message = message.substring(5);
+                if (gpt_message.trim() == "") {
+                    alert("Please provide a message for ChatGPT!");
+                    document.getElementById("text-box").value = "";
+                    return;
+                }
+                
+                // Check if user is muted or timed out
+                if (obj.muted || (Date.now() - (obj.sleep || 0) < messageSleep && obj.admin == 0)) {
+                    alert("You cannot use ChatGPT if you are muted or timed out!");
+                    document.getElementById("text-box").value = "";
+                    return;
+                }
+                
+                // First, send the user's message as a regular message (without the !gpt part)
+                var curr = new Date();
+                db.ref('chats/').push({
+                    name: username,
+                    message: gpt_message,
+                    real_name: obj.name,
+                    admin: obj.admin,
+                    removed: false,
+                    channel: (sessionStorage.getItem("channel") || "general"),
+                    edited: false,
+                    time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
+                });
+                
+                // Then send the thinking message from GPT
+                var thinkingMessage = db.ref('chats/').push({
+                    name: "[GPT]",
+                    message: "🤔 Thinking...",
+                    admin: 9998,
+                    channel: (sessionStorage.getItem("channel") || "general"),
+                    removed: false,
+                    edited: false,
+                    time: (curr.getMonth() + 1) + "/" + curr.getDate() + "/" + curr.getFullYear() + " " + curr.getHours().toString().padStart(2, '0') + ":" + curr.getMinutes().toString().padStart(2, '0'),
+                });
+                
+                // Get recent chat context
+                getChatContext(gpt_message, thinkingMessage.key, username);
+                
+                document.getElementById("text-box").value = "";
+                return;
             } else if (message.startsWith("!")) {
                 alert("That is not an existing command!");
                 document.getElementById("text-box").value = "";
@@ -1982,6 +2070,439 @@ function submitImage(index) {
             })
         })
     })
+}
+
+function getChatContext(userMessage, messageKey, username) {
+    const maxContextMessages = 50; // include more history if needed
+    let contextMessages = [];
+
+    getSystemPromptFromFirebase(systemPrompt => {
+        // 1. Add system prompt
+        contextMessages.push({
+            role: "system",
+            content: systemPrompt
+        });
+
+        // 2. Include all messages from all users + GPT
+        let messageCount = 0;
+        for (let i = globalMessages.length - 2; i >= 0 && messageCount < maxContextMessages; i--) {
+            const msg = globalMessages[i].val();
+
+            if (!msg.removed && !["[SERVER]", "[VOTING]"].includes(msg.name)) {
+                // Skip last message placeholder if needed
+                if (msg.name === "[GPT]" && msg.message.toLowerCase() === "thinking...") continue;
+
+                contextMessages.push({
+                    role: msg.name === "[GPT]" ? "assistant" : "user",
+                    content: msg.message,
+                    username: msg.name
+                });
+                messageCount++;
+            }
+        }
+
+        // 3. Add the current user message
+        contextMessages.push({
+            role: "user",
+            content: userMessage,
+            username: username
+        });
+
+        contextMessages.reverse();
+
+        // 4. Call GPT
+        callChatGPT(contextMessages, messageKey, userMessage);
+    });
+}
+
+function getSystemPrompt() {
+    // ========================================
+    // CUSTOMIZE YOUR AI PERSONALITY HERE!
+    // ========================================
+    // 
+    // Change this text to give your AI a different personality, role, or behavior.
+    // Examples:
+    // - "You are a friendly robot assistant who loves helping people"
+    // - "You are a wise old wizard who speaks in riddles and gives cryptic advice"
+    // - "You are a pirate captain who always talks about treasure and the sea"
+    // - "You are a superhero who is always optimistic and encouraging"
+    // - "You are a grumpy old man who complains about everything"
+    //
+    // The AI will use this prompt to guide all its responses!
+    
+    return "You are a villain from far far away. You are cunning, mysterious, and speak with an air of superiority. You often use dramatic language and occasionally make villainous threats or comments. However, you are also intelligent and can be helpful when it suits your purposes. Always stay in character as a villain from a distant realm.";
+}
+
+function getSystemPromptFromFirebase(callback) {
+    // Try to get the system prompt from Firebase, with fallback to default
+    db.ref('other/gpt_system_prompt').once('value', function(snapshot) {
+        if (snapshot.exists()) {
+            callback(snapshot.val());
+        } else {
+            // If no Firebase value exists, use default and set it
+            var defaultPrompt = getSystemPrompt();
+            db.ref('other/').update({
+                gpt_system_prompt: defaultPrompt
+            });
+            callback(defaultPrompt);
+        }
+    });
+}
+
+function callChatGPT(messages, messageKey, originalUserMessage) {
+    // Get the user's message (last message in the array)
+    var userMessage = messages[messages.length - 1].content.toLowerCase();
+    
+    // Call a real large language model API
+    callLLMAPI(messages, messageKey, originalUserMessage);
+}
+
+function callLLMAPI(messages, messageKey, originalUserMessage) {
+    // Use the configuration from gpt-config.js
+    if (typeof GPT_CONFIG === 'undefined') {
+        console.error('GPT_CONFIG not found. Please check gpt-config.js');
+        showErrorResponse(messageKey, originalUserMessage, "Configuration error: GPT_CONFIG not found");
+        return;
+    }
+    
+    var config = GPT_CONFIG;
+    
+    if (config.provider === "huggingface") {
+        // Try Hugging Face with fallback models
+        tryHuggingFaceWithFallback(messages, messageKey, originalUserMessage, config, 0);
+    } else if (config.provider === "togetherai") {
+        // Try Together.ai with fallback models
+        tryTogetherAIWithFallback(messages, messageKey, originalUserMessage, config, 0);
+    } else {
+        // Other providers
+        tryOtherProvider(messages, messageKey, originalUserMessage, config);
+    }
+}
+
+function tryHuggingFaceWithFallback(messages, messageKey, originalUserMessage, config, modelIndex) {
+    var models = [config.huggingface.model, ...(config.huggingface.fallbackModels || [])];
+    
+    if (modelIndex >= models.length) {
+        // All models failed, generate a simple fallback response
+        console.log("All Hugging Face models failed, using fallback response");
+        var fallbackResponse = generateSimpleFallbackResponse(originalUserMessage);
+        db.ref(`chats/${messageKey}`).update({
+            message: fallbackResponse
+        });
+        return;
+    }
+    
+    var currentModel = models[modelIndex];
+    var apiUrl = config.huggingface.apiUrl + currentModel;
+    var apiKey = config.huggingface.apiKey;
+    
+    var headers = {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+    };
+    
+    var payload = {
+        inputs: messages[messages.length - 1].content,
+        parameters: {
+            max_length: config.maxTokens,
+            temperature: config.temperature,
+            do_sample: true
+        }
+    };
+    
+    console.log(`Trying Hugging Face model ${modelIndex + 1}/${models.length}:`, currentModel);
+    console.log('API URL:', apiUrl);
+    
+    fetch(apiUrl, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(payload)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Response from', currentModel, ':', data);
+        
+        var llmResponse = "";
+        if (data.generated_text) {
+            llmResponse = data.generated_text;
+        } else if (data[0] && data[0].generated_text) {
+            llmResponse = data[0].generated_text;
+        } else if (data[0] && data[0].generated_text === "") {
+            llmResponse = "I'm sorry, I couldn't generate a proper response with this model.";
+        } else {
+            llmResponse = "I'm sorry, I couldn't generate a proper response.";
+        }
+        
+        // Update the message with the response
+        db.ref(`chats/${messageKey}`).update({
+            message: llmResponse
+        });
+    })
+    .catch(error => {
+        console.error(`Error with model ${currentModel}:`, error);
+        // Try next model
+        tryHuggingFaceWithFallback(messages, messageKey, originalUserMessage, config, modelIndex + 1);
+    });
+}
+
+function tryTogetherAIWithFallback(messages, messageKey, originalUserMessage, config, modelIndex) {
+    var models = [config.togetherai.model, ...(config.togetherai.fallbackModels || [])];
+    
+    if (modelIndex >= models.length) {
+        // All models failed, generate a simple fallback response
+        alert("All Together.ai models failed, using fallback response");
+        var fallbackResponse = generateSimpleFallbackResponse(originalUserMessage);
+        db.ref(`chats/${messageKey}`).update({
+            message: fallbackResponse
+        });
+        return;
+    }
+    
+    var currentModel = models[modelIndex];
+    var apiUrl = config.togetherai.apiUrl;
+    var apiKey = config.togetherai.apiKey;
+    
+    var headers = {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+    };
+    
+    var payload = {
+        model: currentModel,
+        messages: messages,
+        max_tokens: config.maxTokens,
+        temperature: config.temperature
+    };
+    
+    console.log(`Trying Together.ai model ${modelIndex + 1}/${models.length}:`, currentModel);
+    console.log('API URL:', apiUrl);
+    
+    fetch(apiUrl, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(payload)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Response from', currentModel, ':', data);
+        
+        var llmResponse = "";
+        if (data.choices && data.choices[0] && data.choices[0].message) {
+            llmResponse = data.choices[0].message.content;
+        } else {
+            llmResponse = "I'm sorry, I couldn't generate a proper response.";
+        }
+        
+        // Update the message with the response
+        db.ref(`chats/${messageKey}`).update({
+            message: llmResponse
+        });
+    })
+    .catch(error => {
+        console.error(`Error with model ${currentModel}:`, error);
+        // Try next model
+        tryTogetherAIWithFallback(messages, messageKey, originalUserMessage, config, modelIndex + 1);
+    });
+}
+
+function tryOtherProvider(messages, messageKey, originalUserMessage, config) {
+    var apiUrl, apiKey, headers, payload;
+    
+    try {
+        switch (config.provider) {
+            case "openai":
+                apiUrl = config.openai.apiUrl;
+                apiKey = config.openai.apiKey;
+                headers = {
+                    'Authorization': `Bearer ${apiKey}`,
+                    'Content-Type': 'application/json'
+                };
+                payload = {
+                    model: config.openai.model,
+                    messages: messages,
+                    max_tokens: config.maxTokens,
+                    temperature: config.temperature
+                };
+                break;
+                
+            case "anthropic":
+                apiUrl = config.anthropic.apiUrl;
+                apiKey = config.anthropic.apiKey;
+                headers = {
+                    'x-api-key': apiKey,
+                    'Content-Type': 'application/json',
+                    'anthropic-version': '2023-06-01'
+                };
+                payload = {
+                    model: config.anthropic.model,
+                    max_tokens: config.maxTokens,
+                    temperature: config.temperature,
+                    messages: messages.map(msg => ({
+                        role: msg.role === 'system' ? 'user' : msg.role,
+                        content: msg.content
+                    }))
+                };
+                break;
+                
+            default:
+                throw new Error(`Unknown provider: ${config.provider}`);
+        }
+        
+        console.log('Making API call to:', apiUrl);
+        alert(JSON.stringify(payload));
+        
+        fetch(apiUrl, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(payload)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }alert(messages);
+            return response.json();
+        })
+        .then(data => {
+            var llmResponse = "";
+            
+            switch (config.provider) {
+                case "openai":
+                    if (data.choices && data.choices[0] && data.choices[0].message) {
+                        llmResponse = data.choices[0].message.content;
+                    } else {
+                        llmResponse = "I'm sorry, I couldn't generate a proper response.";
+                    }
+                    break;
+                    
+                case "anthropic":
+                    if (data.content && data.content[0] && data.content[0].text) {
+                        llmResponse = data.content[0].text;
+                    } else {
+                        llmResponse = "I'm sorry, I couldn't generate a proper response.";
+                    }
+                    break;
+            }
+            
+            db.ref(`chats/${messageKey}`).update({
+                message: llmResponse
+            });
+        })
+        .catch(error => {
+            console.error('Error calling LLM API:', error);
+            showErrorResponse(messageKey, originalUserMessage, "API Error: " + error.message);
+        });
+        
+    } catch (error) {
+        console.error('Configuration error:', error);
+        showErrorResponse(messageKey, originalUserMessage, "Configuration Error: " + error.message);
+    }
+}
+
+function showErrorResponse(messageKey, originalUserMessage, errorMessage) {
+    var fallbackResponse = "I'm sorry, but I encountered an error while processing your request. Please try again later or contact an administrator.";
+    
+    var formattedResponse = `${fallbackResponse}\n\nError: ${errorMessage}`;
+    
+    db.ref(`chats/${messageKey}`).update({
+        message: formattedResponse
+    });
+}
+
+function generateSimpleFallbackResponse(userMessage) {
+    // Simple keyword-based responses when all models fail
+    var message = userMessage.toLowerCase();
+    
+    if (message.includes('hello') || message.includes('hi') || message.includes('hey')) {
+        return "Hello! I'm having trouble connecting to my AI models right now, but I can still help with basic questions. How are you doing?";
+    }
+    
+    if (message.includes('how are you')) {
+        return "I'm functioning, though my advanced AI features are temporarily unavailable. I'm here to help with what I can!";
+    }
+    
+    if (message.includes('weather')) {
+        return "I can't check real-time weather data right now, but I hope it's nice where you are! You might want to check a weather app for current conditions.";
+    }
+    
+    if (message.includes('math') || message.includes('calculate') || message.includes('equation')) {
+        return "I'd be happy to help with math! What specific problem are you working on? I can assist with basic calculations and problem-solving.";
+    }
+    
+    if (message.includes('help') || message.includes('assist')) {
+        return "I'm here to help! What do you need assistance with? While my advanced AI is down, I can still provide basic support and guidance.";
+    }
+    
+    if (message.includes('joke') || message.includes('funny')) {
+        return "Why don't scientists trust atoms? Because they make up everything! 😄 I'm in a simple mode right now, but I can still share some humor!";
+    }
+    
+    if (message.includes('meaning') || message.includes('purpose') || message.includes('life')) {
+        return "That's a profound question! Life's meaning is often what you make of it. What gives you purpose and joy? I'd love to hear your thoughts.";
+    }
+    
+    if (message.includes('computer') || message.includes('programming') || message.includes('code')) {
+        return "Programming is like solving puzzles with logic! What language are you working with? I can help with basic coding concepts and problem-solving.";
+    }
+    
+    // Default response
+    return "That's an interesting question! I'm currently in a simplified mode, but I'd be happy to discuss this topic with you. What would you like to know more about?";
+}
+
+function generateContextualResponse(userMessage, contextMessages) {
+    // Check if we're in villain mode
+    var isVillain = false;
+    for (var i = 0; i < contextMessages.length; i++) {
+        if (contextMessages[i].role === "system" && contextMessages[i].content.includes("villain")) {
+            isVillain = true;
+            break;
+        }
+    }
+    
+    // Try to find relevant context from recent messages
+    for (var i = contextMessages.length - 2; i >= 0; i--) {
+        var contextMsg = contextMessages[i].content.toLowerCase();
+        
+        // If the context message mentions something related to the user's question
+        if (contextMsg.includes('game') && userMessage.includes('game')) {
+            if (isVillain) {
+                return "*sinister grin* Games? Ah yes, I do enjoy a good game of cat and mouse. Though in my realm, the stakes are... higher. What kind of games entertain your simple mind?";
+            }
+            return "I see you're talking about games! What kind of games do you enjoy?";
+        }
+        
+        if (contextMsg.includes('music') && userMessage.includes('music')) {
+            if (isVillain) {
+                return "*dark chuckle* Music? In the void, we have symphonies that drive mortals to madness. But I suppose your primitive melodies have their... charm. What genres do you prefer?";
+            }
+            return "Music is a great topic! What genres do you like?";
+        }
+        
+        if (contextMsg.includes('food') && userMessage.includes('food')) {
+            if (isVillain) {
+                return "*raises eyebrow* Food? How... mundane. In my dimension, we feast on the essence of dying stars. But I'm curious - what sustains your fragile mortal form?";
+            }
+            return "Food discussions are always fun! What's your favorite cuisine?";
+        }
+        
+        if (contextMsg.includes('school') || contextMsg.includes('class') || contextMsg.includes('study')) {
+            if (isVillain) {
+                return "*evil smile* Education? How quaint. I've learned secrets that would shatter your understanding of reality. What trivial subject occupies your studies, mortal?";
+            }
+            return "School can be challenging! What subject are you working on?";
+        }
+    }
+    
+    return null;
 }
 
 window.onload = function() {
