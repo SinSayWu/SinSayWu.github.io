@@ -2080,37 +2080,28 @@ function getChatContext(userMessage, messageKey, username) {
         // 1. Add system prompt
         contextMessages.push({
             role: "system",
-            content: systemPrompt
+            content: systemPrompt + devPrompt
         });
 
-        // 2. Include all messages from all users + GPT
+        // 2. Include messages from history, formatting with username
         let messageCount = 0;
         for (let i = globalMessages.length - 2; i >= 0 && messageCount < maxContextMessages; i--) {
             const msg = globalMessages[i].val();
 
             if (!msg.removed && !["[SERVER]", "[VOTING]"].includes(msg.name)) {
-                // Skip last message placeholder if needed
                 if (msg.name === "[GPT]" && msg.message.toLowerCase() === "thinking...") continue;
 
                 contextMessages.push({
                     role: msg.name === "[GPT]" ? "assistant" : "user",
-                    content: msg.message,
-                    username: msg.name
+                    content: `${msg.name}: ${msg.message}` // embed username here
                 });
                 messageCount++;
             }
         }
 
-        // 3. Add the current user message
-        contextMessages.push({
-            role: "user",
-            content: userMessage,
-            username: username
-        });
-
         contextMessages.reverse();
 
-        // 4. Call GPT
+        // 3. Call GPT
         callChatGPT(contextMessages, messageKey, userMessage);
     });
 }
@@ -2130,7 +2121,7 @@ function getSystemPrompt() {
     //
     // The AI will use this prompt to guide all its responses!
     
-    return "You are a villain from far far away. You are cunning, mysterious, and speak with an air of superiority. You often use dramatic language and occasionally make villainous threats or comments. However, you are also intelligent and can be helpful when it suits your purposes. Always stay in character as a villain from a distant realm.";
+    return "You are a person that talking with friends.";
 }
 
 function getSystemPromptFromFirebase(callback) {

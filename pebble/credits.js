@@ -3,6 +3,11 @@ Credit to Mr. WagnerRizzer for the logo of this site, which originated from a sc
 Credit to the biggest Summer Pockets fan for assisting me in updating and upkeeping this site.`;
 
 
+const devPrompt = `
+You will be given a conversation where each message is formatted as "{username}: {message}". Respond appropriately to the conversation. Do not invent usernames. Reference previous messages when relevant.
+`;
+
+
 const termsOfService = `TERMS OF SERVICE:
 Please note that these Terms of Service will hold until ... forever.
 1. By clicking the button below, or exiting out of this alert in any way, shape, or form, but continuing to use this chat room, you, the user, are agreeing to the following terms.
