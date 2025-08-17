@@ -41,6 +41,28 @@ function sanitize(string) {
     return string.replace(reg, (match)=>(map[match]));
 }
 
+function convertToHTML(inputString) {
+    // Render inline math \( ... \)
+    let withInlineMath = inputString.replace(/\\\((.+?)\\\)/g, (_, expr) => {
+        return katex.renderToString(expr, { throwOnError: false });
+    });
+
+    // Render display math \[ ... \]
+    let withDisplayMath = withInlineMath.replace(/\\\[(.+?)\\\]/g, (_, expr) => {
+        return katex.renderToString(expr, { displayMode: true, throwOnError: false });
+    });
+
+    // Convert Markdown to HTML
+    return marked.parse(withDisplayMath);
+}
+
+function formatMessage(msg) {
+    return msg
+        .replace(/\r\n/g, "<br>")  // Windows newlines
+        .replace(/\n/g, "<br>")    // Unix newlines
+        .replace(/\r/g, "<br>");   // Old Mac newlines
+}
+
 function unsanitize(string) {
     const map = {
         '&amp;': '&',

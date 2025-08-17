@@ -240,7 +240,17 @@ function refreshChat(user_data, change_channel = false, first = false) {
                 messageContent.height = messageImage.height;
             }
 
-            messageContent.innerHTML = message;
+            // Fix escaped LaTeX delimiters
+            // message = message
+            //     .replace(/\\\\\(/g, "\\(")   // \\( -> \(
+            //     .replace(/\\\\\)/g, "\\)")   // \\) -> \)
+            //     .replace(/\\\\\[/g, "\\[")   // \\[ -> \[
+            //     .replace(/\\\\\]/g, "\\]");  // \\] -> \]
+            message = message.replace(/\\\[((?:.|\n)*?)\\\]/g, (match, p1) => {
+                return "\\[" + p1.replace(/\n/g, " ") + "\\]";
+            });
+
+            messageContent.innerHTML = convertToHTML(message);
 
             if (message.includes("@" + getUsername()) || message.includes("@everyone")) {
                 messageContent.setAttribute("id", "ping-text");
@@ -711,8 +721,6 @@ function sendMessage() {
         if (!obj.xss) {
             message = sanitize(message);
         }
-
-        message = message.replace(/\n/g, "<br/>");
 
         //Check if user is muted
         if (obj.muted) {
@@ -2350,7 +2358,7 @@ function tryOtherProvider(messages, messageKey, originalUserMessage, config) {
         }
         
         console.log('Making API call to:', apiUrl);
-        alert(JSON.stringify(payload));
+        // alert(JSON.stringify(payload));
         
         fetch(apiUrl, {
             method: 'POST',
@@ -2360,7 +2368,7 @@ function tryOtherProvider(messages, messageKey, originalUserMessage, config) {
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
-            }alert(messages);
+            }
             return response.json();
         })
         .then(data => {
@@ -2384,6 +2392,8 @@ function tryOtherProvider(messages, messageKey, originalUserMessage, config) {
                     break;
             }
             
+            alert(llmResponse);
+
             db.ref(`chats/${messageKey}`).update({
                 message: llmResponse
             });

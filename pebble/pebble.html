@@ -3,21 +3,10 @@
         <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
         <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-database-compat.js"></script>
         <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-check-compat.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-        <script>
-            window.MathJax = {
-                tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] },
-                svg: { fontCache: 'global' }
-            };
-        </script>
-        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 
         <link href="https://fonts.googleapis.com/css2?family=Comic+Neue&display=swap" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet">
-
-
-
 
         <script src="../config.js"></script>
         <script src="gpt-config.js"></script>
@@ -106,6 +95,7 @@
                     <ul>
                         <li>New command: !gpt (commands an AI)</li>
                         <li>Admin command: !setPrompt (sets the system prompt for the AI)</li>
+                        <li>LaTeX and markdown! Try *x* for italics, **x** for bold, etc.</li>
                     </ul>
                     <h2>
                         Pebble v6.2 is coming!
@@ -197,4 +187,7 @@
             </div>
         </div> -->
     </body>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
 </html>

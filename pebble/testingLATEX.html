@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Markdown + LaTeX Rendering</title>
+<!-- KaTeX CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+<style>
+  #textarea {
+    border: 1px solid #ccc;
+    padding: 10px;
+    width: 90%;
+    max-width: 800px;
+    margin: 20px auto;
+  }
+</style>
+</head>
+<body>
+
+<div id="textarea"></div>
+
+<!-- Marked.js -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<!-- KaTeX JS -->
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+
+<script>
+function convertToHTML(inputString) {
+    // Render inline math \( ... \)
+    let withInlineMath = inputString.replace(/\\\((.+?)\\\)/g, (_, expr) => {
+        return katex.renderToString(expr, { throwOnError: false });
+    });
+
+    // Render display math \[ ... \]
+    let withDisplayMath = withInlineMath.replace(/\\\[(.+?)\\\]/g, (_, expr) => {
+        return katex.renderToString(expr, { displayMode: true, throwOnError: false });
+    });
+
+    // Convert Markdown to HTML
+    return marked.parse(withDisplayMath);
+}
+
+// Example text
+const text = `Certainly, DinoShark! Here is a classic proof of the Pythagorean theorem using a geometric approach:
+
+**Proof (Using rearrangement):**
+
+1. Consider a right-angled triangle with legs of length \\(a\\) and \\(b\\), and hypotenuse of length \\(c\\).
+2. Construct four identical right triangles and arrange them inside a square with side length \\(a + b\\), such that their hypotenuses form a smaller square in the center.
+3. The large square has an area of \\((a + b)^2\\).
+4. The four triangles each have an area of \\(\\frac{1}{2}ab\\), so together they cover an area of \\(2ab\\).
+5. The remaining central square has an area of \\(c^2\\).
+6. Therefore: \\[ (a + b)^2 = 4 \\times \\frac{1}{2}ab + c^2 \\Rightarrow (a + b)^2 = 2ab + c^2 \\]
+7. Expanding the left side: \\[ a^2 + 2ab + b^2 = 2ab + c^2 \\]
+8. Subtracting \\(2ab\\) from both sides: \\[ a^2 + b^2 = c^2 \\]
+
+**Hence, the Pythagorean theorem is proven.**
+
+Would you like a different proof or more detailed explanation?`;
+
+document.getElementById('textarea').innerHTML = convertToHTML(text);
+</script>
+
+</body>
+</html>
